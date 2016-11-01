@@ -1,6 +1,6 @@
 {
   "name": "enter-ghost",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Mystery tool that transforms JavaScript virtual file systems 👻 🎃i🔮",
   "main": "index.js",
   "scripts": {
