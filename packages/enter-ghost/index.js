@@ -18,6 +18,11 @@ const File = (what) => {
         stringify: (obj) => ghost.stringify(file, obj),
         write: (contents) => ghost.write(file, contents),
         flush: () => ghost.flush(file),
+
+        extname: () => ghost.extname(file),
+        mime: () => ghost.mime(file),
+
+        test: () => ghost.test(file),
     };
     return file;  
 }
