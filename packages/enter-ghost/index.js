@@ -93,8 +93,20 @@ const ghost = {
             return f[prop] = getter? getter(f): Promise.resolve();
         }
     },
-    
-    
+    mime(file) {
+        console.warn('ghost.mime: this function is not implemented completely.');
+
+        const mimes = {
+            '.html': 'text/html',
+            '.js': 'text/javascript',
+            '.json': 'application/json',
+            '.jsx': 'text/javascript',
+            '.css': 'text/css',
+        };
+        const ext = this.extname(file);
+        return mimes.hasOwnProperty(ext) && mimes[ext];
+    }
+        
 };
 
 
