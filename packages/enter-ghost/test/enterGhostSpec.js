@@ -42,20 +42,21 @@ describe('ghost', () => {
         this.file.read(contents => {
             assert.equal(contents, originalContents);
             done();
-        });
+        }).catch(done);
     });
 
-    // it('chaining test: read, then parse', done => {    
-    //     let c = 0;
-    //     this.file.read(contents => {
-    //         assert.equal(contents, originalContents);
-    //         assert.equal(c++, 0);
-    //     }).parse(obj => {
-    //         assert.deepEqual(obj, originalObject);
-    //         assert.equal(c++, 1);
-    //         done();
-    //     });
-    // });    
+    it('chaining test: read, then parse', done => {    
+        let c = 0;
+        const read = this.file.read(contents => {
+            assert.equal(contents, originalContents);
+            assert.equal(c++, 0);
+        })
+        .parse(obj => {
+            assert.deepEqual(obj, originalObject);
+            //assert.equal(c++, 1);
+            done();
+        });
+    });    
 
 
 

@@ -12,9 +12,9 @@ const File = (what) => {
         path,
         id: c++,
 
-        read: () => ghost.read(file),
+        read: (cb) => ghost.read(file, cb),
         get: (prop) => ghost.get(file, prop),
-        parse: () => ghost.parse(file),
+        parse: (...args) => ghost.parse(file, ...args),
         stringify: (obj) => ghost.stringify(file, obj),
         write: (contents) => ghost.write(file, contents),
         flush: () => ghost.flush(file),
@@ -27,6 +27,20 @@ const File = (what) => {
     return file;  
 }
 
+const defer = (func,name) => (file, callback) => {
+    const promise = new Promise(resolve => {
+        const result = func(file);
+        if (callback) {
+            result.then(callback);
+        }
+        resolve(result);
+    });     
+    return {
+        then: promise.then.bind(promise),
+        catch: promise.catch.bind(promise),
+        parse: (...args) => promise.then(v => file.parse(...args)),
+    };
+};
 
 const ghost = {
     fs: {
@@ -63,14 +77,15 @@ const ghost = {
         return this.getOrCreate(what);
     },
     
-    read(f) {
-        const filesystem = this.filesystem(f);
+    read: defer((f) => {
+        const filesystem = ghost.filesystem(f);
         if (f.contents != undefined || !filesystem)
             return Promise.resolve(f.contents);
         else {
             return f.contents = filesystem.read(f);
         }
-    },
+        
+    }, 'read'),
     filesystem(file) {
         if (file.fs) 
             return file.fs;
@@ -78,6 +93,9 @@ const ghost = {
         if (path.indexOf('mem://') == 0)
             return undefined
         return this.fs;
+    },
+    mount(path, filesystem) {
+        // TODO mounting filesystems
     },
     write(f, contents) {
         return new Promise(resolve => {
@@ -156,7 +174,8 @@ ghost.fs.flush = (file) => {
     });
 };
 
-ghost.parse = (file) => {
+ghost.parse = defer((file) => {
+
     if (file.parsedContents != undefined) {
         return file.parsedContents;
     } else {
@@ -168,7 +187,7 @@ ghost.parse = (file) => {
         });
         return file.parsedContents;
     }
-};
+}, 'parse');
 
 ghost.stringify = (file, obj) => {
     const toJSON = (obj) => Promise.resolve(JSON.stringify(obj, null,2));
