@@ -13,7 +13,7 @@ const File = (what) => {
         id: c++,
 
         read: (cb) => ghost.read(file, cb),
-        get: (prop) => ghost.get(file, prop),
+        get: (...args) => ghost.get(file, ...args),
         parse: (...args) => ghost.parse(file, ...args),
         stringify: (obj) => ghost.stringify(file, obj),
         write: (contents) => ghost.write(file, contents),
@@ -27,8 +27,10 @@ const File = (what) => {
     return file;  
 }
 
+
+
 const defer = (func,name) => (file, callback) => {
-    const promise = new Promise(resolve => {
+    const promise = new Promise(function(resolve) {
         const result = func(file);
         if (callback) {
             result.then(callback);
@@ -43,6 +45,7 @@ const defer = (func,name) => (file, callback) => {
 };
 
 const ghost = {
+    defer, 
     fs: {
         
     },
@@ -65,6 +68,27 @@ const ghost = {
     state(inst, data) {
         return data;
     },
+    acquire(file, methods) {
+        file.old = new Map;
+        file.acquired = true;
+        Object.keys(methods).forEach(name => {
+            file.old.set(name, file[name]);
+            file[name] = methods[name];
+        });
+    },
+    release(file) {
+        Object.assign(file, file.old);
+        file.old = undefined;
+        file.acquired = false;
+    },
+    //TODO
+    // usage
+    // vifi.open(...).transform([a,b,c])
+    // implementation:
+    // read => trans 1 => trans 2 => trans n => write
+    transform(file, transformers) {
+        
+    },
     on(file, func) {
         return this.ee.on(this.id(file), func);
     },
@@ -73,7 +97,10 @@ const ghost = {
     },
     extname: file => Path.extname(file.path),
     
-    open(what) {
+    // TODO flags
+    // wildcards, then treat many people as one
+    // vifi.open('*.js','*').transform([babel, uglify])
+    open(what, flags) {
         return this.getOrCreate(what);
     },
     
@@ -108,12 +135,14 @@ const ghost = {
     flush(f) {
         return this.fs.flush(f);
     },
-    get(f, prop) {
-        if (f[prop])
+    get(f, prop, ...args) {
+        console.log("GET", args);
+        //TODO switching: cacheable/not cacheable props
+        if (false && f[prop])
             return Promise.resolve(f[prop]);
         else {
             const getter = this.getters[prop];
-            return f[prop] = getter? getter(f): Promise.resolve();
+            return f[prop] = getter? getter(f, ...args): Promise.resolve();
         }
     },
     mime(file) {
