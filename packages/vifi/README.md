@@ -1,8 +1,8 @@
 examples:
 ```javascript
-const ghost = require('enter-ghost');
+const vifi = require('vifi');
 
-const file = ghost.open('example.json');
+const file = vifi.open('example.json');
 
 file.read().then(contents => {
     console.log("THIS IS TEXT CONTENTS", contents);
