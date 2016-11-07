@@ -77,6 +77,9 @@ const ghost = {
         
     },
     acquire(file, methods) {
+        if (file.acquired) {
+            throw new Error(`file ${file.path} was already acquired`);
+        }
         file.old = {};
         file.acquired = true;
         

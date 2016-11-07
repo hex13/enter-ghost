@@ -141,6 +141,37 @@ describe('vifi', () => {
         });
     });
 
+    it('shouldn\'t acquire same file twice', done => {
+        const vifi = this.ghost;
+        vifi._cache = new Map;
+        const file = vifi.open('test.txt');
+        
+        vifi.acquire(file, {
+            read() {
+                return Promise.resolve('abc');
+            }
+        });
+
+        assert.throws(() => {
+            vifi.acquire(file, {
+                read() {
+                    return Promise.resolve('def');
+                }
+            });
+        });
+
+        vifi.release(file);
+
+        vifi.acquire(file, {
+            read() {
+                return Promise.resolve('abc');
+            }
+        });
+
+        done();
+                
+    });
+
 
     
     it('should do mysterious things with files', done => {
