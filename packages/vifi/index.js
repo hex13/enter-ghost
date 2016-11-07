@@ -23,6 +23,7 @@ const File = (what) => {
         mime: () => ghost.mime(file),
 
         test: () => ghost.test(file),
+        query: (...args) => ghost.query(file, ...args),
     };
     return file;  
 }
@@ -49,6 +50,9 @@ const ghost = {
     fs: {
         
     },
+    save(file) {
+        file.flush();
+    },
     getOrCreate(what) {
         const id = this.id(what);
 		if (this._cache.has(id))
@@ -68,13 +72,21 @@ const ghost = {
     state(inst, data) {
         return data;
     },
+    service(name, handler) {
+        this.getters[name] = handler;
+        
+    },
     acquire(file, methods) {
-        file.old = new Map;
+        file.old = {};
         file.acquired = true;
+        
         Object.keys(methods).forEach(name => {
-            file.old.set(name, file[name]);
-            file[name] = methods[name];
+            //file.old.set(name, file[name]);
+            file.old[name] = file[name];
+            file[name] = defer(methods[name]).bind(null, file);
         });
+        
+        return Promise.resolve();
     },
     release(file) {
         Object.assign(file, file.old);
@@ -135,7 +147,7 @@ const ghost = {
     flush(f) {
         return this.fs.flush(f);
     },
-    get(f, prop, ...args) {
+    query(f, prop, ...args) {
         console.log("GET", args);
         //TODO switching: cacheable/not cacheable props
         if (false && f[prop])

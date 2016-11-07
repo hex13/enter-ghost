@@ -6,7 +6,7 @@ const fs = require('fs');
 const Path = require('path');
 
 
-describe('ghost', () => {
+describe('vifi', () => {
     const path = Path.join(__dirname, '/../mock.json');
 
     const originalObject = {a: 1, b: 2};
@@ -78,7 +78,68 @@ describe('ghost', () => {
         }).catch(done);
     });
 
-    
+    it('should acquire and replace `read` method', done => {
+        const vifi = this.ghost;
+        const file = vifi.open('test.txt');
+        vifi.acquire(file, {
+            read() {
+                console.log("######xxxx1");
+                return Promise.resolve('this is not a test.\n');
+            }
+        });
+        
+        Promise.all([
+            new Promise((resolve, reject) => { 
+                file.read(contents => {
+                    try {            
+                        assert.equal(contents, 'this is not a test.\n');
+                    } catch(e) {
+                        reject(e);
+                    }
+                    resolve();
+                });
+            }),
+
+            file.read().then(contents => {            
+                assert.equal(contents, 'this is not a test.\n');
+            })
+        ]).then(() => done(), done)        
+
+    });
+
+
+    it('should acquire and release', done => {
+        const vifi = this.ghost;
+        vifi._cache = new Map;
+        const file = vifi.open('test.txt');
+        
+        vifi.acquire(file, {
+            read() {
+                console.log("######xxxx1");
+                return Promise.resolve('this is not a test.\n');
+            }
+        }).then(() => {
+            
+            vifi.release(file);
+            
+            Promise.all([
+                new Promise((resolve, reject) => { 
+                    file.read(contents => {
+                        try {            
+                            assert.equal(contents, 'this is a test.\n');
+                        } catch(e) {
+                            reject(e);
+                        }
+                        resolve();
+                    });
+                }),
+
+                file.read().then(contents => {            
+                    assert.equal(contents, 'this is a test.\n');
+                })
+            ]).then(() => done(), done)        
+        });
+    });
 
 
     
