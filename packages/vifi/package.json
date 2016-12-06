@@ -1,6 +1,6 @@
 {
   "name": "vifi",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Virtual File System",
   "main": "index.js",
   "scripts": {

@@ -7,6 +7,7 @@ const isString = v => typeof v == 'string' || v instanceof String;
 
 let c = 100;
 const File = (what) => {
+    const dict = new Map;
     const path = what.path || what;
     const file = {
         path,
@@ -14,18 +15,25 @@ const File = (what) => {
 
         read: (cb) => ghost.read(file, cb),
         get: (...args) => ghost.get(file, ...args),
+        set: (...args) => ghost.set(file, ...args),
         parse: (...args) => ghost.parse(file, ...args),
         stringify: (obj) => ghost.stringify(file, obj),
         write: (contents) => ghost.write(file, contents),
         flush: () => ghost.flush(file),
 
         extname: () => ghost.extname(file),
+        basename: () => ghost.basename(file),
         mime: () => ghost.mime(file),
 
         test: () => ghost.test(file),
         query: (...args) => ghost.query(file, ...args),
+
+        get: k => dict.get(k),
+        set: (k, v) => dict.set(k, v),
+
+        stat: (...args) => ghost.stat(file, ...args),
     };
-    return file;  
+    return file;
 }
 
 
@@ -37,7 +45,7 @@ const defer = (func,name) => (file, callback) => {
             result.then(callback);
         }
         resolve(result);
-    });     
+    });
     return {
         then: promise.then.bind(promise),
         catch: promise.catch.bind(promise),
@@ -46,22 +54,22 @@ const defer = (func,name) => (file, callback) => {
 };
 
 const ghost = {
-    defer, 
+    defer,
     fs: {
-        
+
     },
     save(file) {
         file.flush();
     },
-    getOrCreate(what) {
+    retrieveOrCreate(what) {
         const id = this.id(what);
 		if (this._cache.has(id))
             return this._cache.get(id);
-        else { 
+        else {
             const cached = File(what);
             this._cache.set(id, cached);
             return cached;
-		}			
+		}
     },
     _cache: new Map,
     ee: new EventEmitter,
@@ -74,27 +82,35 @@ const ghost = {
     },
     service(name, handler) {
         this.getters[name] = handler;
-        
+
     },
-    acquire(file, methods) {
+    acquire(file, methods, opts = {}) {
+
+
         if (file.acquired) {
-            throw new Error(`file ${file.path} was already acquired`);
+            if (opts.force) {
+                console.log("FORCED ACQ");
+                this.release(file);
+            } else
+                throw new Error(`file ${file.path} was already acquired`);
         }
         file.old = {};
         file.acquired = true;
-        
+
         Object.keys(methods).forEach(name => {
             //file.old.set(name, file[name]);
             file.old[name] = file[name];
             file[name] = defer(methods[name]).bind(null, file);
         });
-        
+        file.owner = opts.owner;
+
         return Promise.resolve();
     },
     release(file) {
         Object.assign(file, file.old);
         file.old = undefined;
         file.acquired = false;
+        file.owner = undefined;
     },
     //TODO
     // usage
@@ -102,7 +118,7 @@ const ghost = {
     // implementation:
     // read => trans 1 => trans 2 => trans n => write
     transform(file, transformers) {
-        
+
     },
     on(file, func) {
         return this.ee.on(this.id(file), func);
@@ -111,25 +127,28 @@ const ghost = {
         return this.ee.emit(this.id(file), func);
     },
     extname: file => Path.extname(file.path),
-    
+    basename: file => Path.basename(file.path),
+
     // TODO flags
     // wildcards, then treat many people as one
     // vifi.open('*.js','*').transform([babel, uglify])
     open(what, flags) {
-        return this.getOrCreate(what);
+        return this.retrieveOrCreate(what);
     },
-    
+
     read: defer((f) => {
         const filesystem = ghost.filesystem(f);
-        if (f.contents != undefined || !filesystem)
+        if (f.contents != undefined || !filesystem) {
             return Promise.resolve(f.contents);
-        else {
-            return f.contents = filesystem.read(f);
+        } else {
+
+            const res = f.contents = filesystem.read(f);
+            return res;
         }
-        
+
     }, 'read'),
     filesystem(file) {
-        if (file.fs) 
+        if (file.fs)
             return file.fs;
         const path = file.path;
         if (path.indexOf('mem://') == 0)
@@ -144,14 +163,13 @@ const ghost = {
             f.contents = contents;
             f.parsedContents = undefined;
             f.description = undefined;
-			resolve(f);            
+			resolve(f);
         });
     },
     flush(f) {
         return this.fs.flush(f);
     },
     query(f, prop, ...args) {
-        console.log("GET", args);
         //TODO switching: cacheable/not cacheable props
         if (false && f[prop])
             return Promise.resolve(f[prop]);
@@ -173,7 +191,7 @@ const ghost = {
         const ext = this.extname(file);
         return mimes.hasOwnProperty(ext) && mimes[ext];
     }
-        
+
 };
 
 
@@ -182,10 +200,19 @@ const fs = require('fs');
 
 module.exports = ghost;
 
+ghost.stat = defer((f) => {
+    return new Promise((resolve, reject) => {
+        fs.stat(f.path, (err, stats) => {
+            console.log("STATSY JAKIE", f.path,stats)
+            stats? resolve(stats) : reject(err);
+        })
+    });
+});
+
 // example setters
 ghost.getters = {
     ast: (file) => {
-        
+
         return Promise.resolve(`this is AST for ${file.path} ${c++}`);
     },
     description: (file) => {
@@ -213,7 +240,7 @@ ghost.fs.flush = (file) => {
         return new Promise(resolve => {
             fs.writeFile(file.path, contents, err => {
                 resolve();
-            });            
+            });
         });
     });
 };
@@ -239,7 +266,7 @@ ghost.stringify = (file, obj) => {
 		file.contents = toJSON(obj);
         return file.contents;
     }
-    
+
     return ghost.parse(file).then(parsedContents => {
 		file.contents = toJSON(parsedContents);
         return file.contents;
@@ -259,7 +286,7 @@ ghost.stringify = (file, obj) => {
 //         animals: 'squirrels & chipmunks 🐿🐿🐿'
 //     }).then(()=> {
 //         animals.flush();
-//     });    
+//     });
 // });
 
 
@@ -281,4 +308,3 @@ ghost.stringify = (file, obj) => {
 // ghost.read(inmem).then(c => {
 //     console.log('111122222222',c);
 // });
-
