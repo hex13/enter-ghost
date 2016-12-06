@@ -24,10 +24,12 @@ describe('Command emitter', () => {
 
         ce.command('doge');
         ce.command('animal', {type: 'cat'});
-        ce.command('animal', {type: 'squirrel'});
+        ce.command('animal', {type: 'squirrel'}).then(() => {
+            animals.push('second squirrel');
+        });
 
         setTimeout(() => {
-            assert.deepEqual(animals, ['doge', 'cat', 'squirrel']);
+            assert.deepEqual(animals, ['doge', 'cat', 'squirrel', 'second squirrel']);
             done();
         }, 600)
     });
