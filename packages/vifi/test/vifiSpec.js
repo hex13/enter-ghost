@@ -5,7 +5,10 @@ const ghost = require('..');
 const fs = require('fs');
 const Path = require('path');
 
+const testFilePath = Path.join(__dirname, '../test.txt');
 
+
+// TODO tests for service/query
 describe('vifi', () => {
     const path = Path.join(__dirname, '/../mock.json');
 
@@ -14,19 +17,19 @@ describe('vifi', () => {
 
     beforeEach(() => {
         fs.writeFileSync(path, originalContents, 'utf8');
-        
 
-        delete require.cache[require.resolve('..')];    
+
+        delete require.cache[require.resolve('..')];
 
         this.ghost = require('..');
 
-        
+
         this.file = ghost.open(path);
         //TODO clear cache
     });
-    
+
     // note: it can be deprecated in future
-    it('should read from disk (using promises)', done => {    
+    it('should read from disk (using promises)', done => {
         this.file.read().then(contents => {
             assert.equal(contents, originalContents);
             return 123;
@@ -38,14 +41,14 @@ describe('vifi', () => {
 
     // proposed api
 
-    it('should read from disk (using callback)', done => {    
+    it('should read from disk (using callback)', done => {
         this.file.read(contents => {
             assert.equal(contents, originalContents);
             done();
         }).catch(done);
     });
 
-    it('chaining test: read, then parse', done => {    
+    it('chaining test: read, then parse', done => {
         let c = 0;
         const read = this.file.read(contents => {
             assert.equal(contents, originalContents);
@@ -56,22 +59,22 @@ describe('vifi', () => {
             //assert.equal(c++, 1);
             done();
         });
-    });    
+    });
 
 
 
     //------------
 
-    it('should parse', done => {    
+    it('should parse', done => {
         this.file.parse().then(obj => {
             assert.deepEqual(obj, originalObject);
             done();
         }).catch(done);
-    });    
-    
+    });
+
 
     it('should read from `contents` property', done => {
-        this.file.contents = 'kot';    
+        this.file.contents = 'kot';
         this.file.read().then(contents => {
             assert.equal(contents, 'kot');
             done();
@@ -80,18 +83,18 @@ describe('vifi', () => {
 
     it('should acquire and replace `read` method', done => {
         const vifi = this.ghost;
-        const file = vifi.open('test.txt');
+        const file = vifi.open(testFilePath);
         vifi.acquire(file, {
             read() {
                 console.log("######xxxx1");
                 return Promise.resolve('this is not a test.\n');
             }
         });
-        
+
         Promise.all([
-            new Promise((resolve, reject) => { 
+            new Promise((resolve, reject) => {
                 file.read(contents => {
-                    try {            
+                    try {
                         assert.equal(contents, 'this is not a test.\n');
                     } catch(e) {
                         reject(e);
@@ -100,10 +103,10 @@ describe('vifi', () => {
                 });
             }),
 
-            file.read().then(contents => {            
+            file.read().then(contents => {
                 assert.equal(contents, 'this is not a test.\n');
             })
-        ]).then(() => done(), done)        
+        ]).then(() => done(), done)
 
     });
 
@@ -111,21 +114,21 @@ describe('vifi', () => {
     it('should acquire and release', done => {
         const vifi = this.ghost;
         vifi._cache = new Map;
-        const file = vifi.open('test.txt');
-        
+        const file = vifi.open(testFilePath);
+
         vifi.acquire(file, {
             read() {
                 console.log("######xxxx1");
                 return Promise.resolve('this is not a test.\n');
             }
         }).then(() => {
-            
+
             vifi.release(file);
-            
+
             Promise.all([
-                new Promise((resolve, reject) => { 
+                new Promise((resolve, reject) => {
                     file.read(contents => {
-                        try {            
+                        try {
                             assert.equal(contents, 'this is a test.\n');
                         } catch(e) {
                             reject(e);
@@ -134,18 +137,18 @@ describe('vifi', () => {
                     });
                 }),
 
-                file.read().then(contents => {            
+                file.read().then(contents => {
                     assert.equal(contents, 'this is a test.\n');
                 })
-            ]).then(() => done(), done)        
+            ]).then(() => done(), done)
         });
     });
 
     it('shouldn\'t acquire same file twice', done => {
         const vifi = this.ghost;
         vifi._cache = new Map;
-        const file = vifi.open('test.txt');
-        
+        const file = vifi.open(testFilePath);
+
         vifi.acquire(file, {
             read() {
                 return Promise.resolve('abc');
@@ -169,16 +172,16 @@ describe('vifi', () => {
         });
 
         done();
-                
+
     });
 
 
-    
+
     it('should do mysterious things with files', done => {
-            
-        
+
+
         const file = this.ghost.open(path);
-        
+
         assert.equal(file.path, path);
 
         const newContents = `{"abc":"${+new Date}}"`;
@@ -193,11 +196,11 @@ describe('vifi', () => {
                      assert.equal(newContents, diskContents);
                      done();
                  }).catch(done);
-                  
+
             }).catch(done);
-            
+
         });
 
     });
-    
+
 });
