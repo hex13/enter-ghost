@@ -81,6 +81,7 @@ const ghost = {
         return data;
     },
     service(name, handler) {
+        // TODO rename `getters` to `services`
         this.getters[name] = handler;
 
     },
@@ -175,7 +176,14 @@ const ghost = {
             return Promise.resolve(f[prop]);
         else {
             const getter = this.getters[prop];
-            return f[prop] = getter? getter(f, ...args): Promise.resolve();
+            const result = f[prop] = getter? getter(f, ...args) : undefined;
+            if (result)
+                return result;
+            else {
+                console.error(`Can't find service '${prop}'`);
+                Promise.resolve();
+            }
+            //return f[prop] = getter? getter(f, ...args): Promise.resolve();
         }
     },
     mime(file) {
@@ -209,27 +217,29 @@ ghost.stat = defer((f) => {
     });
 });
 
+ghost.getters = {};
 // example setters
-ghost.getters = {
-    ast: (file) => {
-
-        return Promise.resolve(`this is AST for ${file.path} ${c++}`);
-    },
-    description: (file) => {
-        return file.parse().then(obj => {
-         	return `this is ${obj.animal} and eats ${obj.food}`;
-        });
-    }
-}
+// ghost.getters = {
+//     ast: (file) => {
+//
+//         return Promise.resolve(`this is AST for ${file.path} ${c++}`);
+//     },
+//     description: (file) => {
+//         return file.parse().then(obj => {
+//          	return `this is ${obj.animal} and eats ${obj.food}`;
+//         });
+//     }
+// }
 
 ghost.fs.read = (file) => {
 
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         fs.readFile(file.path, 'utf8', (err, contents) => {
             if (!err) {
                 resolve(contents);
             } else {
-                resolve(undefined);
+                reject(err)
+                //resolve(undefined);
             }
         });
     });
