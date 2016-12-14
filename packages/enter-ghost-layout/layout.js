@@ -29,7 +29,7 @@ exports.createLayoutFromJson = (workspace, source) => {
 function createLayout(workspace, layout) {
     layout = layout || {
         rows:  [
-            {height: 60, cells: [
+            {height: 32, cells: [
                 {
                     hidePath: true,
                     hideMenu: true,
@@ -46,7 +46,8 @@ function createLayout(workspace, layout) {
                 {
                     width: 200,
                     doc: {
-                        type: 'sideBar',
+                        id: 'treeView',
+                        type: 'treeView',
                         file: {path: 'ignore://test123.sideBar1'}
                     }
                 },
