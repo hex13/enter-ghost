@@ -1,0 +1,39 @@
+{
+    "env": {
+        "es6": true,
+        "node": true,
+        "browser": true,
+        "jasmine": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "es6": true,
+            "jsx": true
+        }
+    },
+    "rules": {
+        "comma-dangle": [0],
+        "no-unused-vars" : [1],
+        "no-console": [1],
+        "no-unreachable": [1],
+        "no-return-assign": [1],
+        "no-inner-declarations": [1],
+        "no-empty": [1],
+        "no-mixed-spaces-and-tabs": [1],
+        "object-curly-spacing": [1, "always"],
+        "react/jsx-uses-react": [2],
+        "react/jsx-uses-vars": [2],
+        "react/jsx-key": [1],
+        "react/react-in-jsx-scope": [2],
+        "react/jsx-no-undef": [2],
+        "react/no-unknown-property": [1]
+    },
+    "globals": {
+        "atom": false
+    },
+    "plugins": [
+        "react"
+    ]
+}
