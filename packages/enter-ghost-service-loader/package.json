@@ -1,0 +1,13 @@
+{
+  "name": "enter-ghost-service-loader",
+  "version": "0.0.2",
+  "description": "",
+  "main": "serviceLoader.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "= <=>",
+  "license": "MIT",
+  "dependencies": {
+  }
+}
