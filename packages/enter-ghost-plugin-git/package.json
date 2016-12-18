@@ -1,0 +1,24 @@
+{
+  "name": "enter-ghost-plugin-git",
+  "version": "0.0.2",
+  "description": "",
+  "main": "git.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "= <=>",
+  "license": "MIT",
+  "TODO": [
+    "clear dependencies"  
+  ],
+  "dependencies": {
+    "assert": "^1.4.1",
+    "git": "^0.1.5",
+    "git-diff-parser": "^0.1.1",
+    "git-utils": "^4.1.4",
+    "simple-git": "^1.65.0"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^1.4.0"
+  }
+}
