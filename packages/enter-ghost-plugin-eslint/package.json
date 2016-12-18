@@ -1,0 +1,15 @@
+{
+  "name": "enter-ghost-plugin-eslint",
+  "version": "0.0.2",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "= <=>",
+  "license": "MIT",
+  "dependencies": {
+    "escope": "^3.6.0",
+    "eslint": "^3.12.2"
+  }
+}
