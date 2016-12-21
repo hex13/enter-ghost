@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/hex13/enter-ghost/issues"
   },
-  "homepage": "https://github.com/hex13/enter-ghost#readme"
+  "homepage": "https://github.com/hex13/enter-ghost#readme",
+  "devDependencies": {
+    "lerna": "2.0.0-beta.31"
+  }
 }
