@@ -62,10 +62,54 @@ function createWorkspace(app) {
     workspace.on('setActiveDirectory', path => {
         app.set('activeDirectory', path);
         const resolveFiles = new Promise(resolve => {
-            resolve(glob.sync(app.get('activeDirectory') + '/**/*.js', {
-                ignore: '**/node_modules/**/*',
-                //cwd: app.get('activeDirectory')
-            }).map(path => app.vifi.open(path)));
+            const t0 = Date.now();
+
+            const fs = require('fs');
+            const Path = require('path');
+            const entries = [];
+
+            const root = {
+                path,
+                file: app.vifi.open(path),
+                children: []
+            };
+
+            const visit = (parent) => {
+                const paths = fs.readdirSync(parent.path)
+                    .map(path => Path.join(parent.path, path)).filter(f => {
+                        const stats = fs.statSync(f);
+                        return f.indexOf('node_modules') == -1;
+                    });
+
+                entries.push.apply(entries, paths);
+
+
+
+                paths.map(path => ({
+                    path,
+                    file: app.vifi.open(path),
+                    isDirectory: fs.statSync(path).isDirectory(),
+                    children: []
+                })).forEach( (child) => {
+                    parent.children.push(child);
+                    if (child.isDirectory) visit(child);
+                });
+
+
+            };
+
+            visit(root);
+
+            const files = entries.map(path => app.vifi.open(path))
+
+            // (`glob` package is too slow)
+            // const files = glob.sync(app.get('activeDirectory') + '/**/*.js', {
+            //     ignore: '**/node_modules/**/*',
+            //     //cwd: app.get('activeDirectory')
+            // }).map(path => app.vifi.open(path))
+            console.log("CZAS ", path,  Date.now() - t0, entries, root);
+            app.set('projectRoot', root);
+            resolve(files);
 
 
         });
