@@ -1,4 +1,9 @@
 {
+  "enterGhost": {
+    "role": "infrastructure",
+    "spawns": "service process",
+    "because": "optimization"
+  },
   "name": "enter-ghost-service-loader",
   "version": "0.0.2",
   "description": "",

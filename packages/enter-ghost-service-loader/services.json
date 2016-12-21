@@ -1,6 +1,7 @@
 {
     "services": {
-        "lint": "../enter-ghost-plugin-eslint"
+        "lint": "../enter-ghost-plugin-eslint",
+        "vcs": "../enter-ghost-plugin-git/git"
     },
     "unused": {
         "vcs": "./git"

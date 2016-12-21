@@ -36,11 +36,16 @@ process.on('message', (event = {}) => {
         const file = event.args[0];
         file.read = () => Promise.resolve(file.contents);
 
-        handler(event, file).then(result => {
-            process.send({type: 'response', id: event.id, value: result});
-        });
-
+        try {
+            handler(event, file).then(result => {
+                process.send({type: 'response', id: event.id, value: result});
+            }).catch(err => {
+                console.error(`Error in '${event.name}' service: `, err);
+            });
+        } catch (err) {
+            console.error(`Error in '${event.name}' service: `, err);
+        }
     } else {
-        process.send({type: 'error', text: `No extension ${event.name}`});
+        process.send({type: 'error', text: `No service '${event.name}'`});
     }
 });
