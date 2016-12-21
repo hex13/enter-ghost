@@ -2,7 +2,11 @@ module.exports = {
     props: ['doc'],
     methods: {
         click() {
-            alert('kliknales ' + this.doc.file.path);
+            window.app.emit('close-document', {doc: this.doc});
+
+            //alert('kliknales ' + this.doc.file.path);
+
+            // TODO API proposal
            	//this.doc.close()
 
         }
