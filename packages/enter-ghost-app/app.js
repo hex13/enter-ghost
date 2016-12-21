@@ -1,6 +1,6 @@
 const EventEmitter =  require('events');
 
-const ghost = require('../vifi');
+const ghost = require('vifi');
 
 module.exports = () => {
     const app = new EventEmitter;
