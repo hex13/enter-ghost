@@ -2,7 +2,7 @@ const createDoc = require('../enter-ghost-doc');
 
 const createCell = (doc) => ({
     doc,
-    width: 400,
+    width: 600,
     height: 0, //TODO
 });
 

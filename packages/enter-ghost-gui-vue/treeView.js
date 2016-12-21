@@ -1,3 +1,7 @@
+const resolveFileDisplayName = (file) => {
+  const prefix = 'enter-ghost-';
+  return file.basename().includes(prefix)? file.basename().replace(prefix, '') : file.basename();
+};
 module.exports = {
     name: 'treeview',
     props: ['doc'],
@@ -19,6 +23,7 @@ module.exports = {
     components: {
         file: {
             methods: {
+              	resolveFileDisplayName,
                 toggle(e) {
                     this.open = !this.open;
                     e && e.stopPropagation();
@@ -38,7 +43,9 @@ module.exports = {
             }),
             template: `<div style="cursor:default">
                 <span v-if="item.children.length" v-on:click="toggle">{{ open? 'C' : 'O' }}</span>
-                <span v-on:click="openItem(item)" :style="{color: item.isDirectory? '#b96': '#aaa'}">{{ item.file.basename() }}</span>
+                <span v-on:click="openItem(item)" :style="{color: item.isDirectory? '#b96': '#aaa'}">
+					{{ resolveFileDisplayName(item.file) }}
+				</span>
                 <ul v-if="open">
                     <li v-for="item in item.children">
                         <file :item="item"></file>

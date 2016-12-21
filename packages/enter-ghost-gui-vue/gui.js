@@ -79,7 +79,7 @@ module.exports = (el) => {
                     <div :style="{height: (row.height||800) + 'px', border: '1px solid rgba(255, 255, 255, 0.1)', overflow: 'hidden',display:'flex'}">
                         <div v-for="(cell, index) in row.cells" :key="cell.doc.id">
                             <div :style="{height: '100%', width: cell.width + 'px', background: '#222'}">
-                                <div v-if="true || cell.doc.type == 'textDocument'" style="height:100%;position:relative">
+                                <div v-if="cell.doc.type != 'placeholder'" style="height:100%;position:relative">
                                     <div
                                         class="resize-handle"
                                         style="z-index:1000;position:absolute;comment__background:rgba(0,255,255,0.1);comment__border:1px solid green;width:16px;

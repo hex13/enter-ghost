@@ -6,6 +6,11 @@ module.exports = {
       phrase: 'index',
       selected: 0
    }),
+   mounted() {
+     console.log('MOUNT',this.$refs.phrase);
+     this.$refs.phrase.focus();
+   },
+
    updated() {
        console.log("NOTYFIKACJA");
 
@@ -21,9 +26,16 @@ module.exports = {
         //        return file.indexOf(this.phrase) != -1;
         //    })
         },
+        selectedStyle() {
+            return  {background:  '#000', color: '#aaa', cursor: 'default'};
+            //index == selected? {background:  '#000', color: '#aaa'} : {}
+        }
 
    },
    methods: {
+        click(item) {
+            window.app.emit('open', {paths: [item.path]})
+        },
         keyDown(e) {
 
             const len = this.filtered.length;
@@ -49,9 +61,9 @@ module.exports = {
    },
    template: `
    <div style="height:100%;overflow:scroll;">
-      <input type="text" v-model="phrase" v-on:keydown="keyDown"/>sss
+      <input ref="phrase" type="text" v-model="phrase" v-on:keydown="keyDown"/>sss
       <ul>
-        <li v-for="(item, index) in filtered" :style="{background: index == selected? '#55a' : 'transparent'}" >
+        <li v-for="(item, index) in filtered" :style="index == selected? selectedStyle : {cursor: 'default'}" v-on:click="() => click(item)">
             {{ item.path }}
         </li>
       </ul>
