@@ -1,4 +1,7 @@
 {
+  "enterGhost": {
+     "role": "infrastructure"
+  },
   "name": "commandemitter",
   "version": "0.0.1",
   "description": "",

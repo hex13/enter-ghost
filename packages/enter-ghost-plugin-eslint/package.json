@@ -1,4 +1,10 @@
 {
+  "enterGhost": {
+      "role": "integration",
+      "connectsTo": "eslint",
+      "input": "file",
+      "output": "linter messages"
+  },
   "name": "enter-ghost-plugin-eslint",
   "version": "0.0.2",
   "description": "",

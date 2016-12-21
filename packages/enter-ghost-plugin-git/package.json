@@ -1,4 +1,10 @@
 {
+  "enterGhost": {
+     "role": "integration",
+     "connectsTo": "git",
+     "input": "file",
+     "output": "diff"  
+  },
   "name": "enter-ghost-plugin-git",
   "version": "0.0.2",
   "description": "",
@@ -9,7 +15,7 @@
   "author": "= <=>",
   "license": "MIT",
   "TODO": [
-    "clear dependencies"  
+    "clear dependencies "
   ],
   "dependencies": {
     "assert": "^1.4.1",

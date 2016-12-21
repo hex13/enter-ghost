@@ -1,4 +1,11 @@
 {
+  "enterGhost": {
+     "role": "gui",
+     "connectsTo": "vue",
+     "input": "layout, dom",
+     "output": "side-effect: rendering",
+     "dataStructures": "layout,workspace,doc,file"
+  },
   "name": "enter-ghost-gui-vue",
   "version": "0.0.2",
   "description": "",

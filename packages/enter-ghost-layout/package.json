@@ -1,4 +1,7 @@
 {
+  "enterGhost": {
+    "role": "model"  
+  },
   "name": "enter-ghost-layout",
   "version": "0.0.2",
   "description": "",

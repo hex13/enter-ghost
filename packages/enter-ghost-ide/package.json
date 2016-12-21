@@ -1,4 +1,7 @@
 {
+  "enterGhost": {
+      "role": "application"  
+  },
   "name": "enter-ghost-ide",
   "version": "0.0.2",
   "description": "Enter Ghost - Code Editor",
