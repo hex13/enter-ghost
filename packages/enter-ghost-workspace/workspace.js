@@ -171,7 +171,6 @@ function createWorkspace(app) {
 
 
     workspace.on('save', (e) => {
-        console.log("WWWW SAVE", e);
         const doc = app.get('activeDoc');
 
         if (doc) {
