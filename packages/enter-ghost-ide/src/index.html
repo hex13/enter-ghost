@@ -111,8 +111,14 @@
 
                 appEvent.paths = files;
             }
-            console.log("(1234)",appEvent.type)
-            window.app.emit(appEvent.type, appEvent);
+            //TODO simplify
+            const eventsCurrentlyHandledByWorkspaceAndNotApp = ['save'];
+            console.log("ipcRenderer.on('command'",appEvent.type);
+            if (eventsCurrentlyHandledByWorkspaceAndNotApp.indexOf(name) != -1) {
+                window.workspace.emit(appEvent.type, appEvent);
+            } else {
+                window.app.emit(appEvent.type, appEvent);
+            };
         });
 
         app.on('log', (...args) => {
