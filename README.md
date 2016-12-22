@@ -15,7 +15,7 @@ npm start
 
  ⌘O to open (it's WIP so only `*.js` files supported for now. Other files will open without proper syntax highlighting etc.)
 
-After you open directory, application treat it as a folder root:
+After you open directory, application treat it as a project root:
 
 1. on the left side there will be Folder Tree view,
 2. pressing ⌘P will display Find File view.
