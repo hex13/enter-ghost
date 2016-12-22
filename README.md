@@ -9,7 +9,9 @@ git clone https://github.com/hex13/enter-ghost
 cd enter-ghost
 npm install
 node_modules/.bin/lerna bootstrap
-cd packages/enter-ghost-ide
+cd packages/enter-ghost-plugin-git
+node_modules/.bin/electron-rebuild --version=1.4.7
+cd ../enter-ghost-ide
 npm start
 ```
 
