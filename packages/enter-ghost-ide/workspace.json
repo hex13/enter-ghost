@@ -1,0 +1,59 @@
+{
+  "rows": [
+    {
+      "height": 32,
+      "cells": [
+        {
+          "hidePath": true,
+          "hideMenu": true,
+          "doc": {
+            "type": "appTopBar",
+            "docs": [],
+            "file": "ignore://test123.appTopBar"
+          }
+        }
+      ]
+    },
+    {
+      "height": 0,
+      "cells": [
+        {
+          "width": 200,
+          "doc": {
+            "id": "treeView",
+            "type": "treeView",
+            "file": "ignore://test123.sideBar1"
+          }
+        },
+        {
+          "width": 1,
+          "doc": {
+            "type": "placeholder",
+            "file": "ignore://test123.placeholder",
+            "capacity": 0,
+            "taken": 0
+          }
+        },
+        {
+          "width": 60,
+          "doc": {
+            "type": "sideBar",
+            "file": "ignore://test123.sideBar2"
+          }
+        }
+      ]
+    },
+    {
+      "height": 50,
+      "cells": [
+        {
+          "width": 1,
+          "doc": {
+            "type": "placeholder",
+            "file": "ignore://test123.placeholder"
+          }
+        }
+      ]
+    }
+  ]
+}
