@@ -4,7 +4,8 @@ WIP Mystery tool that transforms JavaScript virtual file systems 👻🎃🔮
 
 Installing (it will be simplified soon):
 
-```git clone https://github.com/hex13/enter-ghost
+```
+git clone https://github.com/hex13/enter-ghost
 cd enter-ghost
 npm install
 node_modules/.bin/lerna bootstrap
