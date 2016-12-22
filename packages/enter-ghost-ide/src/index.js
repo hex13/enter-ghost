@@ -2,7 +2,7 @@
 // import ReactDOM from 'react-dom';
 // import Workspace from './components/Workspace';
 // import {asyncComponent} from './components/asyncComponent';
- import createWorkspace from '../../enter-ghost-workspace';
+ const createWorkspace = require('../../enter-ghost-workspace');
 //
 // import Test from './components/Test';
 //
