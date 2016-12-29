@@ -35,6 +35,9 @@ function createLayout(workspace, layout) {
                     hideMenu: true,
                     doc: {
                         type: 'appTopBar',
+                        timestamp: 0,
+                        // caution: this is initialized only once (Before workspace.json is created),
+                        // then docs in appTopBar are deserialized from *.json and the getter is gone
                         get docs() {
                             return workspace.docs;
                         },
