@@ -117,6 +117,9 @@ module.exports = (el) => {
                 });
                 return d;
             },
+            updated() {
+                    console.log("DDDDDY")
+            },
             render(h) {
                 return h(this.C, {props: {doc: this.doc}})
             }

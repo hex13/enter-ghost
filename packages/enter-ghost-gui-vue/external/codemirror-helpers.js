@@ -51,6 +51,7 @@ const getCMDoc = exports.getCMDoc = (() => {
 })();
 
 exports.createCodeMirror = function createCodeMirror({el, suggest}) {
+    console.log("CREATE CODE MIRROR");
     const autocompleteOptions = {
         extraKeys: {"Ctrl-Space": "autocomplete"},
         hintOptions: {
@@ -113,7 +114,9 @@ exports.openDoc = function openDoc(doc, cm) {
         });
     };
 
+    // TODO optimization: diff marker next/prev before applying!
     const markers = []; // this is already in CM
+
     const refresh = () => {
         file.query('lint').then(messages => {
             markers.forEach(marker => {
@@ -174,6 +177,8 @@ exports.openDoc = function openDoc(doc, cm) {
 
     const focus = () => {
         window.app.set('activeDoc', doc);
+        file.touch();
+        console.log("TOUCH", file.path);
     };
 
 
@@ -191,15 +196,15 @@ exports.openDoc = function openDoc(doc, cm) {
     // TODO something like that:
     // doc.on('activate')
     // it doesn't work anyway
-    // window.app.on('set', (name, value) => {
-    //     console.log("SSSSSS", name, value)
-    //     if (name == 'activeDoc') {
-    //         if(value == doc) {
-    //             console.log("SSSSSS!!!!!!", name, value)
-    //             cm.focus();
-    //         }
-    //     }
-    // });
+    window.app.on('set', (name, value) => {
+        // TODO prevent multiple calling if it appears
+        if (name == 'activeDoc') {
+            if(value == doc) {
+                console.log("FOKUS", doc.file.path)
+                cm.focus();
+            }
+        }
+    });
 }
 
 exports.closeDoc = (doc, cm) => {

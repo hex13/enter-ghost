@@ -9,8 +9,14 @@ module.exports = {
    template: `<div ref="cm" :style="{height: '100%'}">
    </div>
    `,
+    beforeUpdate(a) {
+      console.log("DDD BEFORE UPDATED",a);
+  },
+   updated(a) {
+     console.log("DDD UPDATED",a);
+   },
    mounted() {
-       console.log("MOUNTED", createCodeMirror)
+       console.log("DDDD MOUNTED", createCodeMirror)
        try {
            const cm = createCodeMirror({
                el: this.$refs.cm,
@@ -18,7 +24,7 @@ module.exports = {
            });
 
            openDoc(this.doc, cm);
-           this.interval = setInterval(() => this.doc.emit('refresh'), 700);
+           this.interval = setInterval(() => this.doc.emit('refresh'), 10 * 1000);
            window.TEST_MAP.set(this.doc.file.path, cm);
        }catch(e) {
             console.log("EEERRR",e)
