@@ -52,11 +52,34 @@ function createWorkspace(app) {
     });
 
     workspace.on('activate', ({doc}) => {
+        //const docs = workspace.docs.slice();
+        //docs.sort((a, b) => a.file.timestamp - b.file.timestamp);
+
+        workspace.docs.forEach((d) => {
+            if (d === doc)
+                d.activityLevel = 5;
+            else {
+                d.activityLevel = Math.max(d.activityLevel - 1, 0);
+            }
+        });
+
+        // const existingCell = workspace.layout.rows[1].cells[1];
+        // if (existingCell && existingCell.doc.type == 'textDocument') {
+        //     console.log("XXXXXX", existingCell.doc);
+        //     existingCell.doc.file = doc.file;
+        //     app.set('activeDoc', doc);
+        //     return
+        // }
         const cell = workspace.layout.find(doc);
         if (!cell) {
+
             workspace.layout.add(doc);
             app.set('activeDoc', doc);
-        } else alert('there is already this doc');
+        } else {
+            app.set('activeDoc', doc);
+            //workspace.emit('activate', {doc})
+            //alert('there is already this doc');
+        }
     });
 
     workspace.on('setActiveDirectory', path => {
@@ -162,7 +185,7 @@ function createWorkspace(app) {
             setTimeout(() => {
                 workspace.emit('change');  //TODO setTimeout is temporary
                 e.done && e.done(ctx);
-            }, 300)
+            }, 70)
             //
             // TODO optimization.emit change after all files are open (promise.all?)
             //workspace.emit('change');
