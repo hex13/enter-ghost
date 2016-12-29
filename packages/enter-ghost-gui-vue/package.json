@@ -16,8 +16,8 @@
   "author": "Łukasz Lityński",
   "license": "MIT",
   "dependencies": {
-    "codemirror": "^5.21.0",
     "fuzzaldrin": "^2.1.0",
-    "vue": "^2.1.6"
+    "vue": "^2.1.6",
+    "enter-ghost-codemirror": "*"
   }
 }

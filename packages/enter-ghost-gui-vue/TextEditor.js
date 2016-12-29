@@ -1,7 +1,7 @@
 
 // TODO change code style to space after brackets
 
-const { createCodeMirror, openDoc, closeDoc } = require('./external/codemirror-helpers');
+const { createCodeMirror, openDoc, closeDoc } = require('enter-ghost-codemirror');
 
 
 module.exports = {
