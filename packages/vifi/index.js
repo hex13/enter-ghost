@@ -12,6 +12,7 @@ const File = (what) => {
     const file = {
         path,
         id: c++,
+        timestamp: Date.now(),
 
         read: (cb) => ghost.read(file, cb),
         get: (...args) => ghost.get(file, ...args),
@@ -32,6 +33,8 @@ const File = (what) => {
         set: (k, v) => dict.set(k, v),
 
         stat: (...args) => ghost.stat(file, ...args),
+
+      	touch: (...args) => ghost.touch(file, ...args),
     };
     return file;
 }
@@ -166,6 +169,9 @@ const ghost = {
             f.description = undefined;
 			resolve(f);
         });
+    },
+    touch(f) {
+       f.timestamp = Date.now();
     },
     flush(f) {
         return this.fs.flush(f);
