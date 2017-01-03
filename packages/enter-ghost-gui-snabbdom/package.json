@@ -1,0 +1,15 @@
+{
+  "name": "enter-ghost-gui-snabbdom",
+  "version": "0.0.2",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "= <=>",
+  "license": "MIT",
+  "dependencies": {
+    "snabbdom": "^0.5.4",
+    "enter-ghost-codemirror": "*"
+  }
+}
