@@ -1,0 +1,22 @@
+{
+  "name": "enter-ghost-transform",
+  "version": "0.0.2",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "= <=>",
+  "license": "MIT",
+  "dependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.18.0",
+    "lodash": "^4.17.4",
+    "lupa": "^0.3.0",
+    "resolve": "^1.2.0"
+  },
+  "devDependencies": {
+    "babel-preset-react": "^6.16.0",
+    "react": "^15.4.1"
+  }
+}
