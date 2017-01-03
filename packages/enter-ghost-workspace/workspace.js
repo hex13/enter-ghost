@@ -142,8 +142,14 @@ function createWorkspace(app) {
 
     workspace.open = (path) => {
         const file = app.vifi.open(path);
+
         const doc = createDoc(app, file);
+
         doc.type = 'textDocument';
+        const ext = file.extname();
+        if (ext == '.events') {
+            doc.type = 'events';
+        }
 
         const docs = file.get('docs') || [];
 
