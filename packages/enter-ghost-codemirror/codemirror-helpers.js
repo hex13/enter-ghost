@@ -72,6 +72,9 @@ exports.createCodeMirror = function createCodeMirror({el, suggest}) {
     );
 
     const cm = CodeMirror(el, options);
+    setTimeout(() => {
+        cm.refresh();
+    }, 50);
     return cm;
 
 }
