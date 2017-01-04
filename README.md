@@ -1,6 +1,20 @@
 # enter-ghost
 WIP Mystery tool that transforms JavaScript virtual file systems 👻🎃🔮
 
+version is 0.0.2 which reflects maturity and stability of the project ;)
+
+- virtual file system library (vifi package)
+Which will allow for using one virtual system model across platforms (NodeJS, Browser), storage type (disk, memory, ajax-requests etc.).
+
+- code editor application (enter-ghost-ide package)
+
+- frontend of code editor (enter-ghost-gui-\*)
+
+- backend of code editor (enter-ghost-workspace, enter-ghost-doc, enter-ghost-app)
+
+- event based debugger/recorder (enter-ghost-debug)
+
+- AST transformation tools
 
 Installing (it will be simplified soon):
 
