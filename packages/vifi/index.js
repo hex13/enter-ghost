@@ -24,6 +24,7 @@ const File = (what) => {
 
         extname: () => ghost.extname(file),
         basename: () => ghost.basename(file),
+        dirname: () => ghost.dirname(file),
         mime: () => ghost.mime(file),
 
         test: () => ghost.test(file),
@@ -132,6 +133,8 @@ const ghost = {
     },
     extname: file => Path.extname(file.path),
     basename: file => Path.basename(file.path),
+    dirname: file => Path.dirname(file.path),
+    basedirname: file => Path.basename(Path.dirname(file.path)),
 
     // TODO flags
     // wildcards, then treat many people as one
