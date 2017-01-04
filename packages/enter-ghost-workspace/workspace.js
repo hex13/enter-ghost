@@ -56,10 +56,11 @@ function createWorkspace(app) {
         //docs.sort((a, b) => a.file.timestamp - b.file.timestamp);
 
         workspace.docs.forEach((d) => {
+            console.log("ACCCC", d);
             if (d === doc)
                 d.activityLevel = 5;
             else {
-                d.activityLevel = Math.max(d.activityLevel - 1, 0);
+                d.activityLevel = Math.max((d.activityLevel||0) - 1, 0);
             }
         });
 
@@ -155,14 +156,16 @@ function createWorkspace(app) {
 
         if (docs.find(d => d.file.path == path)) {
 
-            workspace.emit('activate', {doc})
+
         } else {
 
             file.set('docs', docs.concat(doc));
             workspace.add(doc);
             workspace.layout.add(doc);
         }
+
         app.set('activeDoc', doc);
+        workspace.emit('activate', {doc});
 
 
         return doc; // Promise.resolve(doc) ??
@@ -316,6 +319,11 @@ function createWorkspace(app) {
             if (doc) {
                 workspace.activeDocs = [doc].concat(workspace.activeDocs.filter(d => d != doc));
             }
+            const f = doc.file;
+            if (f) {
+                document.title = `${ app.vifi.basename(f) } - ${ app.vifi.basedirname(f) }`;
+            }
+
         }
 
     });
