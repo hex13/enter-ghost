@@ -81,7 +81,7 @@
     }
 
     </style>
-
+    <button onclick="require('fs').writeFileSync('log.html', window.logged, 'utf8')"> log</button>
 
     <script>
 
@@ -93,6 +93,9 @@
         const ipcRenderer = electron.ipcRenderer;
 
         const dialog = electron.remote.dialog;
+
+        const guiPath = electron.remote.require('./main').GUI_PATH;
+        app.set('guiPath', guiPath);
 
         ipcRenderer.on('close', () => {
             window.app.emit('serialize');

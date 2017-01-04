@@ -7,6 +7,7 @@ const bootConfig = require('./bootConfig');
 const BrowserWindow = electron.BrowserWindow;
 
 const path = require('path')
+
 const url = require('url')
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -79,3 +80,5 @@ app.on('activate', function () {
 exports.abc = (a, b) => {
     return Promise.resolve('piesek ' + (a + b));
 };
+
+exports.GUI_PATH = process.argv[2];
