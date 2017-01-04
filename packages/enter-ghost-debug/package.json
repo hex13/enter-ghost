@@ -1,0 +1,21 @@
+{
+  "name": "enter-ghost-debug",
+  "version": "0.0.2",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "= <=>",
+  "license": "MIT",
+  "dependencies": {
+    "circular-json": "^0.3.1",
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "react": "^15.4.1"
+  }
+}
