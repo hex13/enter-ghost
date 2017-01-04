@@ -15,26 +15,44 @@ const components = {
     appTopBar: (doc) => {
         const tabs = doc.docs.map(tab => {
             const tabStyle = {
-                flexShrink: 1,
+                flexShrink: (
+                    tab.activityLevel > 4? 0 : (
+                        tab.activityLevel > 0? 1 : 5
+                    )
+                ),
                 overflow: 'hidden',
-                boxShadow: '2px 2px 3px rgba(0, 0, 0, 0.3)',
-                padding: '2px',
+                //boxShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
+                padding: '4px 2px',
                 color: '#999',
                 background: 'linear-gradient(to bottom, #444, #333)',
-                margin: '0 2px',
+                margin: '0',
                 whiteSpace: 'nowrap',
                 cursor: 'default',
                 //border: '1px solid rgba(255, 255, 255, 0.04)',
-                borderRadius: '4px',
+                //borderRadius: '4px',
+                borderRight: '1px solid rgba(0, 0, 0, 0.3)',
                 textShadow: '1px 1px rgba(0, 0, 0, 0.2)',
             };
             const tabEvents = {
                 click(e, vnode) {
-
+                    window.workspace.emit('activate', {doc: tab});
                     log('activate@${tab.id}');
                 }
             };
-            return h('div', {style: tabStyle, on: tabEvents},  tab.file.basename());
+            const activity = (level) => {
+                let color;
+                if (level > 4) {
+                    color = '#aea';
+                } else if (level > 3) {
+                    color = '#9b9';
+                } else if (level > 2) {
+                    color = '#9a6';
+                } else {
+                    color = '#994';
+                }
+                return h('span', {style: {color}}, '#' + level);
+            };
+            return h('div', {style: tabStyle, on: tabEvents},  [tab.file.basename(), activity(tab.activityLevel)]);
         });
         const style = {
             display: 'flex',
@@ -49,7 +67,6 @@ const polymorphicModule = {
     create(empty, vnode) {
         const el = vnode.elm;
         const { doc } = vnode.data;
-        log(`<h4 style="color:green">${JSON.stringify(doc)}</h4>`)
         if (doc) {
             if (doc.type == 'textDocument') {
                 const cm = createCodeMirror({el});
@@ -58,7 +75,7 @@ const polymorphicModule = {
             if (doc.type == 'events') {
                 el.innerHTML = 'eVVf';
 
-                const debugView = require('../enter-ghost-debug/gui/bundle');
+                const debugView = require('enter-ghost-debug/gui/bundle');
                 console.warn("DDDDdbBBBB", debugView)
                 //const dbg = require('../../enter-ghost-debug');
                 doc.file.read(contents => {

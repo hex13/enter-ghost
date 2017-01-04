@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "snabbdom": "^0.5.4",
-    "enter-ghost-codemirror": "*"
+    "enter-ghost-codemirror": "*",
+    "enter-ghost-debug": "*"
   }
 }
