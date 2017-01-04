@@ -4,7 +4,8 @@
   "description": "Mystery tool that transforms JavaScript virtual file systems 👻🎃🔮",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":  "cd packages/enter-ghost-ide && npm start"
   },
   "repository": {
     "type": "git",
@@ -18,5 +19,8 @@
   "homepage": "https://github.com/hex13/enter-ghost#readme",
   "devDependencies": {
     "lerna": "2.0.0-beta.31"
+  },
+  "dependencies": {
+    "circular-json": "^0.3.1"
   }
 }
