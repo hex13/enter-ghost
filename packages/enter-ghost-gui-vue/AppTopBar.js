@@ -50,7 +50,7 @@ module.exports = {
 				borderBottom: doc.activityLevel == 5? '2px solid rgba(200, 250, 200, 0.4)' : (doc.activityLevel == 4? '2px dotted rgba(200, 250, 200, 0.2)'  : 'none'),
                 marginBottom: '2px',
                 flexGrow: 1,
-                flexShrink: doc.activityLevel > 4? 0 : (doc.activityLevel > 0? 1 : 4),
+                flexShrink: doc.activityLevel > 3? 0 : (doc.activityLevel > 0? 1 : 4),
                 whiteSpace: 'nowrap',
                 aawidth: '100%',
                 maxWidth: '100px',
