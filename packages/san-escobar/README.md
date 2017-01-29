@@ -20,13 +20,13 @@ But if we only we had tool which automagically output nice formatted logs!
 
 That's what this library is supposed to do.
 
-- It formats logs into HTML format. You can redirect process output to *.html file and open it in browser as interactive visualisation.
-- It allows for create spies on objects and functions (it uses trace-machine library under hood).
+- It formats logs into HTML format. You can redirect process output to *.html file and open it in a browser as interactive visualisation.
+- It allows for create spies on objects and functions (it uses trace-machine library under hood). ![screenshot](https://raw.githubusercontent.com/hex13/enter-ghost/master/packages/san-escobar/san-escobar.gif)
 
-Examples:
+Example of use:
 
 ```javascript
-const SE = require('.');
+const SE = require('san-escobar');
 const { log, spy } = SE(SE.htmlLogger);
 
 // first create some objects to log...
@@ -71,3 +71,9 @@ const proxied = spy({
 proxied.fact(7);
 
 ```
+
+Then run:
+```
+node example.js > output.html
+```
+and open `output.html` file.
