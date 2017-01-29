@@ -1,0 +1,2 @@
+  ["call", {"name":"pewna metoda", "args": [{"aa":"bbb"}]}]
+  ["ret", {"value":"pewna wartosc"}]
