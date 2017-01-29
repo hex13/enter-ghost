@@ -25,6 +25,13 @@ That's what this library is supposed to do.
 
 Example of use:
 
+installation:
+
+```
+npm install --save-dev san-escobar
+```
+
+code:
 ```javascript
 const SE = require('san-escobar');
 const { log, spy } = SE(SE.htmlLogger);
