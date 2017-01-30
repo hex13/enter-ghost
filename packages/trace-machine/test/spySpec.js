@@ -1,7 +1,7 @@
 "use strict";
 
 const assert = require('assert');
-const createSpy = require('../spy');
+const createTraceMachine = require('../spy');
 
 
 // factories which provide brand new objects for tests (to ensure we have fresh state on beginning of each test)
@@ -28,17 +28,17 @@ const classFactory = () => class C {
 };
 
 
-const behaviorSpy = createSpy({
+const behaviorSpy = createTraceMachine({
     logger: {
         emit() {}
     }
-});
+}).spy;
 
 const events = [];
 function reset () {
     events.length = 0;
 };
-const logSpy = createSpy({
+const logSpy = createTraceMachine({
     logger: {
         emit(type, payload) {
             //console.log("!!!",type, payload)
@@ -48,7 +48,7 @@ const logSpy = createSpy({
             })
         }
     }
-});
+}).spy;
 
 
 function getProperty(create, spy) {

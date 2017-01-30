@@ -1,6 +1,6 @@
 {
   "name": "trace-machine",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "description": "Trace Machine tracks JS objects in real time and emit events through emitter",
   "main": "spy.js",
   "directories": {
@@ -16,5 +16,9 @@
   "license": "MIT",
   "devDependencies": {
     "mocha": "^3.2.0"
+  },
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/hex13/enter-ghost/tree/master/packages/trace-machine"
   }
 }

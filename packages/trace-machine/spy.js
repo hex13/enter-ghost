@@ -9,7 +9,28 @@ module.exports = function createTraceMachine({logger /*shouldStoreEvents:bool*/}
 
     logger.emit('init');
 
-    return function spy(o, className = '', level = 0) {
+    function playEvents(events) {
+
+    }
+
+
+    function spyPromise(o) {
+        const a = new Promise((resolve,reject) => {
+            o.then(resolve);
+        });
+        a.then = (callback) => {
+            return spy(o.then((value) => {
+                logger.emit('resolve', {value})
+                return callback(value);
+            }));
+        }
+        return a;
+    }
+    function spy(o, className = '', level = 0) {
+
+        if (typeof o.then == 'function') {
+            return spyPromise(o);
+        }
 
         if (level > maxLevel) {
             console.error(`Spy: max level of spying (${maxLevel}) achieved.`)
@@ -78,4 +99,8 @@ module.exports = function createTraceMachine({logger /*shouldStoreEvents:bool*/}
             }
         });
     }
+
+    return {
+        spy, playEvents
+    };
 };
