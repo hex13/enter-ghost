@@ -11,8 +11,15 @@ module.exports = `
             border-radius: 4px;
         }
 
+        .prop-__proto__ {
+            color: #bbb;
+        }
+
         .hide {
             background: rgba(255, 100, 80, 0.3);
+        }
+        .value.date {
+            color:green;
         }
         input[disabled] {
             color: black;
@@ -42,6 +49,12 @@ module.exports = `
         }
         .new {
             color: violet;
+            font-weight: bold;
+        }
+        .resolve {
+            scolor: rgb(200, 30, 100);
+            color: #388;
+            stext-shadow: 0 0 3px rgba(100, 200, 150, 0.4);
             font-weight: bold;
         }
 
