@@ -44,6 +44,10 @@ module.exports = function createHtmlLogger({write}) {
         printNS('new', sic(payload.name));
     });
 
+    htmlLogger.on('resolve', payload => {
+        printNS('resolve', sic(payload.name), payload.value);
+    });
+
     htmlLogger.on('info', payload => {
         print(...payload.messages);
     });
