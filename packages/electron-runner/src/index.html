@@ -1,0 +1,19 @@
+<!doctype HTML>
+    <body>
+        <script>
+            const { ipcRenderer } = require('electron');
+            console.log("YYYYY", process.argv);
+            ipcRenderer.on('init', ({ sender }, data) => {
+                console.log(`require('${data}')`);
+                try {
+                    require(data);
+                    console.log('--ok--');
+                } catch (e) {
+                    console.error(e);
+                }
+            })
+        </script>
+        <h3 style="color:green">Good morning and welcome to the JavaScript running system.</h3>
+        <div id="app000">
+        </div>
+    </body>

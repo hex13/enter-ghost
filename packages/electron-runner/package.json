@@ -1,0 +1,21 @@
+{
+  "name": "electron-runner",
+  "version": "0.0.10",
+  "description": "Enables for running NodeJS apps in Electron.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron"
+  },
+  "author": "= <=>",
+  "license": "MIT",
+  "keywords": [
+    "electron", "debugging", "debug", "node", "renderer"
+   ],
+  "bin": {
+      "electron-runner": "src/run.js"
+  },
+  "dependencies": {
+    "electron": "^1.4.15"
+  }
+}
