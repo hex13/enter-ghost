@@ -5,20 +5,25 @@ const initialStyleTag = require('./initialStyleTag');
 const initialScriptTag = require('./initialScriptTag');
 
 
-function printNS(ns, ...objects) {
-    print(sic(`<span class="${ns}">${ns}</span>`), ...objects);
-}
-function print(...objects) {
-    const s = objects.map(printObject).join(' ');
-    console.log(`<li class="event">${s}</li>`);
-}
-
 module.exports = function createHtmlLogger({write}) {
+    function print(...objects) {
+        const s = objects.map(printObject).join(' ');
+        write(`<li class="event">${s}</li>`);
+    }
+
+    function printNS(ns, ...objects) {
+        print(sic(`<span class="${ns}">${ns}</span>`), ...objects);
+    }
+
     const htmlLogger = new EventEmitter;
     let initialized = false;
 
     htmlLogger.on('init', function () {
-        if (initialized) throw new Error('logger was already initialized');
+        if (initialized) {
+            return;
+            //throw new Error('logger was already initialized');
+
+        }
         initialized = true;
         write(initialStyleTag + initialScriptTag);
     });

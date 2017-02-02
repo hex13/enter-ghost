@@ -20,8 +20,14 @@ function createTreeFromObject(o, visited = new WeakMap) {
         return o;
     }
 
+    if (o && o.constructor === Date) {
+        return o;
+    }
+
     return {
-            props: Object.keys(o).map(k => {
+            props: Object.getOwnPropertyNames(o).map(k => {
+            //props: Object.getOwnPropertyNames(o).concat('__proto__').map(k => {
+            //props: Object.keys(o).concat('__proto__').map(k => {
                 return {
                     name: k,
                     value: createTreeFromObject(o[k], visited)
@@ -60,6 +66,9 @@ function getType(node) {
             return 'string.path';
         }
     }
+    if (node && node.constructor === Date) {
+        return 'date';
+    }
     return typeof node;
     // if (typeof node == 'function') return 'function';
     // if (typeof node == 'number') return 'number';
@@ -89,7 +98,7 @@ function createElementsFromNode(node, indent = 0) {
                     return h(
                             'li',
                             [
-                                h(`b.name.${getType(p.value)}`, escapeHtml(p.name)),
+                                h(`b.name.${getType(p.value)}.prop-${p.name.replace(/ /g, '-')}`, escapeHtml(p.name)),
                                 ': ',
                                 createElementsFromNode(p.value, indent + 1)
                             ]
@@ -99,11 +108,15 @@ function createElementsFromNode(node, indent = 0) {
             ]
         );
     }
+
     if (isPrimitive(node)) {
         repr = JSON.stringify(node);
     }
     if (node === Symbol.for('circular')) {
         repr = '(circular) 🔙';
+    }
+    if (getType(node) == 'date') {
+        repr = node.toString() + ' 📆';
     }
     return h(`span.value.${getType(node)}`, escapeHtml(repr))
 }

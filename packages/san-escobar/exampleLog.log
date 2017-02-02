@@ -1,2 +1,3 @@
-  ["call", {"name":"pewna metoda", "args": [{"aa":"bbb"}]}]
-  ["ret", {"value":"pewna wartosc"}]
+  xxx ["call", {"name":"pewna metoda", "args": [{"aa":"bbb"}]}]
+  rrr ["info", {"messages": ["hau, hau"]}]
+  555 ["ret", {"value":"pewna wartosc xD"}]

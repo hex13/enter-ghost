@@ -31,6 +31,7 @@ const moon = {
     craters: {
         amount: 'many',
     },
+    'ss kotek': '2',
     water: null,
 };
 
@@ -39,7 +40,8 @@ const moon = {
 log('This is Pizza', pizza); // it's like console.log but outputs in different way (e.g. in HTML format)
 
 log('This is Moon', moon);
-
+console.log("TRACE!", new Error('tk'));
+log("AAA", new Error('aasx'), Promise.resolve(111));
 // create spy
 const proxied = spy({
     fact(n) {
@@ -50,9 +52,20 @@ const proxied = spy({
 
 proxied.fact(7);
 
+log("start", new Date);
+const p = spy(new Promise(resolve => {
+    setTimeout(() => {
+        log("end", new Date+'');
+        resolve(123);
+    }, 400)
+}));
 
-
-// const parseEventsFromJsonLogs = require('./parseEventsFromJsonLogs');
+p.then((v) => {
+    //log("AAA", v)
+    return 'hej';
+}).then((v) => {
+    //log("", v)
+})
 //
 // const SanEscobar = require('.');
 // class Abc {
@@ -81,11 +94,14 @@ proxied.fact(7);
 // toHtml(el);
 //
 // console.log(process.argv);
-// const s = require('fs').readFileSync('exampleLog.log', 'utf8');
+//
 //
 // se.log('procesik', true, false, 'aa1');
 //
-// const parsedEvents = parseEventsFromJsonLogs(s);
-// parsedEvents.forEach(e => {
-//     SanEscobar.htmlLogger.emit(e[0], e[1]);
-// });
+//c
+//SE.htmlLogger.emit('info',{messages:[process]});
+var stackTrace = require('stack-trace');
+var err = new Error('something went wrong');
+var trace = stackTrace.parse(err);
+console.log("XXXX",trace);
+log(trace);

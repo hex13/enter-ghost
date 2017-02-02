@@ -24,13 +24,14 @@
     "json-stringify-safe": "^5.0.1",
     "snabbdom": "^0.6.3",
     "snabbdom-to-html": "^3.0.1",
+    "stack-trace": "0.0.9",
     "trace-machine": "*"
   },
   "devDependencies": {
     "mocha": "^3.2.0"
   },
   "repository": {
-      "type": "git",
-      "url": "https://github.com/hex13/enter-ghost/tree/master/packages/san-escobar"
+    "type": "git",
+    "url": "https://github.com/hex13/enter-ghost/tree/master/packages/san-escobar"
   }
 }

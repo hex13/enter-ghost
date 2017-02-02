@@ -6,8 +6,15 @@ const TraceMachine = require('trace-machine');
 const { EventEmitter } = require('events');
 
 
-const write = (s) => console.log(s);
 
+const writeToConsole = (s) => console.log(s);
+
+
+const writeToDom = (s) => {
+    const el = document.body;
+    el.innerHTML += s;
+};
+const write = writeToConsole;
 const consoleLogger = {emit: console.log.bind(console)};
 
 
@@ -16,6 +23,7 @@ const htmlLogger = require('./htmlLogger')({
 });
 
 const jsonLogger = require('./jsonLogger')({
+    prefix: 'san escobar: ',
     write
 });
 
@@ -44,4 +52,5 @@ function SanEscobar(logger = consoleLogger) {
 
 module.exports = SanEscobar;
 module.exports.consoleLogger = consoleLogger;
+module.exports.jsonLogger = jsonLogger;
 module.exports.htmlLogger = htmlLogger;

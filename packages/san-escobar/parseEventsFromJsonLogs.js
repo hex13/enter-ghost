@@ -1,17 +1,11 @@
-const util =require('util');
-const input = `
-["call", {"name": "blah"}]
-["red", {"value": 5}]
-`;
+"use strict";
 
-module.exports = (input) => {
+module.exports = (input, prefix='') => {
     return input
         .split('\n')
+        .filter(line => line.match(prefix))
+        .map(line => line.replace(prefix, ''))
         .map(line => line.trim())
         .filter(line => line) // remove empty lines
         .map(line => JSON.parse(line)); // remove empty lines
-}
-
-// t.forEach(line => {
-//     console.log("LINE", typeof line, util.inspect(line, {colors: true}));
-// });
+};
