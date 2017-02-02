@@ -1,6 +1,6 @@
 {
   "name": "electron-runner",
-  "version": "0.0.11",
+  "version": "0.0.13",
   "description": "Enables for running NodeJS apps in Electron.",
   "main": "index.js",
   "scripts": {
@@ -17,5 +17,9 @@
   },
   "dependencies": {
     "electron": "^1.4.15"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hex13/enter-ghost/tree/master/packages/electron-runner"
   }
 }

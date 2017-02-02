@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const electron = require('electron');
 const cp = require('child_process');
 const { join, parse, resolve } = require('path');
