@@ -1,6 +1,6 @@
 {
   "name": "san-escobar",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "powerful HTML logging for NodeJS applications",
   "main": "san-escobar.js",
   "keywords": [

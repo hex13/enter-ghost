@@ -1,5 +1,7 @@
 const SE = require('.');
-const { log, spy } = SE(SE.htmlLogger);
+const write = SE.createDomOutput(document.body);
+console.log("SSSSSS",write);
+const { log, spy } = SE(SE.htmlLogger, write);
 
 // TODO fix bug with infinite loop when logging spied objects (it doesn't detect circular references then):
 // const someObject = spy({
