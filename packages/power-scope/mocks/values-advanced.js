@@ -1,0 +1,1 @@
+const someVariable = require('someModule');
