@@ -1,11 +1,14 @@
 {
   "name": "power-scope",
   "version": "0.1.0",
-  "description": "",
+  "description": "Performs static analysis, gather scopes, variables, objects etc.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [
+    "ast", "scope", "inference", "static code analysis"
+  ],
   "author": "= <=>",
   "license": "MIT",
   "dependencies": {
@@ -14,5 +17,9 @@
     "lupa-utils": "^0.3.2",
     "resolve": "^1.2.0"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "repository": {
+     "type": "git",
+     "url": "https://github.com/hex13/enter-ghost/tree/master/packages/power-scope"
+   }
 }
