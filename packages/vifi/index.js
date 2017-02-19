@@ -7,8 +7,10 @@ const isString = v => typeof v == 'string' || v instanceof String;
 
 let c = 100;
 const File = (what) => {
+
     const dict = new Map;
     const path = what.path || what;
+    const contents = what.contents;
     const file = {
         path,
         id: c++,
@@ -34,7 +36,7 @@ const File = (what) => {
         set: (k, v) => dict.set(k, v),
 
         stat: (...args) => ghost.stat(file, ...args),
-
+        contents,
       	touch: (...args) => ghost.touch(file, ...args),
     };
     return file;
@@ -217,6 +219,23 @@ const fs = require('fs');
 
 module.exports = ghost;
 
+let mountFromArrayWarning = 0;
+ghost.mountFromArray = (files) => {
+    const vfs = ghost;
+    if (!mountFromArrayWarning++)
+        console.warn('Vifi: method `mountFromArray` currently replaces `open` method. You won\'t be able to open files from disk. This behavior can change in future versions')
+    const oldOpen = vfs.open;
+    vfs.open = (path) => {
+        const f = vfs.File(path);
+        f.contents = files.find(f => f.path == path).contents;
+        return f;
+    };
+    return () => {
+        vfs.open = oldOpen;
+    };
+};
+
+
 ghost.stat = defer((f) => {
     return new Promise((resolve, reject) => {
         fs.stat(f.path, (err, stats) => {
@@ -292,6 +311,8 @@ ghost.stringify = (file, obj) => {
     });
 
 }
+
+ghost.File = File;
 
 
 // TODO move this to spec
