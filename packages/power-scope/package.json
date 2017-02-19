@@ -1,6 +1,6 @@
 {
   "name": "power-scope",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Performs static analysis, gather scopes, variables, objects etc.",
   "main": "index.js",
   "scripts": {
