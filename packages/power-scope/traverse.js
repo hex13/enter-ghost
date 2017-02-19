@@ -141,7 +141,7 @@ module.exports = function (files, resolve, vfs) {
                     return iterate(md)
             });
         } else {
-            return md;
+            return Promise.resolve(md);
         }
     }
     return iterate({files: []});

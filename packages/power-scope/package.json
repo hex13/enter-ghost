@@ -15,7 +15,8 @@
     "babylon": "^6.15.0",
     "estraverse": "^4.2.0",
     "lupa-utils": "^0.3.2",
-    "resolve": "^1.2.0"
+    "resolve": "^1.2.0",
+    "vifi": "*"
   },
   "devDependencies": {},
   "repository": {

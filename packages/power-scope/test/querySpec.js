@@ -1,6 +1,7 @@
 const { parseQuery, queryWithChain, queryWithString } = require('../query');
 const traverse = require('../traverse');
 const assert = require('assert');
+const vfs = require('vifi');
 
 const code = `
     const o = {
@@ -9,15 +10,22 @@ const code = `
         },
         secondChild: 'cat'
     };
+    const m = {name: require('animal')};
 `;
-const file = {
-    read() {
-        return Promise.resolve(code);
-    }
-};
+
+const file = vfs.File({path: 'main.js', contents: code});
 
 function prepare() {
-    return traverse([file], ()=>{}, {});
+    const unmount = vfs.mountFromArray([
+        {path: 'animal', contents: 'module.exports = {animal: require("bear")}'},
+        {path: 'bear', contents: 'module.exports = {a: "bear"}'},
+    ]);
+
+    const result = traverse([file], (from, path) => path, vfs);
+    return result.then(result => {
+        unmount();
+        return result;
+    });
 }
 
 
@@ -36,7 +44,6 @@ describe('parseQuery', () => {
 
 describe('queryWithChain', () => {
     it('should get property', () => {
-
         return prepare().then(result => {
             const obj = result.files[0].scopes[0].vars.get('o');
 
@@ -53,6 +60,34 @@ describe('queryWithChain', () => {
 
         });
     });
+
+    it('should get variable', () => {
+        return prepare().then(result => {
+            const scope = result.files[0].scopes[0];
+            const variable = scope.vars.get('o');
+            assert.strictEqual(
+                queryWithChain(scope, [
+                    {type: 'var', name: 'o'}
+                ]),
+                variable
+            );
+        });
+    });
+
+    it('should get property from module two levels under', () => {
+        return prepare().then(result => {
+            const obj = result.files[0].scopes[0];
+            const ref = queryWithChain(obj, [
+                {type: 'var', name: 'm'},
+                {type: 'prop', name: 'name'},
+                {type: 'prop', name: 'animal'},
+                {type: 'prop', name: 'a'}
+            ], result);
+            assert.strictEqual(ref.value, 'bear');
+        });
+    });
+
+
 });
 
 
@@ -63,4 +98,29 @@ describe('queryWithString', () => {
             assert.equal(queryWithString(obj, '.child.grandchild').value, 1234);
         });
     });
+    it('should get variable', () => {
+        return prepare().then(result => {
+            const scope = result.files[0].scopes[0];
+            const variable = scope.vars.get('o');
+            assert.equal(queryWithString(scope, '@o'), variable);
+        });
+    });
+
+    it('should get property from variable', () => {
+        return prepare().then(result => {
+            const scope = result.files[0].scopes[0];
+            const variable = scope.vars.get('o');
+            assert.equal(queryWithString(scope, '@o.child.grandchild').value, 1234);
+        });
+    });
+
+    it('should get property from module two levels under', () => {
+        return prepare().then(result => {
+            const obj = result.files[0].scopes[0];
+            const ref = queryWithString(obj, '@m.name.animal.a', result);
+//            assert.strictEqual(ref.value, 'bear');
+        });
+    });
+
+
 });
