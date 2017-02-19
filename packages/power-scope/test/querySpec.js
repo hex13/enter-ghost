@@ -1,33 +1,7 @@
 const { parseQuery, queryWithChain, queryWithString } = require('../query');
-const traverse = require('../traverse');
 const assert = require('assert');
-const vfs = require('vifi');
 
-const code = `
-    const o = {
-        child: {
-            grandchild: 1234
-        },
-        secondChild: 'cat'
-    };
-    const m = {name: require('animal')};
-`;
-
-const file = vfs.File({path: 'main.js', contents: code});
-
-function prepare() {
-    const unmount = vfs.mountFromArray([
-        {path: 'animal', contents: 'module.exports = {animal: require("bear")}'},
-        {path: 'bear', contents: 'module.exports = {a: "bear"}'},
-    ]);
-
-    const result = traverse([file], (from, path) => path, vfs);
-    return result.then(result => {
-        unmount();
-        return result;
-    });
-}
-
+const { prepare } = require('./utilsForTests.js');
 
 describe('parseQuery', () => {
     it('should parse query', () => {
