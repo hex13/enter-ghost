@@ -139,11 +139,13 @@ const visitor = ({
     },
     Scope: {
         enter({node}, state) {
+
             const scope = {
                 vars: new Map,
                 type: node.type,
                 scopes: [],
-                outerScope: null
+                outerScope: null,
+                loc: node.loc
             };
             const currScope = peek(state.scopes);
             if (currScope) {
@@ -158,6 +160,7 @@ const visitor = ({
             push(state.result.scopes, scope);
         },
         exit({node}, state) {
+
             if (!state.parent || state.parent.type.indexOf('Function')==0) {
                 pop(state.functions);
             }

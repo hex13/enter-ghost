@@ -194,7 +194,36 @@ const files = [
         const Abc = result.scopes[0].vars.get('Abc');
         assert.equal(Abc.value.type, 'class');
         assert.equal(Abc.name, 'Abc');
+    }],
+    [__dirname + '/../mocks/loc.js', (result, all) => {
+        let loc;
+        
+        loc = result.scopes[0].loc;
+        assert.equal(loc.start.line, 1);
+        assert.equal(loc.start.column, 0);
+
+        loc = result.scopes[1].loc;
+        assert.deepEqual(loc, {
+            start: {
+                line: 2, column: 10
+            },
+            end: {
+                line: 6, column: 1
+            }
+        });
+
+        loc = result.scopes[2].loc;
+        assert.deepEqual(loc, {
+            start: {
+                line: 3, column: 20
+            },
+            end: {
+                line: 5, column: 5
+            }
+        })
+
     }]
+
 ];
 
 describe('scope', () => {
