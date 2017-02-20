@@ -197,7 +197,7 @@ const files = [
     }],
     [__dirname + '/../mocks/loc.js', (result, all) => {
         let loc;
-        
+
         loc = result.scopes[0].loc;
         assert.equal(loc.start.line, 1);
         assert.equal(loc.start.column, 0);
@@ -219,6 +219,27 @@ const files = [
             },
             end: {
                 line: 5, column: 5
+            }
+        });
+
+        loc = result.scopes[0].vars.get('obj').loc;
+        assert.deepEqual(loc, {
+            start: {
+                line: 13, column: 6
+            },
+            end: {
+                line: 16, column: 1
+            }
+        })
+
+        loc = result.scopes[0].vars.get('obj').value.props.get('prop1').loc;
+
+        assert.deepEqual(loc, {
+            start: {
+                line: 14, column: 4
+            },
+            end: {
+                line: 14, column: 13
             }
         })
 

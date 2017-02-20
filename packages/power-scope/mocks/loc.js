@@ -9,3 +9,8 @@ if (true) { // 1
 // any *previously written* code (even one whitespace or new line can break tests)
 
 // However you can safely append to end of this file.
+
+const obj = {
+    prop1: 24,
+    prop2: 'kotek',
+}

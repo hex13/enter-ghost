@@ -84,6 +84,7 @@ const visitor = ({
             const expr = state.expr.pop();
             const name = getName(node);
             const variable = {
+                loc: node.loc,
                 name,
                 value: expr.value
             };
@@ -120,7 +121,10 @@ const visitor = ({
             const currObject = peek(state.objects);
 
             //currObject.props.set(name, expr.value);
-            currObject.props.set(name, {value: expr.value});
+            currObject.props.set(name, {
+                loc: node.loc,
+                value: expr.value
+            });
         },
     },
     Function: {
