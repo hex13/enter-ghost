@@ -50,7 +50,19 @@ const getCMDoc = exports.getCMDoc = (() => {
     }
 })();
 
-exports.createCodeMirror = function createCodeMirror({el, suggest}) {
+exports.createCodeMirror = function createCodeMirror({el, suggest, injectStyles}) {
+    if (injectStyles) [
+        __dirname + "/node_modules/codemirror/lib/codemirror.css",
+        __dirname + "/node_modules/codemirror/theme/material.css",
+        __dirname + "/node_modules/codemirror/addon/hint/show-hint.css",
+    ].forEach(path => {
+        const style = document.createElement('link');
+        style.rel = 'stylesheet';
+        style.href = path;
+        document.body.appendChild(style);
+    })
+
+
     console.log("CREATE CODE MIRROR");
     const autocompleteOptions = {
         extraKeys: {"Ctrl-Space": "autocomplete"},
