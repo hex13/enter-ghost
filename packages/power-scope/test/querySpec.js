@@ -1,19 +1,59 @@
 const { parseQuery, queryWithChain, queryWithString } = require('../query');
+const {time }= require('./utilsForTests');
 const assert = require('assert');
 
 const { prepare } = require('./utilsForTests.js');
 
 describe('parseQuery', () => {
-    it('should parse query', () => {
-
-        const parsed = parseQuery(' . foo .  $bar .  baz 𝚿  whatever');
+    it('should parse query without spaces', () => {
+        const parsed = parseQuery('@foo.$bar.baz𝚿whatever');
         assert.deepEqual(parsed, [
-            {type: 'prop', name: 'foo'},
+            {type: 'var', name: 'foo'},
             {type: 'prop', name: '$bar'},
             {type: 'prop', name: 'baz'},
             {type: '𝚿', name: 'whatever'},
         ])
     });
+
+    it('should parse query with spaces', () => {
+        const parsed = parseQuery(' @foo .  $bar .  baz 𝚿  whatever ');
+        assert.deepEqual(parsed, [
+            {type: 'var', name: 'foo'},
+            {type: 'prop', name: '$bar'},
+            {type: 'prop', name: 'baz'},
+            {type: '𝚿', name: 'whatever'},
+        ])
+    });
+
+    it('should parse query with ommited @ sign', () => {
+        const parsed = parseQuery('foo   $bar .  baz 𝚿  whatever');
+        assert.deepEqual(parsed, [
+            {type: 'var', name: 'foo'},
+            {type: 'var', name: '$bar'},
+            {type: 'prop', name: 'baz'},
+            {type: '𝚿', name: 'whatever'},
+        ])
+    });
+
+    it('should parse multiline query', () => {
+        const parsed = parseQuery('@foo   $bar .  \n \n baz 𝚿  whatever');
+        assert.deepEqual(parsed, [
+            {type: 'var', name: 'foo'},
+            {type: 'var', name: '$bar'},
+            {type: 'prop', name: 'baz'},
+            {type: '𝚿', name: 'whatever'},
+        ])
+    });
+
+    it('should parse only text before semicolon', () => {
+        const parsed = parseQuery('foo   bar  ; not');
+        assert.deepEqual(parsed, [
+            {type: 'var', name: 'foo'},
+            {type: 'var', name: 'bar'},
+        ])
+    });
+
+
 });
 
 describe('queryWithChain', () => {

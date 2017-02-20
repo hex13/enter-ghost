@@ -47,7 +47,17 @@ function queryWithChain(structure, list, all) {
 
 
 function parseQuery(queryString) {
-    const re = /(\W) *([$\w]+)/gu;
+    const q = queryString;
+    queryString = queryString.replace(/\n/g, ' ');
+
+    const indexOfSemicolon = queryString.indexOf(';');
+    if (indexOfSemicolon > 0) {
+        queryString = queryString.slice(0, indexOfSemicolon);
+    }
+
+    //const re = /(\W) *([$\w]+)/gu;
+    const re = /([.@𝚿])? *([$\w]+) *(\(.*?\))?/gum;
+
     let match;
     const operators = {
         '.': 'prop',
@@ -55,7 +65,9 @@ function parseQuery(queryString) {
     };
     const chain = [];
     while (match = re.exec(queryString)) {
-        const [all, op, name] = match;
+
+        let [all, op, name] = match;
+        if (!op) op = '@';
 
         if (operators.hasOwnProperty(op)) {
             chain.push({type: operators[op], name});
@@ -64,6 +76,7 @@ function parseQuery(queryString) {
         }
 
     }
+
     return chain;
 }
 
