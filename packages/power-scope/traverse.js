@@ -4,9 +4,11 @@ const babylon = require('babylon');
 
 const visitor = require('./visitor');
 const commentVisitor = require('./commentVisitor');
-const visitors = [visitor, commentVisitor];
+const referenceGatherer = require('./referenceGatherer');
 
-const visitorsData = new WeakMap;
+let visitors = [visitor, commentVisitor];
+
+let visitorsData = new WeakMap;
 visitors.forEach(visitor => {
     visitorsData.set(visitor, new WeakMap);
 })
@@ -121,6 +123,18 @@ function analyzeFile(file) {
         state.result.path = file.path;
         estraverse.traverse(ast.program, mainVisitor);
         checkInvariants(state);
+        let lastVisitors = visitors;
+        visitors = [referenceGatherer];
+
+        visitors.forEach(visitor => {
+            visitorsData.set(visitor, new WeakMap);
+        });
+        estraverse.traverse(ast.program, mainVisitor);
+        visitors = lastVisitors;
+
+
+
+
         return state.result;
     });
 
