@@ -9,6 +9,7 @@ module.exports = function createState() {
         scopes: [],
         values: [],
         functions: [],
+        chains: [],
         vars: [],
         result: {
             scopes: [],
