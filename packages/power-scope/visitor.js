@@ -14,6 +14,7 @@ const assert = require('assert');
 // const SE = require('../san-escobar');
 // const se = SE(SE.jsonLogger);
 //
+
 const inspect = o => console.log(require('util').inspect(o, {colors: true, depth:16}));
 
 //-----------------------------------------------------------------------------
@@ -67,10 +68,32 @@ function lookupBinding(state, name) {
 
 }
 
-//-----------------------------------------------------------------------------
-// visitor
-//-----------------------------------------------------------------------------
+function setNodeInfo(state, node, name, value) {
+    if (!state.shouldSetNodeInfo) {
+        return;
+    }
+};
+// TODO weakmaps
+/**
+    AST visitor for analysing JS scope. It uses few stacks for keeping track of its state.
 
+    General overview:
+
+    1. When visiting parent node (enter phase), items are pushed into one of the stack.
+    Items are newly created JS objects with some data in it (there are item representing variables, scopes, objects etc.)
+    items can have `value` property or some other properties like `vars` or `props`
+
+    2. Then, when visiting child nodes, top items in stacks are accessed and mutated
+    (for example `value` property is set).
+
+    3. Then, during revisiting parent node (exit phase), items are popped from stacks
+    and their values are taken.
+
+    4. This is recursive so items can propagates up (from leaves to root of the tree)
+
+    5. Remember that this is only short overwiew but exact implementation
+    of this mechanism varies depends on node types.
+*/
 const visitor = ({
     Program: {
         exit(unused, state) {
