@@ -171,6 +171,8 @@ const visitor = ({
                 vars: new Map,
                 type: node.type,
                 scopes: [],
+                chains: [],
+                // TODO make test for `outerScope` property
                 outerScope: null,
                 loc: node.loc
             };
