@@ -74,6 +74,12 @@ function setNodeInfo(state, node, name, value) {
     }
 };
 // TODO weakmaps
+// TODO WeakMap
+// state.nodeInfo.set(node, {scope})
+// or setNodeInfo(state, node, 'scope', scope)
+// or state.setNodeInfo(node, 'scope', scope)
+// state.setNodeInfo(node, 'entity', something)
+
 /**
     AST visitor for analysing JS scope. It uses few stacks for keeping track of its state.
 
