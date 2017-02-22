@@ -73,6 +73,15 @@ function setNodeInfo(state, node, name, value) {
         return;
     }
 };
+
+function islastChainLink (state) {
+    return !(
+        state.parent.type == 'MemberExpression'
+        || (state.parent.type == 'CallExpression' && state.key == 'callee')
+    );
+
+}
+
 // TODO weakmaps
 // TODO WeakMap
 // state.nodeInfo.set(node, {scope})
@@ -223,12 +232,12 @@ const visitor = ({
             // TODO maybe gathering arguments by stacks?
         },
         exit({node}, state) {
-            assert.equal(node.callee.type, 'Identifier', 'TODO: implement support for other callee.type than Identifier');
+            //assert.equal(node.callee.type, 'Identifier', 'TODO: implement support for other callee.type than Identifier');
             const call = {
                 type: 'call',
                 name: node.callee.name,
                 args: node.arguments.map(a => {
-                    assert.equal(a.type, 'StringLiteral', 'TODO: implement support for other argument types than StringLiteral');
+                    //assert.equal(a.type, 'StringLiteral', 'TODO: implement support for other argument types than StringLiteral');
                     return a.value;
                 })
             };
@@ -277,6 +286,49 @@ const visitor = ({
             //binding.value = right.value;
             state.lvalue.value = right.value;
 
+
+        }
+    },
+    ChainLink: {
+        enter({node}, state) {
+            if (islastChainLink(state)) {
+                const chain = [];
+                peek(state.scopes).chains.push(chain);
+                push(state.chains, chain);
+            }
+        },
+        exit({node}, state) {
+            const parent = state.parent;
+
+
+            if (node.object && node.object.type == 'Identifier') {
+                peek(state.chains).push({
+                    name: getName(node.object),
+                    type: 'var',
+                });
+            }
+
+            const isCallee = state.parent.type == 'CallExpression' && state.key == 'callee';
+            if (node.type == 'MemberExpression') {
+                peek(state.chains).push({
+                    name: getName(node.property),
+                    type: isCallee? 'call': 'prop',
+                    access: isCallee? 'prop': undefined,
+                });
+
+            }
+            if (node.type == 'CallExpression') {
+                if (node.callee.type == 'Identifier') {
+                    peek(state.chains).push({
+                        name: getName(node.callee),
+                        type: 'call',
+                        access: 'var'
+                    });
+                }
+            }
+            if (islastChainLink(state)) {
+                pop(state.chains);
+            }
 
         }
     },

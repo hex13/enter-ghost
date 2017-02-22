@@ -7,6 +7,7 @@ const Path = require('path');
 const inspect = (n,o) => console.log(n,require('util').inspect(o, {colors: true, depth:16}));
 
 const SKIP = Symbol();
+const ONLY = Symbol();
 
 // mock of module resolver
 function resolve(from, path) {
@@ -243,7 +244,103 @@ const files = [
             }
         })
 
-    }]
+    }],
+    [__dirname + '/../mocks/chains.js', (result, all) => {
+        const scope = result.scopes[0];
+
+
+
+        let chain;
+        chain = scope.chains[0];
+        assert.equal(scope.chains.length, 5);
+
+        assert.equal(chain.length, 5);
+
+        assert.equal(chain[0].name, 'a');
+        assert.equal(chain[0].type, 'var');
+
+        assert.equal(chain[1].name, 'b');
+        assert.equal(chain[1].type, 'prop');
+
+        assert.equal(chain[2].name, 'c');
+        assert.equal(chain[2].type, 'prop');
+
+        assert.equal(chain[3].name, 'd');
+        assert.equal(chain[3].type, 'prop');
+
+        assert.equal(chain[4].name, 'e');
+        assert.equal(chain[4].type, 'prop');
+
+        chain = scope.chains[1];
+
+        assert.equal(chain.length, 2);
+
+
+        assert.equal(chain[0].name, 'foo');
+        assert.equal(chain[0].type, 'var');
+
+        assert.equal(chain[1].name, 'bar');
+        assert.equal(chain[1].type, 'call');
+        assert.equal(chain[1].access, 'prop');
+
+        chain = scope.chains[2];
+
+        assert.equal(chain.length, 3);
+
+        assert.equal(chain[0].name, 'a');
+        assert.equal(chain[0].type, 'var');
+
+        assert.equal(chain[1].name, 'b');
+        assert.equal(chain[1].type, 'prop');
+
+        assert.equal(chain[2].name, 'c');
+        assert.equal(chain[2].type, 'prop');
+
+        chain = scope.chains[3];
+        assert.equal(chain.length, 3);
+
+        //
+        assert.equal(chain[0].name, 'az');
+        assert.equal(chain[0].type, 'call');
+        assert.equal(chain[0].access, 'var');
+        //
+        assert.equal(chain[1].name, 'bz');
+        assert.equal(chain[1].type, 'prop');
+        //
+        assert.equal(chain[2].name, 'cz');
+        assert.equal(chain[2].type, 'prop');
+        //
+        chain = scope.chains[4];
+        //
+        assert.equal(chain.length, 3);
+
+        assert.equal(chain[0].name, 'ay');
+        assert.equal(chain[0].type, 'var');
+
+        //
+        assert.equal(chain[1].name, 'by');
+        assert.equal(chain[1].type, 'call');
+        assert.equal(chain[1].access, 'prop');
+        //
+        assert.equal(chain[2].name, 'cy');
+        assert.equal(chain[2].type, 'prop');
+
+        //
+
+         // assert.equal(chain, 3);
+        //
+        //
+        //
+
+
+        // assert.equal(Abc.name, 'Abc');
+    }],
+    [__dirname + '/../mocks/references.js', (result, all) => {
+        // const Abc = result.scopes[0].vars.get('Abc');
+        // assert.equal(Abc.value.type, 'class');
+        // assert.equal(Abc.name, 'Abc');
+    }],
+
 
 ];
 
@@ -254,6 +351,7 @@ describe('scope', () => {
         const fileName = Path.relative(__dirname, path);
         let _it = it;
         if (skip === SKIP) _it = xit;
+        if (skip === ONLY) _it = it.only;
         _it(`should analyze scope in '${fileName}'`, () => {
             const code = require('fs').readFileSync(path, 'utf8');
             const file = {

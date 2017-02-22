@@ -84,6 +84,10 @@ function enterOrLeave(phase, node, parent) {
         if (node.type.indexOf('Function') == 0) {
             invokeVisitor(visitor, node, 'Function', phase);
         }
+        if (node.type.indexOf('CallExpression') == 0 || node.type.indexOf('MemberExpression') == 0) {
+            invokeVisitor(visitor, node, 'ChainLink', phase);
+        }
+
     })
 }
 
@@ -105,6 +109,10 @@ function checkInvariants(state) {
     assert.equal(
         state.expr.length, 1,
         `state.expr array should contain exactly one item before and after traversing. It contains ${state.expr.length} items.`);
+    assert.equal(
+        state.chains.length, 0,
+        `state.chains array should not contain items before and after traversing. It contains ${state.chains.length} items.`);
+
 }
 
 function analyzeFile(file) {
