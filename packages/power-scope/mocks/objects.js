@@ -5,4 +5,10 @@ const obiekcik = ({
             ghi: true
         }
     },
+    meth1: function () {
+
+    },
+    meth2() {
+        const some = 'some value';
+    }
 });

@@ -242,7 +242,7 @@ module.exports = function (files, resolve, vfs) {
                         const vars = Array.from(result.scopes[si].vars);
                         for (let vi = 0; vi < vars.length; vi++) {
                             const [name, binding] = vars[vi];
-                            console.log("BBBBBB",binding)
+
                             if (bindingInPos(binding))
                                 return binding;
                             if (binding.value && binding.value.props) {

@@ -65,7 +65,7 @@ const files = [
         assert.equal(bProp.value, 2);
     }],
     [__dirname + '/../mocks/objects.js', (result) => {
-        assert.equal(result.scopes.length, 1);
+        assert.equal(result.scopes.length, 3);
 
         let objVar, objValue;
 
@@ -73,11 +73,17 @@ const files = [
         assert.equal(objVar.name, 'obiekcik');
 
         objValue = objVar.value;
-        assert.equal(Array.from(objValue.props).length, 2);
+        assert.equal(Array.from(objValue.props).length, 4);
+
 
         assert(objValue.props.get('abcd'));
         //assert(objValue.props.get('abc').props.get('def').props.get('ghi'));
         assert(objValue.props.get('abc').value.props.get('def').value.props.get('ghi'));
+
+        assert.equal(objValue.props.get('meth1').value.type, 'function');
+
+        assert.equal(objValue.props.get('meth2').value.vars.get('some').value, 'some value');
+        assert.equal(objValue.props.get('meth2').value.type, 'function');
     }],
     [__dirname + '/../mocks/functions.js', (result) => {
 
@@ -449,7 +455,7 @@ const files = [
     }],
     [__dirname + '/../mocks/references.js', (result, all) => {
         const variable = result.scopes[0].vars.get('o');
-        console.log("BLBLLW")
+
         inspect(result.scopes[0].chains);
 
         assert.equal(variable.refs.length, 5);

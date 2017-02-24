@@ -4,7 +4,7 @@ const { unknown } = require('./symbols');
 const utils = require('lupa-utils');
 const { getName, analyzeChain } = utils;
 const assert = require('assert');
-
+const { Entity } = require('./factories.js');
 
 //-----------------------------------------------------------------------------
 // debugging
@@ -113,14 +113,10 @@ const visitor = ({
         exit({node}, state) {
             const expr = state.expr.pop();
             const name = getName(node);
-            const variable = {
-                loc: {
-                    start: node.id.loc.start,
-                    end: node.id.loc.end
-                },
+            const variable = Entity({
                 name,
-                value: expr.value
-            };
+                value: expr.value,
+            }, node.id.loc);
 
             if (state.parent.kind == 'var') {
                 peek(state.functions).vars.set(name, variable);
@@ -151,18 +147,37 @@ const visitor = ({
             const name = getName(node);
 
             const expr = popExpression(state);
+
             const currObject = peek(state.objects);
 
             //currObject.props.set(name, expr.value);
-            currObject && currObject.props.set(name, {
-                loc: {
-                    start:  node.key.loc.start,
-                    end:  node.key.loc.end,
-                },
+            currObject && currObject.props.set(name, Entity({
                 value: expr.value
-            });
+            }, node.key.loc));
         },
     },
+    // TODO code duplication
+    ObjectMethod: {
+        enter: function({node}, state) {
+            prepareExpression(state);
+        },
+        exit({node}, state) {
+
+            const name = getName(node);
+            // TODO this is hack
+            visitor.Function.enter({node}, state);
+            visitor.Function.exit({node}, state);
+            const expr = popExpression(state);
+
+            const currObject = peek(state.objects);
+
+            //currObject.props.set(name, expr.value);
+            currObject && currObject.props.set(name, Entity({
+                value: expr.value
+            }, node.key.loc));
+        },
+    },
+
     Function: {
         enter({node}, state) {
         },
@@ -180,15 +195,20 @@ const visitor = ({
     Scope: {
         enter({node}, state) {
 
-            const scope = {
+            const parentType = (state.parent && state.parent.type) || '';
+            const isFunction = (
+                 parentType.indexOf('Function') == 0
+                 || parentType == 'ObjectMethod'
+
+            );
+            const scope = Entity({
                 vars: new Map,
-                type: node.type,
+                type: isFunction? 'function' : node.type,
                 scopes: [],
                 chains: [],
                 // TODO make test for `outerScope` property
                 outerScope: null,
-                loc: node.loc
-            };
+            }, node.loc);
             const currScope = peek(state.scopes);
             if (currScope) {
                 scope.outerScope = currScope;

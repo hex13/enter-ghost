@@ -117,6 +117,55 @@ describe('queryWithChain', () => {
 
 });
 
+describe('fluent interface', () => {
+    it('should return variable', () => {
+        return prepare().then(result => {
+            const scope = result.files[0].scopes[0];
+            assert.strictEqual(scope.var('o'), scope.vars.get('o'));
+        });
+    });
+    it('should return undefined when calling with nonexisting name', () => {
+        return prepare().then(result => {
+            const scope = result.files[0].scopes[0];
+            assert.equal(scope.var('there is no such variable'), undefined);
+        });
+    });
+    it('should return variable.property', () => {
+        return prepare().then(result => {
+            const scope = result.files[0].scopes[0];
+            assert.strictEqual(scope.var('o').prop('child'), scope.vars.get('o').value.props.get('child'));
+            assert.strictEqual(scope.var('o').prop('child'), queryWithString(scope, 'o.child'));
+        });
+    });
+    it('should return variable.property.property', () => {
+        return prepare().then(result => {
+            const scope = result.files[0].scopes[0];
+            //assert.strictEqual(scope.var('o').prop('child'), scope.vars.get('o').value.props.get('child'));
+            assert.strictEqual(scope.var('o').prop('child').prop('grandchild'), queryWithString(scope, 'o.child.grandchild'));
+        });
+    });
+    it('should return undefined when calling with non existing property', () => {
+        return prepare().then(result => {
+            const scope = result.files[0].scopes[0];
+            //assert.strictEqual(scope.var('o').prop('child'), scope.vars.get('o').value.props.get('child'));
+            assert.strictEqual(scope.var('o').prop('non existing'), undefined);
+        });
+    });
+    it('should return variable.property variable', () => {
+        return prepare().then(result => {
+            const scope = result.files[0].scopes[0];
+            //assert.strictEqual(scope.var('o').prop('child'), scope.vars.get('o').value.props.get('child'));
+            assert.strictEqual(
+                scope.var('o').prop('foo').var('abc'),
+                queryWithString(scope, 'o.foo abc')
+            );
+        });
+    });
+
+
+});
+
+
 
 describe('queryWithString', () => {
     it('should get property', () => {

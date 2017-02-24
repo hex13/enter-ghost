@@ -6,7 +6,13 @@ const code = `
         child: {
             grandchild: 1234
         },
-        secondChild: 'cat'
+        secondChild: 'cat',
+        foo: function() {
+            const abc = 'alpha';
+        },
+        meth() {
+
+        }
     };
     const m = {name: require('animal')};
 `;
