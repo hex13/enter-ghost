@@ -1,6 +1,6 @@
 "use strict";
 
-function queryWithChain(structure, list, all) {
+function queryWithChain(structure, list, all={files:[]}, cb) {
 
     let curr = structure;
     function resolveCall(value) {
@@ -19,29 +19,38 @@ function queryWithChain(structure, list, all) {
     }
 
     function resolve(value) {
-        if (value.type == 'call') {
+        if (value && value.type == 'call') {
             return resolveCall(value);
         }
         return value;
     }
     list.forEach(function visit(predicate) {
+        if (curr == undefined) return;
         let value = 'value' in curr? curr.value : curr;
 
         value = resolve(value);
-
-
+        if (value == undefined) return;
         switch (predicate.type) {
-            case 'prop':
-                curr = resolve(value.props.get(predicate.name));
+            case 'prop': {
+                const props = value.props;
+                if (props) {
+                    curr = resolve(props.get(predicate.name));
+                } else return
                 break;
-            case 'var':
-                curr = resolve(value.vars.get(predicate.name));
+            }
+            case 'var': {
+                const vars = value.vars;
+                if (vars == undefined) return;
+                curr = resolve(vars.get(predicate.name));
 
+                //cb && cb(curr);
+            }
         }
 
     });
 
-    curr.value = resolve(curr.value);
+    if (curr != undefined)
+        curr.value = resolve(curr && curr.value);
     return curr;
 }
 

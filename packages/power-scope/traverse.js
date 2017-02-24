@@ -6,6 +6,8 @@ const visitor = require('./visitor');
 const commentVisitor = require('./commentVisitor');
 const referenceGatherer = require('./referenceGatherer');
 
+const {queryWithChain} = require('./query');
+
 let visitors = [visitor, commentVisitor];
 
 let visitorsData = new WeakMap;
@@ -66,8 +68,11 @@ function prepareState(node,  parent) {
     state.parent = parent;
     const path = this.__current.path;
     state.key = '';
+    //console.log("PATH",path);
     if (path instanceof Array) {
-        state.key = path[path.length - 1];
+
+        //state.key = path[path.length - 1];
+        state.key = path[0];
     } else {
         state.key = path;
     }
@@ -84,7 +89,10 @@ function enterOrLeave(phase, node, parent) {
         if (node.type.indexOf('Function') == 0) {
             invokeVisitor(visitor, node, 'Function', phase);
         }
-        if (node.type.indexOf('CallExpression') == 0 || node.type.indexOf('MemberExpression') == 0) {
+        if (
+            node.type.indexOf('CallExpression') == 0 || node.type.indexOf('MemberExpression') == 0
+            //|| node.type == 'Identifier'
+        ) {
             invokeVisitor(visitor, node, 'ChainLink', phase);
         }
 
@@ -115,6 +123,55 @@ function checkInvariants(state) {
 
 }
 
+const { lookupBinding } = require('./helpers');
+
+function gatherReferences(all) {
+    all.files.forEach(fileStructure => {
+        fileStructure.scopes.forEach(scope => {
+            scope.chains.forEach(chain => {
+                //console.log("=---CZAJNIK", chain);
+                if (/*chain[0].type == 'var'*/ true) {
+                    const link = chain[0];
+                    const variable = lookupBinding(scope, link.name);//scope.vars.get(link.name);
+                    //console.log("LLLLLL",link)
+                    if (variable) {
+                    //console.log("CZAJNIK", chain[0].name);
+                        variable.refs || (variable.refs = []);
+                        variable.refs.push({
+                            // target: variable,
+                            loc: link.loc
+                        });
+                    }
+
+                    let curr = variable;
+                    for (let i = 1; i < chain.length; i++) {
+                        const link = chain[i];
+                        switch (link.type) {
+                            case 'prop':
+                                if (!curr.value || !curr.value.props)
+                                    return;
+                                curr = curr.value.props.get(link.name);
+                                if (!curr) return;
+                                curr.refs || (curr.refs = []);
+                                curr.refs.push({
+                                    loc: link.loc
+                                })
+                                break;
+                        }
+                    }
+                }
+
+
+                //console.log("WYNICZEK", queryWithChain(scope, chain, all));
+            });
+            const tuples = Array.from(scope.vars);
+            tuples.forEach(tuple => {
+
+            });
+        });
+
+    })
+}
 function analyzeFile(file) {
 
 
@@ -131,6 +188,7 @@ function analyzeFile(file) {
         state.result.path = file.path;
         estraverse.traverse(ast.program, mainVisitor);
         checkInvariants(state);
+
         let lastVisitors = visitors;
         visitors = [referenceGatherer];
 
@@ -155,6 +213,61 @@ module.exports = function (files, resolve, vfs) {
         const file = fileQueue.shift();
         if (file) {
             return analyzeFile(file).then(result => {
+
+                // this code is shit
+                // TODO rewrite it from scratch.
+                result.entityAt = function (pos) {
+                    const inPos = (loc) => (
+                        loc && loc.start.line <= pos.line
+                        && loc.end.line >= pos.line
+                        && loc.start.column <= pos.column
+                        && loc.end.column >= pos.column
+                    );
+
+                    const bindingInPos = (binding) => {
+                        if (!binding.refs) return;
+                        //assert(binding.refs, 'no refs for ' + name;
+                        for (let ri = 0; ri < binding.refs.length; ri++) {
+                            const loc = binding.refs[ri].loc;
+                            if (
+                                loc && loc.start.line == pos.line
+                                && loc.start.column <= pos.column
+                                && loc.end.column >= pos.column
+                            ) {
+                                return binding;
+                            }
+                        }
+                    }
+                    for (let si = 0; si < result.scopes.length; si++) {
+                        const vars = Array.from(result.scopes[si].vars);
+                        for (let vi = 0; vi < vars.length; vi++) {
+                            const [name, binding] = vars[vi];
+                            console.log("BBBBBB",binding)
+                            if (bindingInPos(binding))
+                                return binding;
+                            if (binding.value && binding.value.props) {
+                                const props = Array.from(binding.value.props);
+
+                                for (let pi = 0; pi < props.length; pi++) {
+                                    const prop = props[pi][1];
+                                    if (prop.refs) {
+                                        for (let ri = 0; ri < prop.refs.length;ri++) {
+                                            if (inPos(prop.refs[ri].loc))
+                                                return prop;
+                                        }
+
+                                    }
+
+                                    // if (inPos(prop.loc)) {
+                                    //
+                                    //     return prop;
+                                    // }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 result.requires.forEach(relativePath => {
                     fileQueue.push(vfs.open(resolve(file.path, relativePath)));
                 })
@@ -166,7 +279,12 @@ module.exports = function (files, resolve, vfs) {
             return Promise.resolve(md);
         }
     }
-    return iterate({files: []});
+    // const all =
+
+    return iterate({files: []}).then(all => {
+        gatherReferences(all);
+        return all;
+    });
     //
     // return file.read().then(code => {
     //     analyzeFile(code);

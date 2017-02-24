@@ -56,17 +56,7 @@ function popExpression(state) {
     return state.expr.pop();
 }
 
-function lookupBinding(state, name) {
-    let scope = peek(state.scopes);
-    do {
-        const binding = scope.vars.get(name);
-        if (binding) {
-            return binding;
-        }
-        scope = scope.outerScope;
-    } while (scope);
-
-}
+const { lookupBinding } = require('./helpers');
 
 function setNodeInfo(state, node, name, value) {
     if (!state.shouldSetNodeInfo) {
@@ -74,11 +64,13 @@ function setNodeInfo(state, node, name, value) {
     }
 };
 
-function islastChainLink (state) {
-    return !(
+function islastChainLink (state, node) {
+
+    const isLast = !(
         state.parent.type == 'MemberExpression'
         || (state.parent.type == 'CallExpression' && state.key == 'callee')
     );
+    return isLast;
 
 }
 
@@ -122,7 +114,10 @@ const visitor = ({
             const expr = state.expr.pop();
             const name = getName(node);
             const variable = {
-                loc: node.loc,
+                loc: {
+                    start: node.id.loc.start,
+                    end: node.id.loc.end
+                },
                 name,
                 value: expr.value
             };
@@ -159,8 +154,11 @@ const visitor = ({
             const currObject = peek(state.objects);
 
             //currObject.props.set(name, expr.value);
-            currObject.props.set(name, {
-                loc: node.loc,
+            currObject && currObject.props.set(name, {
+                loc: {
+                    start:  node.key.loc.start,
+                    end:  node.key.loc.end,
+                },
                 value: expr.value
             });
         },
@@ -261,7 +259,23 @@ const visitor = ({
             // ) {
             //     return;
             // }
-            const binding = lookupBinding(state, node.name);
+
+            const binding = lookupBinding(peek(state.scopes), node.name);
+
+            // TODO computed keys should be treat as chains!
+//            if (state.key != 'id' && state.key != 'key' && state.key != 'property' && state.key != 'object') {
+            if (state.parent.type == 'ExpressionStatement' || state.key == 'arguments' ) {
+                //if (node.name == 'az')console.log("KLLUCZUZUZUZUZUZUZUZUZUZU", state.parent, node.name, node.loc.start)
+
+                peek(state.scopes).chains.push([{
+                    loc: {
+                        start: node.loc.start,
+                        end: node.loc.end,
+                    },
+                    type: 'var',
+                    name: node.name
+                }]);
+            }
             //if (!binding) throw node.name;// console.log("!!!!!!!",node.name, state.parent.type);
             //evaluateExpression(state, binding? binding.value : unknown);
 
@@ -291,19 +305,27 @@ const visitor = ({
     },
     ChainLink: {
         enter({node}, state) {
-            if (islastChainLink(state)) {
+            if (node.type == 'Identifier') {
+                return;
+            }
+            if (islastChainLink(state, node)) {
                 const chain = [];
                 peek(state.scopes).chains.push(chain);
                 push(state.chains, chain);
             }
         },
         exit({node}, state) {
+
             const parent = state.parent;
 
 
             if (node.object && node.object.type == 'Identifier') {
                 peek(state.chains).push({
                     name: getName(node.object),
+                    loc: {
+                        start: node.object.loc.start,
+                        end: node.object.loc.end,
+                    },
                     type: 'var',
                 });
             }
@@ -311,6 +333,10 @@ const visitor = ({
             const isCallee = state.parent.type == 'CallExpression' && state.key == 'callee';
             if (node.type == 'MemberExpression') {
                 peek(state.chains).push({
+                    loc: {
+                        start: node.property.loc.start,
+                        end: node.property.loc.end
+                    },
                     name: getName(node.property),
                     type: isCallee? 'call': 'prop',
                     access: isCallee? 'prop': undefined,
@@ -320,13 +346,17 @@ const visitor = ({
             if (node.type == 'CallExpression') {
                 if (node.callee.type == 'Identifier') {
                     peek(state.chains).push({
+                        loc: {
+                            start: node.callee.loc.start,
+                            end:  node.callee.loc.end,
+                        },
                         name: getName(node.callee),
                         type: 'call',
                         access: 'var'
                     });
                 }
             }
-            if (islastChainLink(state)) {
+            if (islastChainLink(state, node)) {
                 pop(state.chains);
             }
 
@@ -338,7 +368,7 @@ const visitor = ({
         },
         exit({node}, state) {
             const chain = analyzeChain(node);
-            let binding = lookupBinding(state, chain[0].name);
+            let binding = lookupBinding(peek(state.scopes), chain[0].name);
             if (!binding) {
                 // create binding
                 binding = {
@@ -349,10 +379,11 @@ const visitor = ({
                 // optimistically assign to global scope
                 state.scopes[0].vars.set(chain[0].name, binding);
             }
-
+            // do we still need analyze chains it this way, when we have analysis in ChainLink
+            // and after we created semantic `chains`?
             let curr = binding, next;
             for (let i = 1; i < chain.length; i++) {
-                if (curr.value.props) {
+                if (curr.value && curr.value.props) {
                     next = curr.value.props.get(chain[i].name);
                     if (!next) {
                         // there is no such property in object, let's create it.

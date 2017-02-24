@@ -4,6 +4,7 @@ const scope = require('../traverse');
 const assert = require('assert');
 const Path = require('path');
 
+
 const inspect = (n,o) => console.log(n,require('util').inspect(o, {colors: true, depth:16}));
 
 const SKIP = Symbol();
@@ -229,7 +230,7 @@ const files = [
                 line: 13, column: 6
             },
             end: {
-                line: 16, column: 1
+                line: 13, column: 9
             }
         })
 
@@ -240,10 +241,113 @@ const files = [
                 line: 14, column: 4
             },
             end: {
-                line: 14, column: 13
+                line: 14, column: 9
             }
         })
 
+        let ref;
+        ref = result.scopes[0].vars.get('obj').refs[0];
+        assert.deepEqual(ref.loc, {
+            start: {
+                line: 23,
+                column: 2
+            },
+            end: {
+                line: 23,
+                column: 5,
+            }
+        });
+
+        let binding;
+        binding = result.scopes[0].vars.get('obj');
+        ref = binding.refs[1];
+
+        assert.deepEqual(ref.loc, {
+            start: {
+                line: 25,
+                column: 5
+            },
+            end: {
+                line: 25,
+                column: 8,
+            }
+        });
+
+        let entity
+        entity = result.entityAt({
+                line: 25,
+                column: 5
+        });
+        assert.strictEqual(entity, binding);
+
+
+        const scope = result.scopes[0];
+
+        let refLoc = {
+            start: {
+                line: 26,
+                column: 6
+            },
+            end: {
+                line: 26,
+                column: 8
+            }
+        };
+        assert.deepEqual(scope.chains[1][1].loc, refLoc);
+
+        assert.deepEqual(scope.vars.get('obj').value.props.get('aa').loc, {
+            start: {
+                line: 16,
+                column: 4
+            },
+            end: {
+                line: 16,
+                column: 6
+            }
+        });
+        assert.deepEqual(scope.vars.get('obj').value.props.get('aa').refs[0].loc, refLoc);
+
+        entity = result.entityAt({
+                line: 26,
+                column: 6
+        });
+
+        assert.strictEqual(entity,  scope.vars.get('obj').value.props.get('aa'));
+
+
+        assert.deepEqual(scope.chains[2][0].loc, {
+            start: {
+                line: 28,
+                column: 0
+            },
+            end: {
+                line: 28,
+                column: 3
+            }
+        });
+        scope.chains.forEach(ch => {
+            const link = ch[0];
+            ch.forEach(link => {
+                assert(link.loc, JSON.stringify(link));
+            })
+            assert(link.loc);
+        });
+
+        //variable.refs
+
+        let prop;
+        prop = result.scopes[0].vars.get('obj').value.props.get('prop1');
+        assert.equal(prop.refs.length, 1);
+        assert.deepEqual(prop.refs[0].loc, {
+            start: {
+                line: 33,
+                column: 4
+            },
+            end: {
+                line: 33,
+                column: 9
+            }
+        });
     }],
     [__dirname + '/../mocks/chains.js', (result, all) => {
         const scope = result.scopes[0];
@@ -251,8 +355,10 @@ const files = [
 
 
         let chain;
+        assert.equal(scope.chains.length, 6);
+
+
         chain = scope.chains[0];
-        assert.equal(scope.chains.length, 5);
 
         assert.equal(chain.length, 5);
 
@@ -325,6 +431,12 @@ const files = [
         assert.equal(chain[2].name, 'cy');
         assert.equal(chain[2].type, 'prop');
 
+        chain = scope.chains[5];
+        assert.equal(chain.length, 1);
+
+        assert.equal(chain[0].name, 'cosTam');
+        assert.equal(chain[0].type, 'call');
+
         //
 
          // assert.equal(chain, 3);
@@ -336,8 +448,19 @@ const files = [
         // assert.equal(Abc.name, 'Abc');
     }],
     [__dirname + '/../mocks/references.js', (result, all) => {
-        // const Abc = result.scopes[0].vars.get('Abc');
-        // assert.equal(Abc.value.type, 'class');
+        const variable = result.scopes[0].vars.get('o');
+        console.log("BLBLLW")
+        inspect(result.scopes[0].chains);
+
+        assert.equal(variable.refs.length, 5);
+
+        // assert.equal(Abc.name, 'Abc');
+    }],
+    [__dirname + '/../mocks/weirdCode.js', (result, all) => {
+        assert.equal(result.scopes.length, 2, 'It should not crash when code is weird.');
+        //asert.equal(result.scopes[0].vars.get('a').value.props.get('b'))
+        // const variable = result.scopes[0].vars.get('o');
+        //  assert.equal(variable.references.length, 3);
         // assert.equal(Abc.name, 'Abc');
     }],
 

@@ -15,3 +15,7 @@ something(o);
 const notThis = {o: 2};
 
 const alsoNotThis = aa.o;
+
+if (true) {
+    o;
+}

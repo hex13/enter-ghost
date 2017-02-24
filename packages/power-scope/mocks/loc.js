@@ -13,4 +13,21 @@ if (true) { // 1
 const obj = {
     prop1: 24,
     prop2: 'kotek',
-}
+    aa: {
+        nested: {
+            aa: 1
+        }
+    }
+};
+
+  obj;
+
+     obj
+     .aa.oo;
+
+obj   (
+);
+
+obj().a;
+
+obj.prop1;

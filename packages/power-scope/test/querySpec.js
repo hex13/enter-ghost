@@ -3,6 +3,19 @@ const {time }= require('./utilsForTests');
 const assert = require('assert');
 
 const { prepare } = require('./utilsForTests.js');
+// TODO
+//
+// scope.vars.get('obj').value.props.get('child').value.props.get('grandchild').value;
+//
+// scope.vars.get('obj').props.get('child').props.get('grandchild').value
+//
+// scope.var('obj').prop('child').prop('grandchild').value
+//
+// scope.vars.get('obj').props.get('child').props.get('grandchild').value = 1;
+//
+// scope.var('obj').prop('child').prop('grandchild', 3);
+//
+//
 
 describe('parseQuery', () => {
     it('should parse query without spaces', () => {
