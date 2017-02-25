@@ -318,7 +318,7 @@ const visitor = ({
 
             const right = popExpression(state);
             //binding.value = right.value;
-            state.lvalue.value = right.value;
+            state.lvalue && (state.lvalue.value = right.value);
 
 
         }
