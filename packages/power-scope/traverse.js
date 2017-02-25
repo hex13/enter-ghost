@@ -206,7 +206,10 @@ function analyzeFile(file) {
 
 }
 
-module.exports = function (files, resolve, vfs) {
+module.exports = function (files, resolve, vfs, opts) {
+    opts = opts || {
+        followRequires: true
+    };
     const fileQueue = files.slice(0);
 // HERE asynchronous recursion
     function iterate(md) {
@@ -268,9 +271,11 @@ module.exports = function (files, resolve, vfs) {
                     }
                 }
 
-                result.requires.forEach(relativePath => {
-                    fileQueue.push(vfs.open(resolve(file.path, relativePath)));
-                })
+                if (opts.followRequires) {
+                    result.requires.forEach(relativePath => {
+                        fileQueue.push(vfs.open(resolve(file.path, relativePath)));
+                    })
+                }
                 md.files.push(result)
                 if (files.length)
                     return iterate(md)
