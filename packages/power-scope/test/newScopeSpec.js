@@ -469,7 +469,23 @@ const files = [
         //  assert.equal(variable.references.length, 3);
         // assert.equal(Abc.name, 'Abc');
     }],
+    [__dirname + '/../mocks/implicit.js', (result, all) => {
+        assert(result.scopes[0].vars.get('cat'));
+        assert(result.scopes[0].vars.get('cat').value.props.get('kitty'));
+        assert(result.scopes[0].vars.get('cat').value.props.get('kitty').value.props.get('kitten'));
 
+        assert(result.scopes[0].var('cat').prop('kitty').prop('kitten').prop('smallKitten'));
+
+        assert(result.scopes[0].vars.get('cat').value.props.get('eat'));
+
+        assert(result.scopes[0].var('cat').prop('eat').prop);
+
+        assert(result.scopes[0].var('dog').prop('much'));
+        //asert.equal(result.scopes[0].vars.get('a').value.props.get('b'))
+        // const variable = result.scopes[0].vars.get('o');
+        //  assert.equal(variable.references.length, 3);
+        // assert.equal(Abc.name, 'Abc');
+    }],
 
 ];
 

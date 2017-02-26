@@ -389,13 +389,14 @@ const visitor = ({
         exit({node}, state) {
             const chain = analyzeChain(node);
             let binding = lookupBinding(peek(state.scopes), chain[0].name);
+
             if (!binding) {
                 // create binding
-                binding = {
+                binding = Entity({
                     value: {
                         props: new Map
                     }
-                };
+                }, node.loc);
                 // optimistically assign to global scope
                 state.scopes[0].vars.set(chain[0].name, binding);
             }
@@ -406,10 +407,13 @@ const visitor = ({
                 if (curr.value && curr.value.props) {
                     next = curr.value.props.get(chain[i].name);
                     if (!next) {
+
                         // there is no such property in object, let's create it.
-                        curr.value.props.set(chain[i].name, {
-                            props: new Map
-                        });
+                        curr.value.props.set(chain[i].name, Entity({
+                            value: {
+                                props: new Map,
+                            }
+                        }, chain[i].loc));
                         next = curr.value.props.get(chain[i].name);
                     }
                     curr = next;

@@ -130,11 +130,12 @@ function gatherReferences(all) {
         fileStructure.scopes.forEach(scope => {
             scope.chains.forEach(chain => {
                 //console.log("=---CZAJNIK", chain);
-                if (/*chain[0].type == 'var'*/ true) {
+                if (chain.length/*chain[0].type == 'var'*/ ) {
                     const link = chain[0];
-                    const variable = lookupBinding(scope, link.name);//scope.vars.get(link.name);
+                    const variable = lookupBinding(scope, link && link.name);//scope.vars.get(link.name);
                     //console.log("LLLLLL",link)
                     if (variable) {
+                        if (!link) console.error("NONLINE", chain)
                     //console.log("CZAJNIK", chain[0].name);
                         variable.refs || (variable.refs = []);
                         variable.refs.push({
@@ -148,7 +149,7 @@ function gatherReferences(all) {
                         const link = chain[i];
                         switch (link.type) {
                             case 'prop':
-                                if (!curr.value || !curr.value.props)
+                                if (!curr || !curr.value || !curr.value.props)
                                     return;
                                 curr = curr.value.props.get(link.name);
                                 if (!curr) return;
