@@ -12,3 +12,8 @@ let dog = {};
 dog.wow;
 
 dog.much();
+
+function someFunc(dog) {
+    dog.asArgument;
+    this.op.ap;
+}
