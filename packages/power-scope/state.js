@@ -8,7 +8,9 @@ function State(analysis) {
     this.props = [];
 }
 
-State.prototype = {
+const naiveModel1 = require('./naiveModel1').stateMixin;
+
+State.prototype = Object.assign({
     prepareFromEstraverse(ctx, node, parent) {
         this.node = node;
         this.parent = parent;
@@ -21,8 +23,8 @@ State.prototype = {
         } else {
             this.key = path;
         }
-    }
-};
+    },
+}, naiveModel1);
 
 
 module.exports = State;

@@ -23,4 +23,6 @@ if (true) {
     if (kotek) {
 
     }
+
+    const {forSmokeTestOfObjectPattern} = {};
 }

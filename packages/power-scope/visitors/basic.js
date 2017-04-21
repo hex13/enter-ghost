@@ -14,7 +14,12 @@ const variableDeclarationVisitor = {
 
 
         node.declarations.forEach(node => {
-            assert.equal(node.id.type, 'Identifier', 'TODO support for other types of id than identifier')
+            if (node.id.type != 'Identifier') {
+                //assert.equal(node.id.type, 'Identifier', 'TODO support for other types of id than identifier')
+                console.warn('TODO support for other types of id than identifier');
+                return;
+            }
+
             const name = getName(node);
 
             let scope;
@@ -24,16 +29,15 @@ const variableDeclarationVisitor = {
                 scope = state.blockScopes[state.blockScopes.length - 1];
             }
 
-            const props = Object.create(null);
-            const expr = state.expr.pop();
 
-            state.analysis.entities.push({
+            state.declareVariable({
                 name,
                 loc: node.id.loc,
                 scope,
                 kind,
-                props: expr
-            });
+            }, state.expr.pop());
+
+            //state.analysis.entities.push();
         });
     },
     enter(node, state) {
@@ -45,32 +49,30 @@ const variableDeclarationVisitor = {
 module.exports = {
     ObjectProperty: {
         enter(node, state) {
+
         },
         exit(node, state) {
-            const expr = state.expr.pop();
-
-            console.log("$$$$", node.key.name)
-            state.props[state.props.length - 1].push({
+            state.declareProperty({
                 name: node.key.name,
                 loc: node.key.loc,
-                props: expr
-            });
+            }, state.expr.pop());
         }
+    },
+    ObjectPattern: {
+        enter(node, state) {
+            state.enterObject();
+        },
+        exit(node, state) {
+            state.exitObject();
+        }
+
     },
     ObjectExpression: {
         enter(node, state) {
-            state.props.push([]);
+            state.enterObject();
         },
         exit(node, state) {
-            const props = state.props.pop();
-
-            // node.properties.forEach(prop => {
-            //     props.push({
-            //         name: prop.key.name,
-            //         loc: prop.key.loc
-            //     });
-            // });
-            state.expr.push(props);
+            state.exitObject();
         }
     },
     Scope: {

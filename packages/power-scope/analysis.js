@@ -7,6 +7,8 @@ function Analysis() {
     this.refs = [];
 }
 
+model = require('./naiveModel1').analysisUtil;
+
 Analysis.prototype = {
     getScopes() {
         return this.scopes;
@@ -35,7 +37,7 @@ Analysis.prototype = {
         const name = ref[0].key;
         let scope = ref[0].scope;
         let entity;
-
+        if (!scope) return;
         do {
             entity = this.entities.find(entity => {
                 return entity.scope === scope && entity.name == name;
@@ -49,8 +51,8 @@ Analysis.prototype = {
                 if (ref[i].key == '.') {
                     op = 'prop';
                 } else {
-                    if (op == 'prop') {
-                        curr = curr.props.find(prop => prop.name == [ref[i].key]);
+                    if (op == 'prop' && curr && model.hasProps(curr)) {
+                        curr = model.getProperty(curr, ref[i].key);
                     }
 
                 }
