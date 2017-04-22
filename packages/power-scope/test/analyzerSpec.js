@@ -7,6 +7,7 @@ const fs = require('fs');
 
 const basicCode = fs.readFileSync(__dirname + '/../mocks/basic.js', 'utf8');
 const chainCode = fs.readFileSync(__dirname + '/../mocks/chains.js', 'utf8');
+const refsCode = fs.readFileSync(__dirname + '/../mocks/refs.js', 'utf8');
 
 const parse = require('babylon').parse;
 
@@ -216,6 +217,15 @@ describe('Analyzer (chains)', () => {
         });
         def = analysis.resolveRef(ref);
         assertSameLoc(def.loc, [4, 19, 4, 20]);
+
+        ref = analysis.refAt({
+            line: 29,
+            column: 12,
+        });
+
+        def = analysis.resolveRef(ref);
+
+        assert(def == undefined);
     });
 
 });
@@ -258,4 +268,48 @@ describe('Education mode', () => {
         assertSameLoc(info.loc, [8, 32, 8, 36]);
 
     });
+});
+
+
+describe('refs', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    beforeEach(() => {
+        ast = parse(refsCode);
+        analyzer = new Analyzer();
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('', () => {
+        let ref, def, refs;
+        ref = analysis.refAt({
+            line: 10, column: 0
+        });
+        assert.equal(ref.length, 1);
+        assert.equal(ref[0].key, 'o');
+
+        def = analysis.resolveRef(ref);
+        assert.equal(def.loc.start.line, 1);
+        assert.equal(def.loc.start.column, 6);
+        assert.equal(def.loc.end.line, 1);
+        assert.equal(def.loc.end.column, 7);
+
+        refs = analysis.refsFor(def);
+
+        console.log("REFY",refs)
+        assert.equal(refs.length, 9);
+        assert.equal(refs[0].length, 1);
+        assertSameLoc(refs[0][0].loc, [8, 0, 8, 1]);
+
+        ref = analysis.refAt({
+            line: 20, column: 3
+        });
+        def = analysis.resolveRef(ref);
+        //refs = analysis.refsFor(def);
+
+
+    });
+
 });

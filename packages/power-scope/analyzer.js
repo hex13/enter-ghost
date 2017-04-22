@@ -78,6 +78,7 @@ Analyzer.prototype.analyze = function analyze(ast) {
 
     estraverse.traverse(ast, mainVisitor);
 
+    analysis.postprocess();
     return analysis;
 }
 

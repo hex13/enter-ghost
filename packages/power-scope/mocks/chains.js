@@ -25,4 +25,6 @@ if (true) {
     }
 
     const {forSmokeTestOfObjectPattern} = {};
+    let foo = [];
+    a = foo.nonExistent;
 }

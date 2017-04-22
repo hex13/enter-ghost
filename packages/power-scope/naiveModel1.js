@@ -18,7 +18,6 @@ exports.stateMixin = {
 
 exports.analysisUtil = {
     getProperty(obj, name) {
-        console.log("OBJ!", obj);
         return obj.props.find(prop => prop.name == name);
     },
     hasProps(obj) {

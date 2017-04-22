@@ -38,12 +38,14 @@ Analysis.prototype = {
         let scope = ref[0].scope;
         let entity;
         if (!scope) return;
+        console.log("RESOLVE REF", ref.map(p=>p.key).join(''));
         do {
             entity = this.entities.find(entity => {
                 return entity.scope === scope && entity.name == name;
             });
             scope = scope.parent;
         } while(!entity && scope);
+
         if (ref.length > 1) {
             let op = '';
             let curr = entity;
@@ -53,6 +55,12 @@ Analysis.prototype = {
                 } else {
                     if (op == 'prop' && curr && model.hasProps(curr)) {
                         curr = model.getProperty(curr, ref[i].key);
+                    } else {
+                        return;
+                    }
+                    if (!curr)  {
+                        return
+                        //console.log("!!!!!ZN", ref.map(p=>p.key).join(''))
                     }
 
                 }
@@ -60,6 +68,26 @@ Analysis.prototype = {
             return curr;
         }
         return entity;
+    },
+    refsFor(def) {
+        return def.refs;
+    },
+    postprocess() {
+        this.refs.forEach(ref_ => {
+            const ref = ref_.slice();
+            while (ref.length) {
+                const entity = this.resolveRef(ref);
+                if (entity) {
+                    //console.log("YYYY", ref.map(part=>part.key).join(''));
+                    entity.refs = entity.refs || [];
+                    entity.refs.push(ref.slice());
+                }
+                ref.pop();
+                if (ref.length && ref[ref.length - 1].key == '.') ref.pop();
+            }
+            //console.log("YYYYY", entity);
+            //console.log("REFIK", ref.map(part=>part.key).join(''));
+        });
     }
 };
 
