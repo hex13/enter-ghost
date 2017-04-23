@@ -167,13 +167,14 @@ module.exports = {
     },
     ForStatement: {
         enter(node, state) {
-
-            variableDeclarationVisitor.enter(node.init, state, 'kotek');
+            if (node.init && node.init.type == 'VariableDeclaration')
+                variableDeclarationVisitor.enter(node.init, state, 'kotek');
         },
         exit(node, state) {
 
             //state.blockScopes.push(state.forScope);
-            variableDeclarationVisitor.exit(node.init, state, 'kotek');
+            if (node.init && node.init.type == 'VariableDeclaration')
+                variableDeclarationVisitor.exit(node.init, state, 'kotek');
             //state.blockScopes.pop();
         }
     },
