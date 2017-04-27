@@ -6,9 +6,6 @@ const estraverse = require('estraverse');
 const Analysis = require('./analysis');
 const State = require('./state');
 
-const basicVisitor = require('./visitors/basic');
-const eduVisitor = require('./visitors/edu');
-
 const { isScope } = require('./helpers');
 
 function invokeVisitor(visitor, node, type, phase, state) {
@@ -53,16 +50,17 @@ function enterOrLeave(phase, state) {
     });
 }
 
-function Analyzer() {
+function Analyzer(opts = {}) {
     this.scopes = [];
+    this.visitors = opts.visitors;
 }
 
 
-Analyzer.prototype.analyze = function analyze(ast) {
+Analyzer.prototype.analyze = function analyze(ast, opts) {
     const analysis = new Analysis();
 
     const state = new State(analysis);
-    state.visitors = [basicVisitor, eduVisitor]
+    state.visitors = this.visitors;
 
     const mainVisitor = {
         enter(node, parent) {

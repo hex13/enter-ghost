@@ -9,9 +9,18 @@ const basicCode = fs.readFileSync(__dirname + '/../mocks/basic.js', 'utf8');
 const chainCode = fs.readFileSync(__dirname + '/../mocks/chains.js', 'utf8');
 const refsCode = fs.readFileSync(__dirname + '/../mocks/refs.js', 'utf8');
 
+const basicVisitor = require('../visitors/basic');
+const eduVisitor = require('../visitors/edu');
+
+const analyzerOpts = {
+    visitors: [basicVisitor, eduVisitor]
+}
+
+
 const parse = require('babylon').parse;
 
 const { assertSameLoc } = require('../testHelpers');
+
 
 describe('Analyzer', () => {
 
@@ -20,7 +29,7 @@ describe('Analyzer', () => {
     let analysis;
     beforeEach(() => {
         ast = parse(basicCode);
-        analyzer = new Analyzer();
+        analyzer = new Analyzer(analyzerOpts);
         analysis = analyzer.analyze(ast);
     });
 
@@ -135,7 +144,7 @@ describe('Analyzer (chains)', () => {
     let analysis;
     beforeEach(() => {
         ast = parse(chainCode);
-        analyzer = new Analyzer();
+        analyzer = new Analyzer(analyzerOpts);
         analysis = analyzer.analyze(ast);
     });
 
@@ -238,7 +247,7 @@ describe('Education mode', () => {
     let analysis;
     beforeEach(() => {
         ast = parse(basicCode);
-        analyzer = new Analyzer();
+        analyzer = new Analyzer(analyzerOpts);
         analysis = analyzer.analyze(ast);
     });
 
@@ -278,7 +287,7 @@ describe('refs', () => {
     let analysis;
     beforeEach(() => {
         ast = parse(refsCode);
-        analyzer = new Analyzer();
+        analyzer = new Analyzer(analyzerOpts);
         analysis = analyzer.analyze(ast);
     });
 
