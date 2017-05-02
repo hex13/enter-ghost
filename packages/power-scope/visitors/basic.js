@@ -3,45 +3,24 @@
 const assert = require('assert');
 const { getName } = require('lupa-utils');
 
+const log = console.log;
 const variableDeclarationVisitor = {
     exit(node, state,c) {
-        //assert(state.parent.type, 'VariableDeclaration');
-        if (state.parent.type == 'ForStatement') {
-            return;
-        }
+        const path = state.path;
 
-        const kind = node.kind;
-
-
-        node.declarations.forEach(node => {
-            if (node.id.type != 'Identifier') {
-                //assert.equal(node.id.type, 'Identifier', 'TODO support for other types of id than identifier')
-                console.warn('TODO support for other types of id than identifier');
-                return;
-            }
-
-            const name = getName(node);
-
-            let scope;
-            if (kind == 'var') {
-                scope = state.functionScopes[state.functionScopes.length - 1];
-            } else {
-                scope = state.blockScopes[state.blockScopes.length - 1];
-            }
-
-
-            state.declareVariable({
-                name,
-                loc: node.id.loc,
-                scope,
-                kind,
-            }, state.expr.pop());
-
-            //state.analysis.entities.push();
-        });
+        state.scopes.pop();
+        state.path.pop();
     },
     enter(node, state) {
+        let scope;
+        if (node.kind == 'var') {
+            scope = state.functionScopes[state.functionScopes.length - 1];
+        } else {
+            scope = state.blockScopes[state.blockScopes.length - 1];
+        }
 
+        state.scopes.push(scope);
+        state.path.push(getName(node));
     }
 }
 
@@ -49,13 +28,24 @@ const variableDeclarationVisitor = {
 module.exports = {
     ObjectProperty: {
         enter(node, state) {
-
+            const ctx = state.last('ctx');
+            if (!ctx) return;
+            ctx.path.push(getName(node));
+            console.log("PROOOOOP", ctx, getName(node))
         },
         exit(node, state) {
-            state.declareProperty({
-                name: node.key.name,
+            const name = getName(node);
+            const ctx = state.last('ctx');
+            if (!ctx) return;
+            const key = ctx.name + ctx.path.map(key => '.' + key).join('');
+
+            state.declareVariable({
+                name: key,
                 loc: node.key.loc,
-            }, state.expr.pop());
+                scope: state.scopes[state.scopes.length - 1],
+            });
+
+            ctx.path.pop();
         }
     },
     ObjectPattern: {
@@ -70,9 +60,11 @@ module.exports = {
     ObjectExpression: {
         enter(node, state) {
             state.enterObject();
+            state.expr.push([]);
         },
         exit(node, state) {
             state.exitObject();
+            const expr = state.expr.pop();
         }
     },
     Scope: {
@@ -86,6 +78,7 @@ module.exports = {
             const scope = {
                 loc: node.loc,
                 isFunctionScope,
+                entries: Object.create(null),
                 parent: state.blockScopes[state.blockScopes.length - 1],
             };
             state.analysis.scopes.push(scope);
@@ -116,6 +109,7 @@ module.exports = {
             const chain = state.chains[state.chains.length - 1];
             if (node.object.type == 'Identifier') {
                 chain.push({
+                    isChain: true,
                     key: getName(node.object),
                     scope: state.blockScopes[state.blockScopes.length - 1],
                     loc: node.object.loc
@@ -140,6 +134,7 @@ module.exports = {
             const key = state.key;
             if (key == 'expression' || key == 'arguments' || key == 'test' || key == 'left' || key == 'argument' || key == 'right' || key == 'init') {
                 state.analysis.refs.push([{
+                    isChain: true,
                     key: getName(node),
                     loc: node.loc,
                     scope: state.blockScopes[state.blockScopes.length - 1]
@@ -149,20 +144,26 @@ module.exports = {
     },
     CallExpression: {
         enter(node, state) {
+            state.ctx.push(null);
+
         },
         exit(node, state) {
-            state.chains[state.chains.length - 1].push({
-                key: '()'
-            });
+            state.ctx.pop();
+            // state.chains[state.chains.length - 1].push({
+            //     key: '()'
+            // });
         }
     },
     ChainEnd: {
         enter(node, state) {
-            state.chains.push([]);
+            const chain = [];
+            state.chains.push(chain);
         },
         exit(node, state) {
             const ref = state.chains.pop();
-            state.analysis.refs.push(ref);
+            if (ref.length) {
+                state.analysis.refs.push(ref);
+            }
         },
     },
     ForStatement: {
@@ -179,4 +180,42 @@ module.exports = {
         }
     },
     VariableDeclaration: variableDeclarationVisitor,
+    VariableDeclarator: {
+        enter(node, state) {
+            state.ctx.push({
+                name: getName(node),
+                path: [],
+                scope: state.scopes[state.scopes.length - 1]
+            });
+            console.log("=".repeat(20))
+        },
+        exit(node, state) {
+            const expr = state.expr.pop();
+            const name = getName(node);
+            //console.log("EEEE",expr)
+            state.declareVariable({
+                name,
+                loc: node.id.loc,
+                scope: state.scopes[state.scopes.length - 1],
+            }, expr);
+
+            state.ctx.pop();
+            console.log("-------------CTXLEN-------------------", state.ctx.length)
+            console.log("/=".repeat(20))
+            //
+            // state.declareVariable({
+            //     name: name + '.prop1',
+            //     loc: node.id.loc,
+            //     scope: state.scopes[state.scopes.length - 1],
+            // });
+            //
+            // state.declareVariable({
+            //     name: name + '.prop1.deepProp',
+            //     loc: node.id.loc,
+            //     scope: state.scopes[state.scopes.length - 1],
+            // });
+
+        }
+    },
+
 };

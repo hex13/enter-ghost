@@ -25,3 +25,19 @@ function assertSameLoc(given, expected) {
 }
 
 exports.assertSameLoc = assertSameLoc;
+
+
+function assertLength(array, length) {
+    assert.equal(array.length, length);
+}
+
+function assertLengthWithWarning(array, length) {
+    if (array.length != length)
+        console.warn("array length mismatch. It should equal ", length, " but it equals ", array.length);
+}
+
+
+exports.assertLength = assertLength;
+exports.assertLengthWithWarning = assertLengthWithWarning;
+
+exports.nop = () => {};

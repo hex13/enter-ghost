@@ -6,6 +6,9 @@ function State(analysis) {
     this.chains = [];
     this.expr = [];
     this.props = [];
+    this.path = [];
+    this.scopes = [];
+    this.ctx = [];
 }
 
 const naiveModel1 = require('./naiveModel1').stateMixin;
@@ -24,6 +27,10 @@ State.prototype = Object.assign({
             this.key = path;
         }
     },
+    last(arrName) {
+        const arr = this[arrName];
+        return arr[arr.length - 1];
+    }
 }, naiveModel1);
 
 

@@ -45,6 +45,7 @@ function enterOrLeave(phase, state) {
             invokeVisitor(visitor, node, 'Scope', phase, state);
         }
         if (isChainEnd(node, state)) {
+            console.log("CHAIN END")
             invokeVisitor(visitor, node, 'ChainEnd', phase, state);
         }
     });
