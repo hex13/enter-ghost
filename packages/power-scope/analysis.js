@@ -99,6 +99,9 @@ Analysis.prototype = {
             return item.map(part => part.key).join('');
         }
     },
+    getEntry(scope, name) {
+        return scope.entries[name];
+    },
     resolveRef(ref) {
         const name = ref[0].key;
         let scope = ref[0].scope;
@@ -110,7 +113,7 @@ Analysis.prototype = {
         do {
             entries = this.getEntries(scope);
             //console.log('=3==3=3=3=33=', entries)
-            entity = entries[name];
+            entity = this.getEntry(scope, name);
             //entity = this.
             // entity = this.entities.find(entity => {
             //     return entity.scope === scope && entity.name == name;
