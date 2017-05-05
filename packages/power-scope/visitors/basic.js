@@ -26,7 +26,31 @@ const variableDeclarationVisitor = {
 
 
 module.exports = {
+    ObjectMethod: {
+        // TODO remove duplication
+        enter(node, state) {
+            const ctx = state.last('ctx');
+            if (!ctx) return;
+            ctx.path.push(getName(node));
+            console.log("PROOOOOP", ctx, getName(node))
+        },
+        exit(node, state) {
+            const name = getName(node);
+            const ctx = state.last('ctx');
+            if (!ctx) return;
+            const key = ctx.name + ctx.path.map(key => '.' + key).join('');
+
+            state.declareVariable({
+                name: key,
+                loc: node.key.loc,
+                scope: state.scopes[state.scopes.length - 1],
+            });
+
+            ctx.path.pop();
+        }
+    },
     ObjectProperty: {
+        // TODO remove duplication
         enter(node, state) {
             const ctx = state.last('ctx');
             if (!ctx) return;
@@ -145,7 +169,16 @@ module.exports = {
     CallExpression: {
         enter(node, state) {
             state.ctx.push(null);
+            console.log("REJESTRACJA X@) #)#)#)  ## )", getName(node.callee))
+            if (node.callee.type == 'Identifier') {
+                state.analysis.refs.push([{
+                    isChain: true,
+                    key: getName(node.callee),
+                    loc: node.callee.loc,
+                    scope: state.blockScopes[state.blockScopes.length - 1]
+                }]);
 
+            }
         },
         exit(node, state) {
             state.ctx.pop();
@@ -179,6 +212,18 @@ module.exports = {
             //state.blockScopes.pop();
         }
     },
+    FunctionDeclaration: {
+        enter(node, state) {
+
+        },
+        exit(node, state) {
+            state.declareVariable({
+                name: node.id.name,
+                loc: node.id.loc,
+                scope: state.blockScopes[state.blockScopes.length - 1],
+            });
+        }
+    },
     VariableDeclaration: variableDeclarationVisitor,
     VariableDeclarator: {
         enter(node, state) {
@@ -200,8 +245,7 @@ module.exports = {
             }, expr);
 
             state.ctx.pop();
-            console.log("-------------CTXLEN-------------------", state.ctx.length)
-            console.log("/=".repeat(20))
+
             //
             // state.declareVariable({
             //     name: name + '.prop1',

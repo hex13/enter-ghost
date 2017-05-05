@@ -10,10 +10,10 @@ const abc = {
 
 let def = 3;
 function abc () {
-    const ooo = {abc: {def: 1}}
+    const ooo = {abc: {def: 1}, meth() {} };
     let aa;
     ooo;
-    ooo.abc.def;
+    ooo.abc.def; ooo.meth();
 }
 
 if (true) {
@@ -21,7 +21,7 @@ if (true) {
 
 }
 
-function def () {
+function foo (arg1) {
 
 }
 
@@ -31,3 +31,5 @@ for (let i = 0; i < 10; i++) {
 }
 
 const something = someFunction({not:2});
+
+foo; foo();

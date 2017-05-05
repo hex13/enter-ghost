@@ -78,7 +78,6 @@ Analysis.prototype = {
         return item.loc;
     },
     refAt(pos) {
-        console.log("R##@ DDD KOT", this.refs)
         for (let ri = 0; ri < this.refs.length; ri++) {
             const item = this.refs[ri];
 

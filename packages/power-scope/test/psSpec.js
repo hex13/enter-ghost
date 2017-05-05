@@ -38,14 +38,21 @@ describe('Analyzer', () => {
 
     it('should have appropriate scopes', () => {
         scopes = analysis.getScopes();
-        assert.equal(scopes.length, 6);
+        assert.equal(scopes.length, 7);
+    });
+
+
+    it('should have appropriate rfs', () => {
+        analysis.refs.forEach(ref => {
+            const text = analysis.textOf(ref);
+            assert(ref.length > 1 || (!text.includes('.')), `${text} should not be in one part ref`);
+        });
     });
 
     it('should have appropriate entries', () => {
         const entries = analysis.getEntries(scopes[0]);
-
         assertLength(Object.keys(entries), 5);
-        console.log("####",entries)
+
         assert(entries['abc']);
         assert(entries['abc.prop1']);
         assert(entries['abc.prop1.deepProp']);
@@ -53,9 +60,11 @@ describe('Analyzer', () => {
         assert(entries['def']);
         assert(entries['something']);
         assert(!entries['something.not']);
+        assert(entries['foo']);
         assert.equal(entries['abc'].name, 'abc');
         //assert(entries['abc.prop']);
         assert.equal(entries['def'].name, 'def');
+        //console.log("@@@@".repeat(20), entries['def'].scope.entries);
     });
 
     it('should return scopeAt', () => {
@@ -121,15 +130,16 @@ describe('Analyzer', () => {
             [[16, 4], [13, 10, 13, 13]], // `ooo`
             [[16, 12], [13, 23, 13, 26]], // `ooo.abc`
             [[16, 10], [13, 17, 13, 20]], // `ooo.abc.def`
+            // another chain, with method calling
+            [[16, 23], [13, 32, 13, 36]], // `ooo.meth`
         ];
 
         refToDef.forEach(([[line, column], defLoc]) => {
-            console.log("LYNIA".repeat(30), line, column)
             ref = analysis.refAt({
                 line, column
             });
             entry = analysis.resolveRef(ref);
-            assert(entry);
+            assert(entry, `ref at ${line}:${column} should be resolved to an entry`);
             assertSameLoc(analysis.rangeOf(entry), defLoc);
         });
     });
