@@ -15,5 +15,14 @@ function posInLoc(pos, loc) {
     );
 }
 
+function isFunctionScope(node, parent) {
+    return (
+        node.type == 'Program'
+        || parent.type == 'ClassMethod'
+        || parent.type.includes('Function')
+    );
+}
+
 exports.isScope = isScope;
 exports.posInLoc = posInLoc;
+exports.isFunctionScope = isFunctionScope;

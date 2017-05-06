@@ -2,6 +2,8 @@
 
 const assert = require('assert');
 const { getName } = require('lupa-utils');
+const Scope = require('../Scope');
+const _isFunctionScope = require('../helpers').isFunctionScope;
 
 const log = console.log;
 const variableDeclarationVisitor = {
@@ -94,17 +96,12 @@ module.exports = {
     Scope: {
         enter(node, state) {
             const parent = state.parent;
-            const isFunctionScope = (
-                node.type == 'Program'
-                || parent.type == 'ClassMethod'
-                || parent.type.includes('Function')
-            );
-            const scope = {
+            const isFunctionScope = _isFunctionScope(node, parent);
+            const scope = new Scope({
                 loc: node.loc,
                 isFunctionScope,
-                entries: Object.create(null),
                 parent: state.blockScopes[state.blockScopes.length - 1],
-            };
+            });
             state.analysis.scopes.push(scope);
             state.blockScopes.push(scope);
             if (isFunctionScope) {
@@ -118,11 +115,8 @@ module.exports = {
                 //state.forScope = scope;
             }
             const parent = state.parent;
-            const isFunctionScope = (
-                node.type == 'Program'
-                || parent.type == 'ClassMethod'
-                || parent.type.includes('Function')
-            );
+
+            const isFunctionScope = _isFunctionScope(node, parent);
             if (isFunctionScope) {
                 state.functionScopes.pop();
             }
@@ -224,12 +218,11 @@ module.exports = {
     },
     FunctionDeclaration: {
         enter(node, state) {
-            const scope = {
+            const scope = new Scope({
                 loc: node.loc,
                 isFunctionScope: true,
-                entries: Object.create(null),
                 parent: state.functionScopes[state.functionScopes.length - 1],
-            };
+            });
             state.analysis.scopes.push(scope);
             state.blockScopes.push(scope);
             state.functionScopes.push(scope);
