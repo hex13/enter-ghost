@@ -22,7 +22,10 @@ if (true) {
 }
 
 function foo (arg1) {
+    arg1;
 
+
+    
 }
 
 

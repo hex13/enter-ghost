@@ -113,8 +113,18 @@ module.exports = {
         },
         exit(node, state) {
             const scope = state.blockScopes.pop();
+            state.poppedScope = scope;
             if (state.parent.type == 'ForStatement') {
                 //state.forScope = scope;
+            }
+            const parent = state.parent;
+            const isFunctionScope = (
+                node.type == 'Program'
+                || parent.type == 'ClassMethod'
+                || parent.type.includes('Function')
+            );
+            if (isFunctionScope) {
+                state.functionScopes.pop();
             }
 
         }
@@ -214,9 +224,31 @@ module.exports = {
     },
     FunctionDeclaration: {
         enter(node, state) {
+            const scope = {
+                loc: node.loc,
+                isFunctionScope: true,
+                entries: Object.create(null),
+                parent: state.functionScopes[state.functionScopes.length - 1],
+            };
+            state.analysis.scopes.push(scope);
+            state.blockScopes.push(scope);
+            state.functionScopes.push(scope);
 
         },
         exit(node, state) {
+            node.params.forEach(param => {
+                if (param.type == 'Identifier') {
+                    console.log("NAZWA#", param.name,  state.functionScopes[state.functionScopes.length - 1])
+                    state.declareVariable({
+                        name: param.name,
+                        loc: param.loc,
+                        scope: state.functionScopes[state.functionScopes.length - 1],
+                    });
+                } else ;// throw new Error('TODO support for params other than identifiers (e.g. destructuring expressions)');
+
+            });
+            state.functionScopes.pop();
+            state.blockScopes.pop();
             state.declareVariable({
                 name: node.id.name,
                 loc: node.id.loc,
