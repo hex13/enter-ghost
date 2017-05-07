@@ -9,7 +9,7 @@ const log = console.log;
 const variableDeclarationVisitor = {
     exit(node, state,c) {
         const path = state.path;
-
+        console.error("POP", getName(node))
         state.scopes.pop();
         state.path.pop();
     },
@@ -32,18 +32,33 @@ module.exports = {
         // TODO remove duplication
         enter(node, state) {
             const ctx = state.last('ctx');
-            if (!ctx) return;
+            if (!ctx) {
+                return;
+            }
             ctx.path.push(getName(node));
-            console.log("PROOOOOP", ctx, getName(node))
+
+            const scope = new Scope({
+                loc: node.loc,
+                isFunctionScope: true,
+                parent: state.blockScopes[state.blockScopes.length - 1],
+            });
+            state.analysis.scopes.push(scope);
+            state.blockScopes.push(scope); // blockScopes are for setting parent in child scope
+            state.functionScopes.push(scope);
+            console.error("ObectMethod enter", state.functionScopes.length)
+
         },
         exit(node, state) {
+            console.error("ObjectMethod ExIT", getName(node), state.functionScopes.length)
+            state.declareParamsFrom(node);
+            state.blockScopes.pop();
+            state.functionScopes.pop();
             const name = getName(node);
             const ctx = state.last('ctx');
             if (!ctx) return;
-            const key = ctx.name + ctx.path.map(key => '.' + key).join('');
 
-            state.declareVariable({
-                name: key,
+            state.declareProperty(ctx, {
+                name,
                 loc: node.key.loc,
                 scope: state.scopes[state.scopes.length - 1],
             });
@@ -61,15 +76,22 @@ module.exports = {
         },
         exit(node, state) {
             const name = getName(node);
+
             const ctx = state.last('ctx');
             if (!ctx) return;
-            const key = ctx.name + ctx.path.map(key => '.' + key).join('');
 
-            state.declareVariable({
-                name: key,
+
+            state.declareProperty(ctx, {
+                name,
                 loc: node.key.loc,
                 scope: state.scopes[state.scopes.length - 1],
             });
+
+            // state.declareVariable({
+            //     name: key,
+            //     loc: node.key.loc,
+            //     scope: state.scopes[state.scopes.length - 1],
+            // });
 
             ctx.path.pop();
         }
@@ -229,17 +251,7 @@ module.exports = {
 
         },
         exit(node, state) {
-            node.params.forEach(param => {
-                if (param.type == 'Identifier') {
-                    console.log("NAZWA#", param.name,  state.functionScopes[state.functionScopes.length - 1])
-                    state.declareVariable({
-                        name: param.name,
-                        loc: param.loc,
-                        scope: state.functionScopes[state.functionScopes.length - 1],
-                    });
-                } else ;// throw new Error('TODO support for params other than identifiers (e.g. destructuring expressions)');
-
-            });
+            state.declareParamsFrom(node);
             state.functionScopes.pop();
             state.blockScopes.pop();
             state.declareVariable({

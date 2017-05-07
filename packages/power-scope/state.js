@@ -1,3 +1,5 @@
+const Scope = require('./Scope');
+
 function State(analysis) {
     this.analysis = analysis;
     this.blockScopes = [];
@@ -7,8 +9,23 @@ function State(analysis) {
     this.expr = [];
     this.props = [];
     this.path = [];
-    this.scopes = [];
+    this.scopes = [new Scope({
+        loc: {
+            start: {
+                line: 1, column:0
+            },
+            end: {
+                line: 10000, column:0
+            }
+        }
+    })];
     this.ctx = [];
+    this.ctx.push({
+        name: 'global',
+        path: [],
+        scope: new Scope({})
+    });
+
 }
 
 const naiveModel1 = require('./naiveModel1').stateMixin;

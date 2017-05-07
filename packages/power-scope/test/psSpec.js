@@ -56,6 +56,7 @@ describe('Analyzer', () => {
         assert(entries['abc']);
         assert(entries['abc.prop1']);
         assert(entries['abc.prop1.deepProp']);
+        assert.equal(entries['abc.prop1.deepProp'].name, 'deepProp');
         assert(entries['abc.prop2']);
         assert(entries['def']);
         assert(entries['something']);
@@ -134,19 +135,22 @@ describe('Analyzer', () => {
             // another chain, with method calling
             [[16, 23], [13, 32, 13, 36]], // `ooo.meth`
             // arg1
-            [[25, 4], [24, 14, 24, 18], []], // `ooo.meth`
+            [[25, 4], [24, 14, 24, 18]], // `ooo.meth`
+            // arg
+            [[13, 44], [13, 37, 13, 40], [13, 32, 13, 54]], // `ooo.meth`
         ];
 
-        refToDef.forEach(([[line, column], defLoc, scope]) => {
+        refToDef.forEach(([[line, column], defLoc, scopeLoc]) => {
             ref = analysis.refAt({
                 line, column
             });
             entry = analysis.resolveRef(ref);
             assert(entry, `ref at ${line}:${column} should be resolved to an entry`);
             assertSameLoc(analysis.rangeOf(entry), defLoc);
-            console.log("LLLLO", line, column, entry.scope.loc)
-            if (scope) {
+            //console.log("LLLLO", line, column, entry.scope.loc)
+            if (scopeLoc) {
 
+                assertSameLoc(entry.scope.loc, scopeLoc);
             }
         });
     });

@@ -102,12 +102,13 @@ Analysis.prototype = {
         return scope.entries[name];
     },
     resolveRef(ref) {
+
         const name = ref[0].key;
         let scope = ref[0].scope;
         let entity;
         let entries;
         if (!scope) return;
-        console.log("RESOLVE REF", ref.map(p=>p.key).join(''));
+        //console.log("RESOLVE REF", ref.map(p=>p.key).join(''));
 
         do {
             entries = this.getEntries(scope);
