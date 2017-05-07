@@ -37,6 +37,7 @@ module.exports = {
             }
             ctx.path.push(getName(node));
 
+
             const scope = new Scope({
                 loc: node.loc,
                 isFunctionScope: true,
@@ -145,15 +146,6 @@ module.exports = {
 
         }
     },
-    // VariableDeclaration: {
-    //     enter(node, state) {
-    //
-    //     },
-    //     exit(node, state) {
-    //
-    //     }
-    // },
-    //VariableDeclarator: {
     MemberExpression: {
         exit(node, state) {
             const chain = state.chains[state.chains.length - 1];
@@ -282,20 +274,6 @@ module.exports = {
             }, expr);
 
             state.ctx.pop();
-
-            //
-            // state.declareVariable({
-            //     name: name + '.prop1',
-            //     loc: node.id.loc,
-            //     scope: state.scopes[state.scopes.length - 1],
-            // });
-            //
-            // state.declareVariable({
-            //     name: name + '.prop1.deepProp',
-            //     loc: node.id.loc,
-            //     scope: state.scopes[state.scopes.length - 1],
-            // });
-
         }
     },
 
