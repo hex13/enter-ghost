@@ -1,5 +1,6 @@
 "use strict";
-
+// TODO test scopes (declareScope, former analysis.scopes.push)
+// TODO test scopes set by function declaration
 const Analyzer = require('../analyzer');
 const assert = require('assert');
 
@@ -137,7 +138,9 @@ describe('Analyzer', () => {
             // arg1
             [[25, 4], [24, 14, 24, 18]], // `ooo.meth`
             // arg
-            [[13, 44], [13, 37, 13, 40], [13, 32, 13, 54]], // `ooo.meth`
+            [[13, 44], [13, 37, 13, 40], [13, 32, 13, 54]],
+            // foo()
+            [[38, 6], [24, 9, 24, 12]],
         ];
 
         refToDef.forEach(([[line, column], defLoc, scopeLoc]) => {

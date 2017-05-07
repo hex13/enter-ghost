@@ -47,6 +47,24 @@ State.prototype = Object.assign({
     last(arrName) {
         const arr = this[arrName];
         return arr[arr.length - 1];
+    },
+    popBlockScope() {
+        return this.blockScopes.pop();
+    },
+    pushBlockScope(scope) {
+        return this.blockScopes.push(scope);
+    },
+    popFunctionScope() {
+        return this.functionScopes.pop();
+    },
+    pushFunctionScope(scope) {
+        return this.functionScopes.push(scope);
+    },
+    declareScope(scope) {
+        this.analysis.scopes.push(scope);
+    },
+    declareRef(ref) {
+        this.analysis.refs.push(ref);
     }
 }, naiveModel1);
 

@@ -43,17 +43,18 @@ module.exports = {
                 isFunctionScope: true,
                 parent: state.blockScopes[state.blockScopes.length - 1],
             });
-            state.analysis.scopes.push(scope);
-            state.blockScopes.push(scope); // blockScopes are for setting parent in child scope
-            state.functionScopes.push(scope);
+            state.declareScope(scope);
+            state.pushBlockScope(scope); // blockScopes are for setting parent in child scope
+            state.pushFunctionScope(scope);
             console.error("ObectMethod enter", state.functionScopes.length)
 
         },
         exit(node, state) {
             console.error("ObjectMethod ExIT", getName(node), state.functionScopes.length)
             state.declareParamsFrom(node);
-            state.blockScopes.pop();
-            state.functionScopes.pop();
+            state.popBlockScope();
+            state.popFunctionScope();
+
             const name = getName(node);
             const ctx = state.last('ctx');
             if (!ctx) return;
@@ -117,14 +118,14 @@ module.exports = {
                 isFunctionScope,
                 parent: state.blockScopes[state.blockScopes.length - 1],
             });
-            state.analysis.scopes.push(scope);
-            state.blockScopes.push(scope);
+            state.declareScope(scope);
+            state.pushBlockScope(scope);
             if (isFunctionScope) {
-                state.functionScopes.push(scope);
+                state.pushFunctionScope(scope)
             }
         },
         exit(node, state) {
-            const scope = state.blockScopes.pop();
+            const scope = state.popBlockScope();
             state.poppedScope = scope;
             if (state.parent.type == 'ForStatement') {
                 //state.forScope = scope;
@@ -133,7 +134,7 @@ module.exports = {
 
             const isFunctionScope = _isFunctionScope(node, parent);
             if (isFunctionScope) {
-                state.functionScopes.pop();
+                state.popFunctionScope();
             }
 
         }
@@ -167,7 +168,7 @@ module.exports = {
         exit(node, state) {
             const key = state.key;
             if (key == 'expression' || key == 'arguments' || key == 'test' || key == 'left' || key == 'argument' || key == 'right' || key == 'init') {
-                state.analysis.refs.push([{
+                state.declareRef([{
                     isChain: true,
                     key: getName(node),
                     loc: node.loc,
@@ -181,7 +182,7 @@ module.exports = {
             state.ctx.push(null);
             console.log("REJESTRACJA X@) #)#)#)  ## )", getName(node.callee))
             if (node.callee.type == 'Identifier') {
-                state.analysis.refs.push([{
+                state.declareRef([{
                     isChain: true,
                     key: getName(node.callee),
                     loc: node.callee.loc,
@@ -205,7 +206,7 @@ module.exports = {
         exit(node, state) {
             const ref = state.chains.pop();
             if (ref.length) {
-                state.analysis.refs.push(ref);
+                state.declareRef(ref);
             }
         },
     },
@@ -229,15 +230,14 @@ module.exports = {
                 isFunctionScope: true,
                 parent: state.functionScopes[state.functionScopes.length - 1],
             });
-            state.analysis.scopes.push(scope);
-            state.blockScopes.push(scope);
-            state.functionScopes.push(scope);
-
+            state.declareScope(scope);
+            state.pushBlockScope(scope);
+            state.pushFunctionScope(scope);
         },
         exit(node, state) {
             state.declareParamsFrom(node);
-            state.functionScopes.pop();
-            state.blockScopes.pop();
+            state.popFunctionScope();
+            state.popBlockScope();
             state.declareVariable({
                 name: node.id.name,
                 loc: node.id.loc,
