@@ -6,7 +6,12 @@ const assert = require('assert');
 
 const fs = require('fs');
 
-const basicCode = fs.readFileSync(__dirname + '/../mocks/scopes.js', 'utf8');
+const mocks =
+{
+    basic: fs.readFileSync(__dirname + '/../mocks/basicMock.js', 'utf8'),
+    scopes: fs.readFileSync(__dirname + '/../mocks/scopes.js', 'utf8'),
+};
+
 const parse = require('babylon').parse;
 
 const { assertSameLoc, assertLengthWithWarning: assertLength } = require('../testHelpers');
@@ -19,6 +24,32 @@ const analyzerOpts = {
     visitors: [basicVisitor, eduVisitor]
 }
 
+describe('Analyzer', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.scopes);
+        analyzer = new Analyzer(analyzerOpts);
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should have appropriate scopes', () => {
+        const scopes = analysis.getScopes();
+        assert.equal(scopes.length, 8);
+        assertSameLoc(analysis.rangeOf(scopes[0]), [1, 0, 100, 0]);
+        assertSameLoc(analysis.rangeOf(scopes[1]), [2, 0, 6, 1]);
+        assertSameLoc(analysis.rangeOf(scopes[2]), [2, 16, 6, 1]);
+        assertSameLoc(analysis.rangeOf(scopes[3]), [3, 14, 5, 5]);
+        assertSameLoc(analysis.rangeOf(scopes[4]), [4, 8, 4, 41]);
+        assertSameLoc(analysis.rangeOf(scopes[5]), [4, 37, 4, 41]);
+        assertSameLoc(analysis.rangeOf(scopes[6]), [9, 4, 11, 5]);
+        assertSameLoc(analysis.rangeOf(scopes[7]), [9, 11, 11, 5]);
+    });
+
+});
 
 describe('Analyzer', () => {
 
@@ -27,7 +58,7 @@ describe('Analyzer', () => {
     let analysis;
     let scopes;
     before(() => {
-        ast = parse(basicCode);
+        ast = parse(mocks.basic);
         analyzer = new Analyzer(analyzerOpts);
         analysis = analyzer.analyze(ast);
     });
