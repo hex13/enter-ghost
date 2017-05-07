@@ -7,12 +7,6 @@ const _isFunctionScope = require('../helpers').isFunctionScope;
 
 const log = console.log;
 const variableDeclarationVisitor = {
-    exit(node, state,c) {
-        const path = state.path;
-        console.error("POP", getName(node))
-        state.scopes.pop();
-        state.path.pop();
-    },
     enter(node, state) {
         let scope;
         if (node.kind == 'var') {
@@ -23,7 +17,13 @@ const variableDeclarationVisitor = {
 
         state.scopes.push(scope);
         state.path.push(getName(node));
-    }
+    },
+    exit(node, state,c) {
+        const path = state.path;
+        console.error("POP", getName(node))
+        state.scopes.pop();
+        state.path.pop();
+    },
 }
 
 
@@ -61,7 +61,6 @@ module.exports = {
             state.declareProperty(ctx, {
                 name,
                 loc: node.key.loc,
-                scope: state.scopes[state.scopes.length - 1],
             });
 
             ctx.path.pop();
@@ -85,7 +84,6 @@ module.exports = {
             state.declareProperty(ctx, {
                 name,
                 loc: node.key.loc,
-                scope: state.scopes[state.scopes.length - 1],
             });
 
             ctx.path.pop();

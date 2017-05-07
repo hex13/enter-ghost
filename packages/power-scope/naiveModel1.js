@@ -23,6 +23,7 @@ exports.stateMixin = {
     },
 
     declareProperty(ctx, prop) {
+        prop.scope = ctx.scope;
         const key = ctx.name + ctx.path.map(key => '.' + key).join('');
         this.declareVariable(prop, null, key);
     },
