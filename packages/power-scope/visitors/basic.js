@@ -88,12 +88,6 @@ module.exports = {
                 scope: state.scopes[state.scopes.length - 1],
             });
 
-            // state.declareVariable({
-            //     name: key,
-            //     loc: node.key.loc,
-            //     scope: state.scopes[state.scopes.length - 1],
-            // });
-
             ctx.path.pop();
         }
     },
