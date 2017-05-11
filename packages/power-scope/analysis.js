@@ -26,6 +26,9 @@ function Analysis() {
 model = require('./naiveModel1').analysisUtil;
 
 Analysis.prototype = {
+    getOutline() {
+        return this.outline;
+    },
     getEntries(scope) {
         return scope.entries;
 

@@ -10,6 +10,7 @@ const mocks =
 {
     basic: fs.readFileSync(__dirname + '/../mocks/basicMock.js', 'utf8'),
     scopes: fs.readFileSync(__dirname + '/../mocks/scopes.js', 'utf8'),
+    outline: fs.readFileSync(__dirname + '/../mocks/outline.js', 'utf8'),
 };
 
 const parse = require('babylon').parse;
@@ -19,12 +20,59 @@ const { assertSameLoc, assertLengthWithWarning: assertLength } = require('../tes
 
 const basicVisitor = require('../visitors/basic');
 const eduVisitor = require('../visitors/edu');
+const outlineVisitor = require('../visitors/outline');
 
 const analyzerOpts = {
-    visitors: [basicVisitor, eduVisitor]
-}
+    visitors: [basicVisitor, eduVisitor, outlineVisitor]
+};
 
-describe('Analyzer', () => {
+describe('outline', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.outline);
+        analyzer = new Analyzer(analyzerOpts);
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should have appropriate scopes', () => {
+        const outline = analysis.getOutline();
+        let item;
+        assert.strictEqual(outline.type, 'file');
+        assert.strictEqual(outline.children.length, 2);
+
+        item = outline.children[0];
+        console.log("IIIIII", item.children)
+        assert.deepEqual(item, {
+            type: 'class',
+            name: 'Abc',
+            children: [
+                {type: 'method', name: 'construct', children: [
+                    {type: 'class', name: 'SubClass', children: []}
+                ]},
+                {type: 'method', name: 'render', children: []},
+            ]
+        });
+
+        item = outline.children[1];
+
+        assert.deepEqual(item, {
+            type: 'class',
+            name: 'Def',
+            children: [
+                // {type: 'method', name: 'handleClick', children: []},
+            ]
+        });
+    });
+
+});
+
+
+
+describe('scopes', () => {
 
     let analyzer;
     let ast;
