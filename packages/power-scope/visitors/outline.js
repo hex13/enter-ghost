@@ -6,6 +6,13 @@ module.exports = {
                 children: [],
             };
             state.outlineNodes = [state.analysis.outline];
+            state.enterOutlineNode = (outlineNode) => {
+                state.last('outlineNodes').children.push(outlineNode);
+                state.outlineNodes.push(outlineNode);
+            };
+            state.exitOutlineNode = () => {
+                state.outlineNodes.pop();
+            };
         },
         exit(node, state) {
 
@@ -13,38 +20,30 @@ module.exports = {
     },
     ClassDeclaration: {
         enter(node, state) {
-            // HERE!!
-            const outlineNode = {
+            state.enterOutlineNode({
                 type: 'class',
                 name: node.id.name,
                 children: []
-            };
-            state.last('outlineNodes').children.push(outlineNode);
-            state.outlineNodes.push(outlineNode);
-
+            });
         },
         exit(node, state) {
-            state.outlineNodes.pop();
+            state.exitOutlineNode();
         },
     },
     ClassMethod: {
         enter(node, state) {
-            const outlineNode = {type: 'method', name: node.key.name, children: []};
-            state.last('outlineNodes').children.push(outlineNode);
-            state.outlineNodes.push(outlineNode);
+            state.enterOutlineNode({type: 'method', name: node.key.name, children: []});
         },
         exit(node, state) {
-            state.outlineNodes.pop();
+            state.exitOutlineNode();
         },
     },
     VariableDeclarator: {
         enter(node, state) {
-            const outlineNode = {type: 'variable', name: node.id.name, children: []};
-            state.last('outlineNodes').children.push(outlineNode);
-            state.outlineNodes.push(outlineNode);
+            state.enterOutlineNode({type: 'variable', name: node.id.name, children: []});
         },
         exit(node, state) {
-            state.outlineNodes.pop();
+            state.exitOutlineNode();
         },
     }
 };
