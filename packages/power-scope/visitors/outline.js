@@ -37,4 +37,14 @@ module.exports = {
             state.outlineNodes.pop();
         },
     },
+    VariableDeclarator: {
+        enter(node, state) {
+            const outlineNode = {type: 'variable', name: node.id.name, children: []};
+            state.last('outlineNodes').children.push(outlineNode);
+            state.outlineNodes.push(outlineNode);
+        },
+        exit(node, state) {
+            state.outlineNodes.pop();
+        },
+    }
 };

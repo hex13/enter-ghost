@@ -45,12 +45,14 @@ describe('outline', () => {
         assert.strictEqual(outline.children.length, 2);
 
         item = outline.children[0];
-        console.log("IIIIII", item.children)
+
         assert.deepEqual(item, {
             type: 'class',
             name: 'Abc',
             children: [
                 {type: 'method', name: 'construct', children: [
+                    {type: 'variable', name: 'a', children: []},
+                    {type: 'variable', name: 'b', children: []},
                     {type: 'class', name: 'SubClass', children: []}
                 ]},
                 {type: 'method', name: 'render', children: []},
