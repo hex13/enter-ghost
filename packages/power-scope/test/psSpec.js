@@ -66,7 +66,7 @@ describe('outline', () => {
     let analysis;
     let scopes;
     before(() => {
-        ast = parse(mocks.outline);
+        ast = parse(mocks.outline, {plugins:['jsx']});
         analyzer = new Analyzer(analyzerOpts);
         analysis = analyzer.analyze(ast);
     });
