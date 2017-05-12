@@ -64,6 +64,7 @@ Analyzer.prototype.analyze = function analyze(ast, opts) {
 
     const mainVisitor = {
         enter(node, parent) {
+            state.nodeId++;
             state.prepareFromEstraverse(this, node, parent);
             enterOrLeave.call(this, 'enter', state);
         },

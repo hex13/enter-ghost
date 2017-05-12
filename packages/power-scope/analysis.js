@@ -21,11 +21,24 @@ function Analysis() {
     this.scopes = [];
     this.entities = [];
     this.refs = [];
+    this.componentData = Object.create(null);
 }
 
 model = require('./naiveModel1').analysisUtil;
 
 Analysis.prototype = {
+    getComponent(nodeId, componentName) {
+        const componentData = this.componentData[componentName];
+        return componentData[nodeId];
+    },
+    setComponent(nodeId, componentName, value) {
+        const data = this.componentData[componentName] || Object.create(null);
+        this.componentData[componentName] = data;
+        this.componentData[componentName][nodeId] = value;
+    },
+    commentsFor() {
+
+    },
     getOutline() {
         return this.outline;
     },
@@ -65,6 +78,7 @@ Analysis.prototype = {
                 return scope;
         }
     },
+    // TODO support for hoisting / lookup in parent scopes
     entryAt(pos) {
         const scope = this.scopeAt(pos);
         const entry = Object.keys(scope.entries)

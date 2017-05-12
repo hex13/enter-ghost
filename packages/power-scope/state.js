@@ -9,6 +9,7 @@ function State(analysis) {
     this.expr = [];
     this.props = [];
     this.path = [];
+    this.nodeId = 0;
     this.scopes = [new Scope({
         loc: {
             start: {

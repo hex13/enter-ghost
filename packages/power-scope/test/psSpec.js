@@ -11,6 +11,8 @@ const mocks =
     basic: fs.readFileSync(__dirname + '/../mocks/basicMock.js', 'utf8'),
     scopes: fs.readFileSync(__dirname + '/../mocks/scopes.js', 'utf8'),
     outline: fs.readFileSync(__dirname + '/../mocks/outline.js', 'utf8'),
+    comments: fs.readFileSync(__dirname + '/../mocks/comments.js', 'utf8'),
+    nodes: fs.readFileSync(__dirname + '/../mocks/nodes.js', 'utf8'),
 };
 
 const parse = require('babylon').parse;
@@ -21,10 +23,41 @@ const { assertSameLoc, assertLengthWithWarning: assertLength } = require('../tes
 const basicVisitor = require('../visitors/basic');
 const eduVisitor = require('../visitors/edu');
 const outlineVisitor = require('../visitors/outline');
+const commentsVisitor = require('../visitors/comments');
+const provider = require('../visitors/provider');
+const receiver = require('../visitors/receiver');
 
 const analyzerOpts = {
-    visitors: [basicVisitor, eduVisitor, outlineVisitor]
+    visitors: [basicVisitor, eduVisitor, outlineVisitor, commentsVisitor, provider, receiver]
 };
+
+describe('provider and receiver', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.nodes);
+        analyzer = new Analyzer({visitors: [provider, receiver]});
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should set and get component', () => {
+        analysis.setComponent('id_1', 'component', 4);
+        analysis.setComponent('id_2', 'component', 3);
+        analysis.setComponent('id_1', 'othercomponent', 5);
+        assert.equal(analysis.getComponent('id_1', 'component'), 4);
+        assert.equal(analysis.getComponent('id_1', 'othercomponent'), 5);
+        assert.equal(analysis.getComponent('id_2', 'component'), 3);
+    });
+
+    it('two plugins should communicate', () => {
+        assert.deepEqual(analysis.getComponent('names', 'receiver'), ['foo', 'bar']);
+        assert.equal(analysis.getComponent(undefined, 'receiver'), 'no node');
+    });
+});
+
 
 describe('outline', () => {
 
@@ -38,7 +71,7 @@ describe('outline', () => {
         analysis = analyzer.analyze(ast);
     });
 
-    it('should have appropriate scopes', () => {
+    it('should have appropriate structure', () => {
         const outline = analysis.getOutline();
         let item;
         assert.strictEqual(outline.type, 'file');
