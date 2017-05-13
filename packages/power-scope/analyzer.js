@@ -41,6 +41,7 @@ function isFunction(node) {
     return (
         t == 'FunctionDeclaration'
         || t == 'ClassMethod'
+        || t == 'FunctionExpression'
     );
 }
 

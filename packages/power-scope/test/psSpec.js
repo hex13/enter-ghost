@@ -127,6 +127,7 @@ describe('outline', () => {
 
     it('should have appropriate structure', () => {
         const outline = analysis.getOutline();
+        console.log("OOOOO OUTLINE", JSON.stringify(outline, 0, 2));
         let item;
         assert.strictEqual(outline.type, 'file');
         assert.strictEqual(outline.children.length, 4);
@@ -139,8 +140,9 @@ describe('outline', () => {
             children: [
                 {type: 'function', name: 'construct', children: [
                     {type: 'variable', name: 'a', children: []},
-                    {type: 'variable', name: 'b', children: []},
-                    {type: 'class', name: 'SubClass', children: []}
+                    {type: 'function', name: 'b', children: []},
+                    {type: 'class', name: 'SubClass', children: []},
+                    {type: 'variable', name: 'added', children: []},
                 ]},
                 {type: 'function', name: 'render', children: [], jsx: true},
             ]

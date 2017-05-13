@@ -45,10 +45,19 @@ return {
     },
     Function: {
         enter(node, state) {
+            if (node.type == 'FunctionExpression') {
+                if (state.parent.type == 'VariableDeclarator') {
+                    state.last('outlineNodes').type = 'function';
+                }
+                return;
+            }
             const outlineNode = {type: 'function', name: getName(node), children: []};
             state.enterOutlineNode(outlineNode);
         },
         exit(node, state) {
+            if (node.type == 'FunctionExpression') {
+                return;
+            }
             const outlineNode = state.exitOutlineNode();
             assignComponents(state.analysis, state.nodeId, outlineNode);
             // TODO API change proposal:
