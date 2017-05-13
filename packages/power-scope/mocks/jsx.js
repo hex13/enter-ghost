@@ -1,7 +1,9 @@
 function Foo () {
     if (true) {
         let Component = () => <div></div>;
-
-        return <Component a="123"/>;
+        function Component2() {}
+        return <Component a="123">
+            <Component2 />
+        </Component>;
     }
 }

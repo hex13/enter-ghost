@@ -199,17 +199,28 @@ describe('jsx', () => {
         analysis = analyzer.analyze(ast);
     });
 
-    it('should have appropriate scopes', () => {
-        let ref = analysis.refAt({
+    it('should have appropriate refs', () => {
+        let ref, def;
+        ref = analysis.refAt({
             line: 5,
             column: 16
         });
-
         assert(ref);
         assert.equal(analysis.textOf(ref), 'Component');
-        let def = analysis.resolveRef(ref);
+        def = analysis.resolveRef(ref);
         assert(def);
         assertSameLoc(analysis.rangeOf(def), [3, 12, 3, 21]);
+
+        ref = analysis.refAt({
+            line: 6,
+            column: 13
+        });
+        assert(ref);
+        assert.equal(analysis.textOf(ref), 'Component2');
+        def = analysis.resolveRef(ref);
+        assert(def);
+        assertSameLoc(analysis.rangeOf(def), [4, 17, 4, 27]);
+
     });
 
 });
