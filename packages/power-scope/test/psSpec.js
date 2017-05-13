@@ -21,8 +21,11 @@ const { assertSameLoc, assertLengthWithWarning: assertLength } = require('../tes
 
 
 const basicVisitor = require('../visitors/basic');
+const jsxVisitor = require('../visitors/jsx');
 const eduVisitor = require('../visitors/edu');
-const outlineVisitor = require('../visitors/outline');
+const outlineVisitor = require('../visitors/outline')({
+    components: ['jsx']
+});
 const commentsVisitor = require('../visitors/comments');
 const provider = require('../visitors/provider');
 const receiver = require('../visitors/receiver');
@@ -58,6 +61,55 @@ describe('provider and receiver', () => {
     });
 });
 
+xdescribe('nodes', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.nodes);
+        analyzer = new Analyzer(analyzerOpts);
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should have appropriate comments', () => {
+        console.log("sSSSSSSSSSSS".repeat(10));
+        console.log(analysis.scopeAt({line:2,column:4}));
+        console.log("=3-3-3-33-3-".repeat(10));
+        const entry = analysis.entryAt({
+            line: 2,
+            column: 4
+        });
+        assert.equal(entry.name, 'abc');
+        assert.equal(entry.nodeId, 1);
+    });
+});
+
+xdescribe('comments', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.comments);
+        analyzer = new Analyzer(analyzerOpts);
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should have appropriate comments', () => {
+        console.log("sSSSSSSSSSSS".repeat(10));
+        console.log(analysis.scopeAt({line:4,column:0}));
+        console.log("=3-3-3-33-3-".repeat(10));
+        const entry = analysis.entryAt({
+            line: 4,
+            column: 8
+        });
+        assert(entry.name)
+        assert(analysis.commentsFor);
+    });
+});
 
 describe('outline', () => {
 
@@ -67,7 +119,9 @@ describe('outline', () => {
     let scopes;
     before(() => {
         ast = parse(mocks.outline, {plugins:['jsx']});
-        analyzer = new Analyzer(analyzerOpts);
+        analyzer = new Analyzer({
+            visitors: [jsxVisitor, outlineVisitor]
+        });
         analysis = analyzer.analyze(ast);
     });
 
@@ -88,7 +142,7 @@ describe('outline', () => {
                     {type: 'variable', name: 'b', children: []},
                     {type: 'class', name: 'SubClass', children: []}
                 ]},
-                {type: 'method', name: 'render', children: []},
+                {type: 'method', name: 'render', children: [], jsx: true},
             ]
         });
 

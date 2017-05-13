@@ -27,8 +27,12 @@ function Analysis() {
 model = require('./naiveModel1').analysisUtil;
 
 Analysis.prototype = {
+    // TODO test non -existing components
     getComponent(nodeId, componentName) {
         const componentData = this.componentData[componentName];
+        if (!componentData) {
+            return;
+        }
         return componentData[nodeId];
     },
     setComponent(nodeId, componentName, value) {

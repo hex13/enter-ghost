@@ -1,4 +1,5 @@
-module.exports = {
+module.exports = function ({components}) {
+return {
     Program: {
         enter(node, state) {
             state.analysis.outline = {
@@ -11,7 +12,7 @@ module.exports = {
                 state.outlineNodes.push(outlineNode);
             };
             state.exitOutlineNode = () => {
-                state.outlineNodes.pop();
+                return state.outlineNodes.pop();
             };
         },
         exit(node, state) {
@@ -30,12 +31,21 @@ module.exports = {
             state.exitOutlineNode();
         },
     },
+    // TODO maybe function virtual type?
     ClassMethod: {
         enter(node, state) {
-            state.enterOutlineNode({type: 'method', name: node.key.name, children: []});
+            const outlineNode = {type: 'method', name: node.key.name, children: []};
+            state.enterOutlineNode(outlineNode);
         },
         exit(node, state) {
-            state.exitOutlineNode();
+            const outlineNode = state.exitOutlineNode();
+
+            components.forEach(componentName => {
+                const component = state.analysis.getComponent(state.nodeId, componentName);
+                if (component) {
+                    outlineNode[componentName] = component;
+                }
+            });
         },
     },
     VariableDeclarator: {
@@ -46,4 +56,5 @@ module.exports = {
             state.exitOutlineNode();
         },
     }
+};
 };

@@ -62,15 +62,20 @@ Analyzer.prototype.analyze = function analyze(ast, opts) {
     const state = new State(analysis);
     state.visitors = this.visitors;
 
+    let ids = [];
+    let c = 0;
     const mainVisitor = {
         enter(node, parent) {
-            state.nodeId++;
+            // TODO test correct ids
+            ids.push(state.nodeId);
+            state.nodeId = ++c;
             state.prepareFromEstraverse(this, node, parent);
             enterOrLeave.call(this, 'enter', state);
         },
         leave(node, parent) {
             state.prepareFromEstraverse(this, node, parent);
             enterOrLeave.call(this, 'exit', state);
+            state.nodeId = ids.pop();
         },
         fallback: 'iteration',
     };
