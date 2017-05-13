@@ -137,12 +137,12 @@ describe('outline', () => {
             type: 'class',
             name: 'Abc',
             children: [
-                {type: 'method', name: 'construct', children: [
+                {type: 'function', name: 'construct', children: [
                     {type: 'variable', name: 'a', children: []},
                     {type: 'variable', name: 'b', children: []},
                     {type: 'class', name: 'SubClass', children: []}
                 ]},
-                {type: 'method', name: 'render', children: [], jsx: true},
+                {type: 'function', name: 'render', children: [], jsx: true},
             ]
         });
 
@@ -152,7 +152,7 @@ describe('outline', () => {
             type: 'class',
             name: 'Def',
             children: [
-                // {type: 'method', name: 'handleClick', children: []},
+                // {type: 'function', name: 'handleClick', children: []},
             ]
         });
 
@@ -171,7 +171,7 @@ describe('outline', () => {
             type: 'function',
             name: 'Foo',
             children: [
-                // {type: 'method', name: 'handleClick', children: []},
+                // {type: 'function', name: 'handleClick', children: []},
             ],
             jsx: true
         });

@@ -43,30 +43,18 @@ return {
             state.exitOutlineNode();
         },
     },
-    FunctionDeclaration: {
+    Function: {
         enter(node, state) {
             const outlineNode = {type: 'function', name: getName(node), children: []};
             state.enterOutlineNode(outlineNode);
         },
         exit(node, state) {
             const outlineNode = state.exitOutlineNode();
-
             assignComponents(state.analysis, state.nodeId, outlineNode);
             // TODO API change proposal:
             // state.assignComponents(outlineNode, components);
             // method assignComponents(target, components);
         }
-    },
-    // TODO maybe function virtual type?
-    ClassMethod: {
-        enter(node, state) {
-            const outlineNode = {type: 'method', name: getName(node), children: []};
-            state.enterOutlineNode(outlineNode);
-        },
-        exit(node, state) {
-            const outlineNode = state.exitOutlineNode();
-            assignComponents(state.analysis, state.nodeId, outlineNode);
-        },
     },
     VariableDeclarator: {
         enter(node, state) {

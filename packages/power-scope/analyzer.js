@@ -36,6 +36,14 @@ function isChainEnd(node, state) {
     );
 }
 
+function isFunction(node) {
+    const t = node.type;
+    return (
+        t == 'FunctionDeclaration'
+        || t == 'ClassMethod'
+    );
+}
+
 function enterOrLeave(phase, state) {
     const { node } = state;
 
@@ -47,6 +55,10 @@ function enterOrLeave(phase, state) {
         if (isChainEnd(node, state)) {
             invokeVisitor(visitor, node, 'ChainEnd', phase, state);
         }
+        if (isFunction(node)) {
+            invokeVisitor(visitor, node, 'Function', phase, state);
+        }
+
     });
 }
 
