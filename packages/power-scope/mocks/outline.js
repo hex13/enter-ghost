@@ -16,10 +16,16 @@ class Abc extends React.Component {
 
 
 
-
-
 class Def extends Abc {
     // handleClick() {
     //
     // }
 };
+
+function whatever () {
+
+}
+
+function Foo () {
+    return <div></div>;
+}

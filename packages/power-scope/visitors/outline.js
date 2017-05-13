@@ -1,4 +1,15 @@
+const createAssignComponents = components => (analysis, nodeId, target) => {
+    components.forEach(componentName => {
+        const component = analysis.getComponent(nodeId, componentName);
+        if (component) {
+            target[componentName] = component;
+        }
+    });
+}
+
+
 module.exports = function ({components}) {
+const assignComponents = createAssignComponents(components);
 return {
     Program: {
         enter(node, state) {
@@ -31,6 +42,20 @@ return {
             state.exitOutlineNode();
         },
     },
+    FunctionDeclaration: {
+        enter(node, state) {
+            const outlineNode = {type: 'function', name: node.id.name, children: []};
+            state.enterOutlineNode(outlineNode);
+        },
+        exit(node, state) {
+            const outlineNode = state.exitOutlineNode();
+
+            assignComponents(state.analysis, state.nodeId, outlineNode);
+            // TODO API change proposal:
+            // state.assignComponents(outlineNode, components);
+            // method assignComponents(target, components);
+        }
+    },
     // TODO maybe function virtual type?
     ClassMethod: {
         enter(node, state) {
@@ -39,13 +64,7 @@ return {
         },
         exit(node, state) {
             const outlineNode = state.exitOutlineNode();
-
-            components.forEach(componentName => {
-                const component = state.analysis.getComponent(state.nodeId, componentName);
-                if (component) {
-                    outlineNode[componentName] = component;
-                }
-            });
+            assignComponents(state.analysis, state.nodeId, outlineNode);
         },
     },
     VariableDeclarator: {

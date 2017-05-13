@@ -129,7 +129,7 @@ describe('outline', () => {
         const outline = analysis.getOutline();
         let item;
         assert.strictEqual(outline.type, 'file');
-        assert.strictEqual(outline.children.length, 2);
+        assert.strictEqual(outline.children.length, 4);
 
         item = outline.children[0];
 
@@ -155,6 +155,27 @@ describe('outline', () => {
                 // {type: 'method', name: 'handleClick', children: []},
             ]
         });
+
+        item = outline.children[2];
+
+        assert.deepEqual(item, {
+            type: 'function',
+            name: 'whatever',
+            children: [
+            ],
+        });
+
+        item = outline.children[3];
+
+        assert.deepEqual(item, {
+            type: 'function',
+            name: 'Foo',
+            children: [
+                // {type: 'method', name: 'handleClick', children: []},
+            ],
+            jsx: true
+        });
+
     });
 
 });

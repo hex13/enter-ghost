@@ -1,5 +1,16 @@
 let functions = [];
 module.exports = {
+    FunctionDeclaration: {
+        enter(node, state) {
+            console.log("KLAS METHOD")
+            functions.push(state.nodeId);
+        },
+        exit(node, state) {
+            console.log("------KLAS METHOD")
+            functions.pop();
+        }
+    },
+
     ClassMethod: {
         enter(node, state) {
             console.log("KLAS METHOD")
