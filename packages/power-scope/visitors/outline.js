@@ -1,3 +1,4 @@
+const { getName } = require('lupa-utils');
 const createAssignComponents = components => (analysis, nodeId, target) => {
     components.forEach(componentName => {
         const component = analysis.getComponent(nodeId, componentName);
@@ -44,7 +45,7 @@ return {
     },
     FunctionDeclaration: {
         enter(node, state) {
-            const outlineNode = {type: 'function', name: node.id.name, children: []};
+            const outlineNode = {type: 'function', name: getName(node), children: []};
             state.enterOutlineNode(outlineNode);
         },
         exit(node, state) {
@@ -59,7 +60,7 @@ return {
     // TODO maybe function virtual type?
     ClassMethod: {
         enter(node, state) {
-            const outlineNode = {type: 'method', name: node.key.name, children: []};
+            const outlineNode = {type: 'method', name: getName(node), children: []};
             state.enterOutlineNode(outlineNode);
         },
         exit(node, state) {
@@ -69,7 +70,7 @@ return {
     },
     VariableDeclarator: {
         enter(node, state) {
-            state.enterOutlineNode({type: 'variable', name: node.id.name, children: []});
+            state.enterOutlineNode({type: 'variable', name: getName(node), children: []});
         },
         exit(node, state) {
             state.exitOutlineNode();
