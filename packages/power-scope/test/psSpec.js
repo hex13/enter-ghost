@@ -13,6 +13,7 @@ const mocks =
     outline: fs.readFileSync(__dirname + '/../mocks/outline.js', 'utf8'),
     comments: fs.readFileSync(__dirname + '/../mocks/comments.js', 'utf8'),
     nodes: fs.readFileSync(__dirname + '/../mocks/nodes.js', 'utf8'),
+    jsx: fs.readFileSync(__dirname + '/../mocks/jsx.js', 'utf8'),
 };
 
 const parse = require('babylon').parse;
@@ -120,7 +121,7 @@ describe('outline', () => {
     before(() => {
         ast = parse(mocks.outline, {plugins:['jsx']});
         analyzer = new Analyzer({
-            visitors: [jsxVisitor, outlineVisitor]
+            visitors: [basicVisitor, jsxVisitor, outlineVisitor]
         });
         analysis = analyzer.analyze(ast);
     });
@@ -182,6 +183,36 @@ describe('outline', () => {
 
 });
 
+
+
+describe('jsx', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.jsx, {plugins:['jsx']});
+        analyzer = new Analyzer({
+            visitors: [basicVisitor, jsxVisitor]
+        });
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should have appropriate scopes', () => {
+        let ref = analysis.refAt({
+            line: 5,
+            column: 16
+        });
+
+        assert(ref);
+        assert.equal(analysis.textOf(ref), 'Component');
+        let def = analysis.resolveRef(ref);
+        assert(def);
+        assertSameLoc(analysis.rangeOf(def), [3, 12, 3, 21]);
+    });
+
+});
 
 
 describe('scopes', () => {

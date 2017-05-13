@@ -29,5 +29,19 @@ module.exports = {
         },
         exit(node, state) {
         }
+    },
+    JSXIdentifier: {
+        enter(node, state) {
+            state.declareRef([
+                {
+                    isChain: true,
+                    loc: node.loc,
+                    key: node.name,
+                    scope: state.blockScopes[state.blockScopes.length - 1],
+                }
+            ]);
+        },
+        exit(node, state) {
+        }
     }
 };
