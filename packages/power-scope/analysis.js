@@ -156,10 +156,10 @@ Analysis.prototype = {
                         path = path + '.' + ref[i].key;
                         curr = entries[path];
                     } else {
-                        return;
+                        return;  // TODO test this.
                     }
                     if (!curr)  {
-                        return
+                        return // TODO test this.
                         //console.log("!!!!!ZN", ref.map(p=>p.key).join(''))
                     }
 
@@ -170,7 +170,7 @@ Analysis.prototype = {
         return entity;
     },
     refsFor(def) {
-        return def.refs;
+        return def.refs; // TODO test this.
     },
     postprocess() {
         this.refs.forEach(ref_ => {
