@@ -32,28 +32,6 @@ Analysis.prototype = {
     },
     getEntries(scope) {
         return scope.entries;
-
-        console.log("SK@OP", scope.loc.start.line, scope.loc.start.column)
-        const entities = this.entities.filter(entity => {
-            return entity.scope === scope;
-        });
-        const o = Object.create(null);
-
-        function visitProps(path, props) {
-            props && props.forEach(prop => {
-                o[path + '.' + prop.name] = 1;
-                visitProps(path + '.' + prop.name, prop.props)
-            });
-
-        }
-
-        entities.forEach(entity => {
-            o[entity.name] = entity;
-            visitProps(entity.name, entity.props);
-        });
-        console.log("$$$$$$",o)
-
-        return o;
     },
     getScopes() {
         return this.scopes;
