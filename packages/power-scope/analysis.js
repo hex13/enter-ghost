@@ -1,19 +1,3 @@
-function abc() {
-    at([10, 2]).scope().pos();
-
-
-
-    editor.jumpTo(
-        ref.at(pos).def().pos()
-    );
-    // vs
-    const ref = refAt(pos);
-    const def = findDef(ref);
-    editor.jumpTo(posFrom(def));
-
-
-
-}
 const { posInLoc } = require('./helpers');
 
 const assert = require('assert');
