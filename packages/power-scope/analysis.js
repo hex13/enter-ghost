@@ -53,9 +53,7 @@ Analysis.prototype = {
         return entry;
     },
     entityAt(pos) {
-        return this.entities.find(item => {
-            return posInLoc(pos, item.loc);
-        });
+        throw new Error('not implemented');
     },
     rangeOf(item) {
         return item.loc;
