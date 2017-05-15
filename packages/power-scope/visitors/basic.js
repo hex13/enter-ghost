@@ -225,13 +225,20 @@ module.exports = {
             //state.blockScopes.pop();
         }
     },
-    FunctionDeclaration: {
+    Function: {
         enter(node, state) {
             const scope = new Scope({
                 loc: node.loc,
                 isFunctionScope: true,
                 parent: state.functionScopes[state.functionScopes.length - 1],
             });
+            const func = {
+                name: getName(node),
+                loc: (node.id || node.key || node).loc,
+                scope: state.blockScopes[state.blockScopes.length - 1],
+                nodeId: state.nodeId,
+            };
+            state.pushFunction(func);
             state.declareScope(scope);
             state.pushBlockScope(scope);
             state.pushFunctionScope(scope);
@@ -240,11 +247,8 @@ module.exports = {
             state.declareParamsFrom(node);
             state.popFunctionScope();
             state.popBlockScope();
-            state.declareVariable({
-                name: node.id.name,
-                loc: node.id.loc,
-                scope: state.blockScopes[state.blockScopes.length - 1],
-            });
+
+            state.declareVariable(state.popFunction());
         }
     },
     VariableDeclaration: variableDeclarationVisitor,

@@ -145,7 +145,9 @@ describe('outline', () => {
                     {type: 'class', name: 'SubClass', children: []},
                     {type: 'variable', name: 'added', children: []},
                 ]},
-                {type: 'function', name: 'render', children: [], jsx: true},
+                {type: 'function', name: 'render', children: [], jsx: {
+                    uses: {A: 1}
+                }},
             ]
         });
 
@@ -176,7 +178,9 @@ describe('outline', () => {
             children: [
                 // {type: 'function', name: 'handleClick', children: []},
             ],
-            jsx: true
+            jsx: {
+                uses: {}
+            }
         });
 
     });
@@ -220,6 +224,25 @@ describe('jsx', () => {
         def = analysis.resolveRef(ref);
         assert(def);
         assertSameLoc(analysis.rangeOf(def), [4, 17, 4, 27]);
+
+    });
+
+    it('should have appropriate dependency information', () => {
+        let ref, def;
+
+        const Foo = analysis.scopes[0].entries.Foo;
+        const Bar = analysis.scopes[0].entries.Bar;
+        assert(Foo);
+        assert(Bar);
+        let jsx;
+
+        jsx = analysis.getComponent(Foo.nodeId, 'jsx');
+        assert.deepEqual(jsx, {
+            uses: {Component: 1, Component2: 1}
+        });
+
+        jsx = analysis.getComponent(Bar.nodeId, 'jsx');
+        assert.equal(jsx, undefined);
 
     });
 

@@ -10,6 +10,7 @@ function State(analysis) {
     this.props = [];
     this.path = [];
     this.nodeId = 0;
+    this.functions = [];
     this.scopes = [new Scope({
         loc: {
             start: {
@@ -51,6 +52,12 @@ State.prototype = Object.assign({
     },
     popBlockScope() {
         return this.blockScopes.pop();
+    },
+    pushFunction(func) {
+        return this.functions.push(func);
+    },
+    popFunction() {
+        return this.functions.pop();
     },
     pushBlockScope(scope) {
         return this.blockScopes.push(scope);

@@ -3,6 +3,7 @@ const createAssignComponents = components => (analysis, nodeId, target) => {
     components.forEach(componentName => {
         const component = analysis.getComponent(nodeId, componentName);
         if (component) {
+            console.log("ASSIGNING", componentName, component)
             target[componentName] = component;
         }
     });

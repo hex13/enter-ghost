@@ -5,5 +5,9 @@ function Foo () {
         return <Component a="123">
             <Component2 />
         </Component>;
+        Other;
     }
+}
+
+function Bar () {
 }

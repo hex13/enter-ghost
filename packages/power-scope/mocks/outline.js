@@ -12,7 +12,7 @@ class Abc extends React.Component {
         const added = [10, 20].map(function addOne (a) { return a + 1});
     }
     render() {
-        return <div></div>;
+        return <div><A /></div>;
     }
 };
 
