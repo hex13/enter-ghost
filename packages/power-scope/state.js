@@ -27,7 +27,7 @@ function State(analysis) {
         path: [],
         scope: new Scope({})
     });
-
+    this.customEntities = [];
 }
 
 const naiveModel1 = require('./naiveModel1').stateMixin;
@@ -73,6 +73,9 @@ State.prototype = Object.assign({
     },
     declareRef(ref) {
         this.analysis.refs.push(ref);
+    },
+    declareEntity(node, entity) {
+        this.customEntities.push({node, entity});
     }
 }, naiveModel1);
 

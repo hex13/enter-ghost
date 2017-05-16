@@ -48,6 +48,7 @@ function isFunction(node) {
 function enterOrLeave(phase, state) {
     const { node } = state;
 
+    state.customEntities.length = 0;
     state.visitors.forEach((visitor) => {
         invokeVisitor(visitor, node, node.type, phase, state);
         if (isScope(node)) {
@@ -59,7 +60,9 @@ function enterOrLeave(phase, state) {
         if (isFunction(node)) {
             invokeVisitor(visitor, node, 'Function', phase, state);
         }
-
+        state.customEntities.forEach(item => {
+            invokeVisitor(visitor, item, 'CustomEntity', phase, state);
+        });
     });
 }
 

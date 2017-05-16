@@ -24,8 +24,17 @@ class Def extends Abc {
     // }
 };
 
-function whatever () {
-
+function whatever (a) {
+    switch (a) {
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        default:
+            break;
+    }
 }
 
 function Foo () {

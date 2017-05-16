@@ -73,6 +73,15 @@ return {
         exit(node, state) {
             state.exitOutlineNode();
         },
-    }
+    },
+    CustomEntity: {
+        enter({node}, state) {
+
+        },
+        exit({node, entity}, state) {
+            state.enterOutlineNode(entity);
+            state.exitOutlineNode();
+        },
+    },
 };
 };

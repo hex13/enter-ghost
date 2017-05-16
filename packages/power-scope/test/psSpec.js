@@ -22,6 +22,7 @@ const { assertSameLoc, assertLengthWithWarning: assertLength } = require('../tes
 
 
 const basicVisitor = require('../visitors/basic');
+const additionalVisitor = require('../visitors/additional');
 const jsxVisitor = require('../visitors/jsx');
 const eduVisitor = require('../visitors/edu');
 const outlineVisitor = require('../visitors/outline')({
@@ -121,7 +122,7 @@ describe('outline', () => {
     before(() => {
         ast = parse(mocks.outline, {plugins:['jsx']});
         analyzer = new Analyzer({
-            visitors: [basicVisitor, jsxVisitor, outlineVisitor]
+            visitors: [basicVisitor, additionalVisitor, jsxVisitor, outlineVisitor]
         });
         analysis = analyzer.analyze(ast);
     });
@@ -167,6 +168,10 @@ describe('outline', () => {
             type: 'function',
             name: 'whatever',
             children: [
+                {type: 'case', test: 1},
+                {type: 'case', test: 2},
+                {type: 'case', test: 3},
+                {type: 'case', test: null},
             ],
         });
 
