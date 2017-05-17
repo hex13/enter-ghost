@@ -4,7 +4,8 @@
   "description": "analyzes JS files",
   "main": "analyzer.js",
   "scripts": {
-    "test": "mocha test/psSpec.js"
+    "test": "mocha test/psSpec.js",
+    "coverage": "nyc --reporter=lcov npm test"
   },
   "author": "= <=>",
   "license": "MIT",
