@@ -79,27 +79,28 @@ Analysis.prototype = {
     getEntry(scope, name) {
         return scope.entries[name];
     },
-    resolveRef(ref) {
-
-        const name = ref[0].key;
-        let scope = ref[0].scope;
+    lookupEntry(scope, name) {
         let entity;
-        let entries;
-        if (!scope) return;
-        //console.log("RESOLVE REF", ref.map(p=>p.key).join(''));
-
         do {
-            entries = this.getEntries(scope);
-            //console.log('=3==3=3=3=33=', entries)
             entity = this.getEntry(scope, name);
-            //entity = this.
-            // entity = this.entities.find(entity => {
-            //     return entity.scope === scope && entity.name == name;
-            // });
             scope = scope.parent;
         } while(!entity && scope);
+        return entity;
+    },
+    resolveRef(ref) {
+        const name = ref[0].key;
+        let initialScope = ref[0].scope;
 
+        let entries;
+        if (!initialScope) return;
 
+        const entity = this.lookupEntry(initialScope, name)
+
+        if (!entity) {
+            return;
+        }
+        scope = entity.scope;
+        entries = this.getEntries(scope);
 
         if (ref.length > 1) {
             let op = '';
