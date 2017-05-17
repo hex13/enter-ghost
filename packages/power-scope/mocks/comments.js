@@ -4,3 +4,12 @@
 function Abc() {
 
 }
+
+/* this is Def.*/
+function Def () {
+
+}
+
+function NoComment() {
+
+}

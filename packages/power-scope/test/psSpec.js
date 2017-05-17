@@ -88,7 +88,7 @@ xdescribe('nodes', () => {
     });
 });
 
-xdescribe('comments', () => {
+describe('comments', () => {
 
     let analyzer;
     let ast;
@@ -104,12 +104,26 @@ xdescribe('comments', () => {
         console.log("sSSSSSSSSSSS".repeat(10));
         console.log(analysis.scopeAt({line:4,column:0}));
         console.log("=3-3-3-33-3-".repeat(10));
-        const entry = analysis.entryAt({
+        let entry;
+
+        entry = analysis.entryAt({
             line: 4,
-            column: 8
+            column: 9
         });
-        assert(entry.name)
-        assert(analysis.commentsFor);
+        assert.equal(analysis.getComponent(entry.nodeId, 'comment'), ' this is Abc.')
+
+        entry = analysis.entryAt({
+            line: 9,
+            column: 9
+        });
+        assert.equal(analysis.getComponent(entry.nodeId, 'comment'), ' this is Def.')
+
+        entry = analysis.entryAt({
+            line: 13,
+            column: 9
+        });
+        assert.equal(analysis.getComponent(entry.nodeId, 'comment'), undefined)
+
     });
 });
 
