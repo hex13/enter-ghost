@@ -354,6 +354,15 @@ describe('Analyzer', () => {
         assertSameLoc(analysis.rangeOf(entry), [13, 10, 13, 13])
     });
 
+    it('should return entry of function at given position', () => {
+        let entry;
+        entry = analysis.entryAt({
+            line: 12, column: 9
+        });
+        assertSameLoc(analysis.rangeOf(entry), [12, 9, 12, 12])
+        assert.equal(entry.name, 'abc');
+    });
+
     it('should return ref at given position', () => {
         let ref;
         ref = analysis.refAt({

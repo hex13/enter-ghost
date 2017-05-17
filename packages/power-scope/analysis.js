@@ -43,11 +43,18 @@ Analysis.prototype = {
     },
     // TODO support for hoisting / lookup in parent scopes
     entryAt(pos) {
-        const scope = this.scopeAt(pos);
-        const entry = Object.keys(scope.entries)
-            .map(key => scope.entries[key])
-            .find(entry => posInLoc(pos, entry.loc));
-        return entry;
+        let scope = this.scopeAt(pos);
+        let entity;
+        do {
+            let entries = this.getEntries(scope);
+            entity = Object.keys(entries)
+                .map(key => entries[key])
+                .find(entry => {
+                    return posInLoc(pos, entry.loc)
+                });
+            scope = scope.parent;
+        } while(!entity && scope);
+        return entity;
     },
     entityAt(pos) {
         throw new Error('not implemented');
