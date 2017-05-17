@@ -27,9 +27,6 @@ Analysis.prototype = {
     commentsFor() {
 
     },
-    getOutline() {
-        return this.outline;
-    },
     getEntries(scope) {
         return scope.entries;
     },

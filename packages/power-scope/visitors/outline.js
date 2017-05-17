@@ -15,11 +15,12 @@ const assignComponents = createAssignComponents(components);
 return {
     Program: {
         enter(node, state) {
-            state.analysis.outline = {
+            const outline = {
                 type: 'file',
                 children: [],
             };
-            state.outlineNodes = [state.analysis.outline];
+            state.outlineNodes = [outline];
+            state.analysis.setComponent('file', 'outline', outline);
             state.enterOutlineNode = (outlineNode) => {
                 state.last('outlineNodes').children.push(outlineNode);
                 state.outlineNodes.push(outlineNode);
@@ -29,7 +30,6 @@ return {
             };
         },
         exit(node, state) {
-
         },
     },
     ClassDeclaration: {

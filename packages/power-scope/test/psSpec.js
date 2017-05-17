@@ -128,7 +128,7 @@ describe('outline', () => {
     });
 
     it('should have appropriate structure', () => {
-        const outline = analysis.getOutline();
+        const outline = analysis.getComponent('file', 'outline');
         console.log("OOOOO OUTLINE", JSON.stringify(outline, 0, 2));
         let item;
         assert.strictEqual(outline.type, 'file');
