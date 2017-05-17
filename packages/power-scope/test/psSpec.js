@@ -101,9 +101,6 @@ describe('comments', () => {
     });
 
     it('should have appropriate comments', () => {
-        console.log("sSSSSSSSSSSS".repeat(10));
-        console.log(analysis.scopeAt({line:4,column:0}));
-        console.log("=3-3-3-33-3-".repeat(10));
         let entry;
 
         entry = analysis.entryAt({

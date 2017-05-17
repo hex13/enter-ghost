@@ -75,7 +75,6 @@ module.exports = {
             const ctx = state.last('ctx');
             if (!ctx) return;
             ctx.path.push(getName(node));
-            console.log("PROOOOOP", ctx, getName(node))
         },
         exit(node, state) {
             const name = getName(node);
@@ -182,7 +181,6 @@ module.exports = {
     CallExpression: {
         enter(node, state) {
             state.ctx.push(null);
-            console.log("REJESTRACJA X@) #)#)#)  ## )", getName(node.callee))
             if (node.callee.type == 'Identifier') {
                 state.declareRef([{
                     isChain: true,
