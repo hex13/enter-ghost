@@ -121,6 +121,12 @@ describe('comments', () => {
         });
         assert.equal(analysis.getComponent(entry.nodeId, 'comment'), undefined)
 
+        // entry = analysis.entryAt({
+        //     line: 18,
+        //     column: 6
+        // });
+        // assert.equal(analysis.getComponent(entry.nodeId, 'comment'), ' this is a.')
+
     });
 });
 
@@ -422,6 +428,10 @@ describe('Analyzer', () => {
             [[13, 44], [13, 37, 13, 40], [13, 32, 13, 54]],
             // foo()
             [[38, 6], [24, 9, 24, 12]],
+            // arguments in arrow functions
+            [[42, 4], [41, 16, 41, 20]],
+            // arguments in function expressions
+            [[46, 4], [45, 25, 45, 29]],
         ];
 
         refToDef.forEach(([[line, column], defLoc, scopeLoc]) => {

@@ -42,6 +42,7 @@ function isFunction(node) {
         t == 'FunctionDeclaration'
         || t == 'ClassMethod'
         || t == 'FunctionExpression'
+        || t == 'ArrowFunctionExpression'
     );
 }
 

@@ -36,3 +36,12 @@ for (let i = 0; i < 10; i++) {
 const something = someFunction({not:2});
 
 foo; foo();
+
+let test;
+const arrow1 = (test) => {
+    test;
+};
+
+const arrow2 = function (test) {
+    test;
+}
