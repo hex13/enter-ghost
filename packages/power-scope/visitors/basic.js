@@ -245,8 +245,11 @@ module.exports = {
             state.declareParamsFrom(node);
             state.popFunctionScope();
             state.popBlockScope();
+            const func = state.popFunction();
+            if (node.type == 'FunctionDeclaration') {
+                state.declareVariable(func);
+            }
 
-            state.declareVariable(state.popFunction());
         }
     },
     VariableDeclaration: variableDeclarationVisitor,

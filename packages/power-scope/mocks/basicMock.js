@@ -42,6 +42,6 @@ const arrow1 = (test) => {
     test;
 };
 
-const arrow2 = function (test) {
+const arrow2 = function noVar (test) {
     test;
 }

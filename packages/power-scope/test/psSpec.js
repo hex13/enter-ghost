@@ -342,6 +342,8 @@ describe('Analyzer', () => {
         assert(!entries['something.not']);
         assert(entries['foo']);
 
+        assert(!entries['noVar']);
+
         assert.equal(entries['abc'].name, 'abc');
         //assert(entries['abc.prop']);
         assert.equal(entries['def'].name, 'def');
@@ -431,7 +433,7 @@ describe('Analyzer', () => {
             // arguments in arrow functions
             [[42, 4], [41, 16, 41, 20]],
             // arguments in function expressions
-            [[46, 4], [45, 25, 45, 29]],
+            [[46, 4], [45, 31, 45, 35]],
         ];
 
         refToDef.forEach(([[line, column], defLoc, scopeLoc]) => {
