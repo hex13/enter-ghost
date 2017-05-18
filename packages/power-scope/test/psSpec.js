@@ -427,7 +427,9 @@ describe('Analyzer', () => {
             // arg1
             [[25, 4], [24, 14, 24, 18]], // `ooo.meth`
             // arg
-            [[13, 44], [13, 37, 13, 40], [13, 32, 13, 54]],
+            [[13, 44], [13, 37, 13, 40], [13, 32, 13, 72]],
+            [[13, 53], null, null, 'this.abc'],
+            [[13, 58], null, null, 'this'],
             // foo()
             [[38, 6], [24, 9, 24, 12]],
             // arguments in arrow functions
@@ -436,14 +438,19 @@ describe('Analyzer', () => {
             [[46, 4], [45, 31, 45, 35]],
         ];
 
-        refToDef.forEach(([[line, column], defLoc, scopeLoc]) => {
+        refToDef.forEach(([[line, column], defLoc, scopeLoc, text]) => {
             ref = analysis.refAt({
                 line, column
             });
-            entry = analysis.resolveRef(ref);
-            assert(entry, `ref at ${line}:${column} should be resolved to an entry`);
-            assertSameLoc(analysis.rangeOf(entry), defLoc);
-            //console.log("LLLLO", line, column, entry.scope.loc)
+            assert(ref);
+            if (text) {
+                assert.strictEqual(analysis.textOf(ref), text);
+            }
+            if (defLoc) {
+                entry = analysis.resolveRef(ref);
+                assert(entry, `ref at ${line}:${column} should be resolved to an entry`);
+                assertSameLoc(analysis.rangeOf(entry), defLoc);
+            }
             if (scopeLoc) {
 
                 assertSameLoc(entry.scope.loc, scopeLoc);

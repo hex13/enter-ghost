@@ -23,7 +23,7 @@ function isChainLink(node, state) {
     return (
         t == 'MemberExpression'
         || t == 'CallExpression'
-        || t == 'Identifiesr'
+        || t == 'Identifiesr' // TODO???? Identifier?
     );
 }
 

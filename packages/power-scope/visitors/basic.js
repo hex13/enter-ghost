@@ -125,6 +125,14 @@ module.exports = {
                     loc: node.object.loc
                 });
             }
+            if (node.object.type == 'ThisExpression') {
+                chain.push({
+                    isChain: true,
+                    key: 'this',
+                    scope: state.blockScopes[state.blockScopes.length - 1],
+                    loc: node.object.loc
+                });
+            }
             chain.push({
                 key: '.'
             });
@@ -146,6 +154,21 @@ module.exports = {
                 state.declareRef([{
                     isChain: true,
                     key: getName(node),
+                    loc: node.loc,
+                    scope: state.blockScopes[state.blockScopes.length - 1]
+                }]);
+            }
+        }
+    },
+    ThisExpression: {
+        enter(node, state) {
+        },
+        exit(node, state) {
+            const key = state.key;
+            if (key == 'expression' || key == 'arguments' || key == 'test' || key == 'left' || key == 'argument' || key == 'right' || key == 'init') {
+                state.declareRef([{
+                    isChain: true,
+                    key: 'this', 
                     loc: node.loc,
                     scope: state.blockScopes[state.blockScopes.length - 1]
                 }]);

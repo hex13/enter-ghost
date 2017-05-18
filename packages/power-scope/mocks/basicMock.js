@@ -10,7 +10,7 @@ const abc = {
 
 let def = 3;
 function abc () {
-    const ooo = {abc: {def: 1}, meth(arg) { arg;     } };
+    const ooo = {abc: {def: 1}, meth(arg) { arg;this.abc; this;        } };
     let aa;
     ooo;
     ooo.abc.def; ooo.meth();
