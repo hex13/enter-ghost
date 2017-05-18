@@ -63,6 +63,7 @@ function enterOrLeave(phase, state) {
         state.customEntities.forEach(item => {
             invokeVisitor(visitor, item, 'CustomEntity', phase, state);
         });
+        invokeVisitor(visitor, node, 'Any', phase, state);
     });
 }
 
