@@ -33,12 +33,10 @@ module.exports = {
     ObjectMethod: {
         // TODO remove duplication
         enter(node, state) {
-            const ctx = state.last('ctx');
+            const ctx = state.enterProperty(node);
             if (!ctx) {
                 return;
             }
-            ctx.path.push(getName(node));
-
 
             const scope = new Scope({
                 loc: node.loc,
@@ -52,43 +50,19 @@ module.exports = {
 
         },
         exit(node, state) {
-            console.error("ObjectMethod ExIT", getName(node), state.functionScopes.length)
             state.declareParamsFrom(node);
             state.popBlockScope();
             state.popFunctionScope();
-
-            const name = getName(node);
-            const ctx = state.last('ctx');
-            if (!ctx) return;
-
-            state.declareProperty(ctx, {
-                name,
-                loc: node.key.loc,
-            });
-
-            ctx.path.pop();
+            state.exitProperty(node);
         }
     },
     ObjectProperty: {
         // TODO remove duplication
         enter(node, state) {
-            const ctx = state.last('ctx');
-            if (!ctx) return;
-            ctx.path.push(getName(node));
+            state.enterProperty(node);
         },
         exit(node, state) {
-            const name = getName(node);
-
-            const ctx = state.last('ctx');
-            if (!ctx) return;
-
-
-            state.declareProperty(ctx, {
-                name,
-                loc: node.key.loc,
-            });
-
-            ctx.path.pop();
+            state.exitProperty(node);
         }
     },
     ObjectPattern: {

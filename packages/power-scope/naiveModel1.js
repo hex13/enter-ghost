@@ -1,3 +1,5 @@
+const { getName } = require('lupa-utils');
+
 exports.stateMixin = {
     declareVariable(entity, value, key) {
         //this.analysis.entities.push(Object.assign({props: value}, entity));
@@ -33,6 +35,25 @@ exports.stateMixin = {
     },
     exitObject() {
     },
+    enterProperty (node) {
+        const ctx = this.last('ctx');
+        if (!ctx) return;
+        ctx.path.push(getName(node));
+        return ctx;
+    },
+    exitProperty (node) {
+        const state = this;
+        const ctx = state.last('ctx');
+        if (!ctx) return;
+
+        state.declareProperty(ctx, {
+            name: ctx.path[ctx.path.length-1],
+            loc: node.key.loc,
+        });
+
+        ctx.path.pop();
+    }
+
 }
 
 
