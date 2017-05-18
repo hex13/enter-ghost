@@ -13,7 +13,6 @@ exports.stateMixin = {
         const state = this;
         node.params.forEach(param => {
             if (param.type == 'Identifier') {
-                console.error("DECKPARAM", state.blockScopes.length)
                 state.declareVariable({
                     name: param.name,
                     loc: param.loc,
