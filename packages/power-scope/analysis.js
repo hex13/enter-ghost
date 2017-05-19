@@ -28,7 +28,7 @@ Analysis.prototype = {
 
     },
     getEntries(scope) {
-        return scope.entries;
+        return scope? scope.entries : [];
     },
     getScopes() {
         return this.scopes;
