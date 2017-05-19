@@ -438,7 +438,7 @@ describe('Analyzer', () => {
             [[74, 24], 'not', null, 'this'], // this in function expression
 
             [[80, 16], [54, 8, 54, 9], null, 'this'], // this in function expression as property
-            //[[84, 31], [54, 8, 54, 9], null, 'this'], // this in arrow expression as property
+            [[84, 31], [54, 8, 54, 9], null, 'this'], // this in arrow expression as property
 
             [[61, 24], [60, 26, 60, 27], null, 'a'],
             [[62, 25], [60, 26, 60, 27], null, 'a'],

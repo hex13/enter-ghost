@@ -73,8 +73,12 @@ State.prototype = Object.assign({
         const ctx = this.last('ctx');
         //const ctx = (scope.parentType) == 'ArrowFunctionExpression' ? this.ctx[this.ctx.length - 2] : this.last('ctx');
         console.log('<br/><b>',scope.loc.start.line,scope.loc.start.column, ' ', ctx && ctx.name, '----', ctx && ctx.path.join('.'), '</b>');
-        if (ctx) {
-
+        if (scope.parentType == 'ArrowFunctionExpression' && scope.parent && scope.parent.parent) {
+            let curr = scope.parent.parent;
+            scope.thisPath = curr.thisPath;
+            scope.thisScope = curr.thisScope;
+        }
+        else if (ctx) {
             scope.thisPath = ctx.name;
             scope.thisScope = ctx.scope;
             if (ctx.path.length > 1 ) {
