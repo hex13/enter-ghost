@@ -69,6 +69,18 @@ State.prototype = Object.assign({
         return this.functionScopes.push(scope);
     },
     declareScope(scope) {
+        console.log("<div style='color:red'>", scope.nodeType, this.ctx[this.ctx.length -2],"</div>")
+        const ctx = this.last('ctx');
+        //const ctx = (scope.parentType) == 'ArrowFunctionExpression' ? this.ctx[this.ctx.length - 2] : this.last('ctx');
+        console.log('<br/><b>',scope.loc.start.line,scope.loc.start.column, ' ', ctx && ctx.name, '----', ctx && ctx.path.join('.'), '</b>');
+        if (ctx) {
+
+            scope.thisPath = ctx.name;
+            scope.thisScope = ctx.scope;
+            if (ctx.path.length > 1 ) {
+                scope.thisPath += '.' + ctx.path.slice(0, -1).join('.');
+            }
+        }
         this.analysis.scopes.push(scope);
     },
     declareRef(ref) {
@@ -78,6 +90,24 @@ State.prototype = Object.assign({
         this.customEntities.push({node, entity});
     }
 }, naiveModel1);
+
+function wrap(obj, prop, func) {
+    const original = obj[prop];
+    obj[prop] = function (...args) {
+        func.apply(this, args);
+        original.apply(this, args);
+    };
+}
+wrap(State.prototype, 'declareScope', function (scope) {
+    console.log(
+        '<h3>scope at ',
+        scope.loc.start.line + ':' + scope.loc.start.column,
+        '(parent at ',
+        scope.parent && (scope.parent.loc.start.line + ':' + scope.parent.loc.start.column),
+        ') blockScopes by line',
+        this.blockScopes.map(s => `<em>${s.loc.start.line}</em>`).join(', '),
+        '</h3>');
+});
 
 
 module.exports = State;

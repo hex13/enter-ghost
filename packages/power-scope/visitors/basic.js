@@ -78,9 +78,18 @@ module.exports = {
         enter(node, state) {
             state.enterObject();
             state.expr.push([]);
+
+            // TODO this is ugly
+            if (state.parent.type == 'CallExpression')
+                state.ctx.push(null);
         },
         exit(node, state) {
+            // TODO this is ugly
+            if (state.parent.type == 'CallExpression')
+                state.ctx.pop();
+
             state.exitObject();
+
             const expr = state.expr.pop();
         }
     },
@@ -91,6 +100,7 @@ module.exports = {
             const scope = new Scope({
                 loc: node.loc,
                 isFunctionScope,
+                parentType: state.parent.type,
                 parent: state.blockScopes[state.blockScopes.length - 1],
             });
             state.declareScope(scope);
@@ -168,7 +178,7 @@ module.exports = {
             if (key == 'expression' || key == 'arguments' || key == 'test' || key == 'left' || key == 'argument' || key == 'right' || key == 'init') {
                 state.declareRef([{
                     isChain: true,
-                    key: 'this', 
+                    key: 'this',
                     loc: node.loc,
                     scope: state.blockScopes[state.blockScopes.length - 1]
                 }]);
@@ -177,7 +187,7 @@ module.exports = {
     },
     CallExpression: {
         enter(node, state) {
-            state.ctx.push(null);
+            //state.ctx.push(null);
             if (node.callee.type == 'Identifier') {
                 state.declareRef([{
                     isChain: true,
@@ -189,7 +199,7 @@ module.exports = {
             }
         },
         exit(node, state) {
-            state.ctx.pop();
+            //state.ctx.pop();
             // state.chains[state.chains.length - 1].push({
             //     key: '()'
             // });
@@ -225,7 +235,8 @@ module.exports = {
             const scope = new Scope({
                 loc: node.loc,
                 isFunctionScope: true,
-                parent: state.functionScopes[state.functionScopes.length - 1],
+                nodeType: node.type,
+                parent: state.blockScopes[state.blockScopes.length - 1],
             });
             const func = {
                 name: getName(node),
@@ -248,6 +259,27 @@ module.exports = {
             }
 
         }
+    },
+    FunctionExpression: {
+        enter(node, state) {
+            console.log("<h2>TTTT>", getName(node), state.parent.type, node.loc.start.line, ':', node.loc.start.column, node.type, "</h2>")
+            // TODO this is ugly
+            if (state.parent.type != 'ObjectProperty')
+                state.ctx.push(0);
+        },
+        exit(node, state) {
+            // TODO this is ugly
+            if (state.parent.type != 'ObjectProperty')
+                state.ctx.pop();
+        },
+    },
+    FunctionDeclaration: {
+        enter(node, state) {
+            state.ctx.push(0);
+        },
+        exit(node, state) {
+            state.ctx.pop();
+        },
     },
     VariableDeclaration: variableDeclarationVisitor,
     VariableDeclarator: {

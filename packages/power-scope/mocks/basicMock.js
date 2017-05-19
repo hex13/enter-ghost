@@ -45,3 +45,45 @@ const arrow1 = (test) => {
 const arrow2 = function noVar (test) {
     test;
 }
+
+const o = {
+    p: {
+        r() {
+            this;
+        },
+        s: {
+            t() {
+                this.t;
+                const a = 2;
+                if (this.t) {
+                    this.t;
+                    const a = 2;
+                    if (a) {
+                        a(() => {a; this.a;});
+                    }
+                    function s()  {
+                        a;
+
+                        //
+                        this.t
+                    };
+                    (function s()  {
+                        a;
+
+                        //
+                        this.t
+                    })();
+
+                }
+            },
+            u: function () {
+                this;
+            },
+            v() {
+                const a = {
+                    b: () => { this; }
+                };
+            }
+        }
+    }
+};

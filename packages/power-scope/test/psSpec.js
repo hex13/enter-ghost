@@ -428,8 +428,23 @@ describe('Analyzer', () => {
             [[25, 4], [24, 14, 24, 18]], // `ooo.meth`
             // arg
             [[13, 44], [13, 37, 13, 40], [13, 32, 13, 72]],
-            [[13, 53], null, null, 'this.abc'],
-            [[13, 58], null, null, 'this'],
+
+            [[13, 53], [13, 17, 13, 20], null, 'this.abc'],
+            [[13, 58], [13, 10, 13, 13], null, 'this'],
+            [[52, 12], [50, 4, 50, 5], null, 'this'],
+
+            [[62, 36], [54, 8, 54, 9], null, 'this'], // this in arrow function
+            [[68, 24], 'not', null, 'this'], // this in function declaration
+            [[74, 24], 'not', null, 'this'], // this in function expression
+
+            [[80, 16], [54, 8, 54, 9], null, 'this'], // this in function expression as property
+            //[[84, 31], [54, 8, 54, 9], null, 'this'], // this in arrow expression as property
+
+            [[61, 24], [60, 26, 60, 27], null, 'a'],
+            [[62, 25], [60, 26, 60, 27], null, 'a'],
+            [[62, 33], [60, 26, 60, 27], null, 'a'],
+            [[65, 24], [60, 26, 60, 27], null, 'a'],
+
             // foo()
             [[38, 6], [24, 9, 24, 12]],
             // arguments in arrow functions
@@ -448,8 +463,12 @@ describe('Analyzer', () => {
             }
             if (defLoc) {
                 entry = analysis.resolveRef(ref);
-                assert(entry, `ref at ${line}:${column} should be resolved to an entry`);
-                assertSameLoc(analysis.rangeOf(entry), defLoc);
+                if (defLoc == 'not') {
+                    assert.equal(entry, undefined);
+                } else {
+                    assert(entry, `ref at ${line}:${column} should be resolved to an entry`);
+                    assertSameLoc(analysis.rangeOf(entry), defLoc);
+                }
             }
             if (scopeLoc) {
 

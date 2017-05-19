@@ -95,8 +95,13 @@ Analysis.prototype = {
         return entity;
     },
     resolveRef(ref) {
-        const name = ref[0].key;
+        let name = ref[0].key;
+
         let initialScope = ref[0].scope;
+        if (name == 'this') {
+            name = initialScope.thisPath;
+            initialScope = ref[0].scope.thisScope;//.parent;
+        }
 
         let entries;
         if (!initialScope) return;
@@ -106,6 +111,7 @@ Analysis.prototype = {
         if (!entity) {
             return;
         }
+
         scope = entity.scope;
         entries = this.getEntries(scope);
 
