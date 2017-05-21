@@ -14,6 +14,7 @@ const mocks =
     comments: fs.readFileSync(__dirname + '/../mocks/comments.js', 'utf8'),
     nodes: fs.readFileSync(__dirname + '/../mocks/nodes.js', 'utf8'),
     jsx: fs.readFileSync(__dirname + '/../mocks/jsx.js', 'utf8'),
+    implicit: fs.readFileSync(__dirname + '/../mocks/implicit.js', 'utf8'),
 };
 
 const parse = require('babylon').parse;
@@ -85,6 +86,59 @@ xdescribe('nodes', () => {
         });
         assert.equal(entry.name, 'abc');
         assert.equal(entry.nodeId, 1);
+    });
+});
+
+
+describe('implicit', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.implicit);
+        analyzer = new Analyzer(analyzerOpts);
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should have appropriate implicit declarations', () => {
+
+
+        let entries;
+
+        entries = analysis.getEntries(analysis.scopes[0]);
+        assertLength(Object.keys(entries), 4); // TODO enable!!!!!
+        let vars = [
+            {path: 'bear'},
+            {path: 'bear.is', implicit: true},
+            {path: 'bear.is.big', implicit: true},
+            {path: 'bear.is.animal', implicit: true},
+        ];
+        vars.forEach(v => {
+            const entry = entries[v.path];
+            assert(entry);
+            assert(entry.loc);
+            assert((!!entry.isImplicit) == (!!v.implicit), v.path + ',' + entry.isImplicit);
+        });
+        const refs = analysis.refsFor(entries['bear.is']);
+        assert.equal(refs.length, 3);
+        //console.log("TO SU REFY", refs.length, refs);
+
+
+        entries = analysis.getEntries(analysis.scopes[1]);
+        vars = [
+            {path: 'arg'},
+            {path: 'arg.a', implicit: true},
+        ];
+        vars.forEach(v => {
+            const entry = entries[v.path];
+            assert(entry, `Entry '${v.path}' should exist`);
+            assert(entry.loc);
+            assert((!!entry.isImplicit) == (!!v.implicit), v.path + ',' + entry.isImplicit);
+        });
+
+
     });
 });
 

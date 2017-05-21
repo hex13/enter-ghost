@@ -146,12 +146,21 @@ Analysis.prototype = {
     postprocess() {
         this.refs.forEach(ref_ => {
             const ref = ref_.slice();
+            const baseVariable = this.resolveRef([ref[0]]);
             while (ref.length) {
                 const entity = this.resolveRef(ref);
                 if (entity) {
-                    //console.log("YYYY", ref.map(part=>part.key).join(''));
                     entity.refs = entity.refs || [];
                     entity.refs.push(ref.slice());
+                } else if(baseVariable) {
+                    // declare implicit entry
+                    baseVariable.scope.entries[this.textOf(ref)] = {
+                        name: ref[ref.length - 1].name,
+                        scope: baseVariable.scope,
+                        loc: {start:{column:0,line:1}, end:{line:1, column:0}},
+                        isImplicit: true,
+                        refs: [ref.slice()],
+                    };
                 }
                 ref.pop();
                 if (ref.length && ref[ref.length - 1].key == '.') ref.pop();
