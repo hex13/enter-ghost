@@ -1,3 +1,5 @@
+"use strict";
+
 const { posInLoc } = require('./helpers');
 
 const assert = require('assert');
@@ -8,7 +10,6 @@ function Analysis() {
     this.componentData = Object.create(null);
 }
 
-model = require('./naiveModel1').analysisUtil;
 
 Analysis.prototype = {
     // TODO test non -existing components
@@ -112,7 +113,7 @@ Analysis.prototype = {
             return;
         }
 
-        scope = entity.scope;
+        const scope = entity.scope;
         entries = this.getEntries(scope);
 
         if (ref.length > 1) {
