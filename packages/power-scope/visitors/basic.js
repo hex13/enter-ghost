@@ -22,7 +22,6 @@ const variableDeclarationVisitor = {
     },
     exit(node, state,c) {
         const path = state.path;
-        console.error("POP", getName(node))
         state.scopes.pop();
         state.path.pop();
     },
@@ -46,8 +45,6 @@ module.exports = {
             state.declareScope(scope);
             state.pushBlockScope(scope); // blockScopes are for setting parent in child scope
             state.pushFunctionScope(scope);
-            console.error("ObectMethod enter", state.functionScopes.length)
-
         },
         exit(node, state) {
             state.declareParamsFrom(node);
@@ -262,7 +259,6 @@ module.exports = {
     },
     FunctionExpression: {
         enter(node, state) {
-            console.log("<h2>TTTT>", getName(node), state.parent.type, node.loc.start.line, ':', node.loc.start.column, node.type, "</h2>")
             // TODO this is ugly
             if (state.parent.type != 'ObjectProperty')
                 state.ctx.push(0);
