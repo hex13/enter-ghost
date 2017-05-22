@@ -29,6 +29,16 @@ const variableDeclarationVisitor = {
 
 
 module.exports = {
+    ClassDeclaration: {
+        exit(node, state) {
+            const entity = {
+                name: node.id.name,
+                scope: state.blockScopes[state.blockScopes.length - 1],
+                loc: node.id.loc,
+            };
+            state.declareVariable(entity);
+        }
+    },
     ObjectMethod: {
         // TODO remove duplication
         enter(node, state) {

@@ -395,6 +395,7 @@ describe('Analyzer', () => {
         assert(entries['something']);
         assert(!entries['something.not']);
         assert(entries['foo']);
+        assert(entries['Abc']);
 
         assert(!entries['noVar']);
 
@@ -505,6 +506,8 @@ describe('Analyzer', () => {
             [[42, 4], [41, 16, 41, 20]],
             // arguments in function expressions
             [[46, 4], [45, 31, 45, 35]],
+
+            [[98, 0], [93, 6, 93, 9]], // Abc
         ];
 
         refToDef.forEach(([[line, column], defLoc, scopeLoc, text]) => {
