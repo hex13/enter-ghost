@@ -290,14 +290,28 @@ module.exports = {
     VariableDeclaration: variableDeclarationVisitor,
     VariableDeclarator: {
         enter(node, state) {
+            if (node.id.type == 'ObjectPattern') {
+                return;
+            }
+
             state.ctx.push({
                 name: getName(node),
                 path: [],
                 scope: state.scopes[state.scopes.length - 1]
             });
-            console.log("=".repeat(20))
         },
         exit(node, state) {
+            if (node.id.type == 'ObjectPattern') {
+                node.id.properties.forEach(prop => {
+                    state.declareVariable({
+                        name: getName(prop),
+                        loc: prop.key.loc,
+                        scope: state.scopes[state.scopes.length - 1],
+                    });
+                });
+                return;
+            }
+
             const expr = state.expr.pop();
             const name = getName(node);
             //console.log("EEEE",expr)
@@ -310,5 +324,40 @@ module.exports = {
             state.ctx.pop();
         }
     },
+    ImportDeclaration: {
+        enter(node, state) {
+            const source = node.source.value;
+            node.specifiers.forEach(specifier => {
+                const loc = specifier.local.loc;
+                state.declareVariable({
+                    name: specifier.local.name,
+                    loc,
+                    scope: state.blockScopes[state.blockScopes.length - 1],
+                    origin: {
+                        path: source,
+                        name: specifier.imported && specifier.imported.name,
+                        importDefault: specifier.type == 'ImportDefaultSpecifier',
+                    }
+                });
+
+            });
+        },
+        exit(node, state) {
+        }
+    },
+    ExportNamedDeclaration: {
+        enter(node, state) {
+            //state.analysis.setComponent('file', 'exports.' + name);
+            //state.pushExport();
+
+        },
+        exit(node, state) {
+            let variable = global.nodeMap.get(node.declaration);
+            if (variable) {
+                state.analysis.setComponent('file', 'exports.' + variable.name, variable);
+            }
+            //state.pop();
+        }
+    }
 
 };

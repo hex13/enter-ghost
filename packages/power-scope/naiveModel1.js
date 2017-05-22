@@ -1,12 +1,24 @@
+
 const { getName } = require('lupa-utils');
 
+const nodeMap = new WeakMap;
+global.nodeMap = nodeMap;
 exports.stateMixin = {
     declareVariable(entity, value, key) {
         //this.analysis.entities.push(Object.assign({props: value}, entity));
         //console.warn("DECLARE", entity);
         const scope = entity.scope;
-        if (!scope) console.error("NO SCOPE", entity, new Error)
+        if (!scope) {
+            console.error("NO SCOPE", entity, new Error)
+            return;
+        }
+
         scope.entries[key || entity.name] = Object.assign({props: value}, entity);
+
+        if (this.node.type == 'VariableDeclarator') {
+            nodeMap.set(this.parent, scope.entries[key || entity.name]);
+        } else
+            nodeMap.set(this.node, scope.entries[key || entity.name]);
     },
 
     declareParamsFrom(node) {
@@ -18,7 +30,15 @@ exports.stateMixin = {
                     loc: param.loc,
                     scope: state.functionScopes[state.functionScopes.length - 1],
                 });
-            } else ;// throw new Error('TODO support for params other than identifiers (e.g. destructuring expressions)');
+            } else if (param.type == 'ObjectPattern') {
+                param.properties.forEach(prop => {
+                    state.declareVariable({
+                        name: prop.key.name,
+                        loc: prop.key.loc,
+                        scope: state.functionScopes[state.functionScopes.length - 1],
+                    });
+                });
+            }
 
         });
     },
@@ -44,6 +64,8 @@ exports.stateMixin = {
         const state = this;
         const ctx = state.last('ctx');
         if (!ctx) return;
+        if (state.parent.type != 'ObjectExpression') return;
+
 
         state.declareProperty(ctx, {
             name: ctx.path[ctx.path.length-1],

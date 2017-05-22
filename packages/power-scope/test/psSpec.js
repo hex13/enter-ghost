@@ -15,6 +15,8 @@ const mocks =
     nodes: fs.readFileSync(__dirname + '/../mocks/nodes.js', 'utf8'),
     jsx: fs.readFileSync(__dirname + '/../mocks/jsx.js', 'utf8'),
     implicit: fs.readFileSync(__dirname + '/../mocks/implicit.js', 'utf8'),
+    exports: fs.readFileSync(__dirname + '/../mocks/exports.js', 'utf8'),
+    imports: fs.readFileSync(__dirname + '/../mocks/imports.js', 'utf8'),
 };
 
 const parse = require('babylon').parse;
@@ -26,6 +28,7 @@ const basicVisitor = require('../visitors/basic');
 const additionalVisitor = require('../visitors/additional');
 const jsxVisitor = require('../visitors/jsx');
 const eduVisitor = require('../visitors/edu');
+const exportsVisitor = require('../visitors/exports');
 const outlineVisitor = require('../visitors/outline')({
     components: ['jsx']
 });
@@ -36,6 +39,78 @@ const receiver = require('../visitors/receiver');
 const analyzerOpts = {
     visitors: [basicVisitor, eduVisitor, outlineVisitor, commentsVisitor, provider, receiver]
 };
+
+
+
+describe('imports', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.imports, {sourceType: 'module'});
+        analyzer = new Analyzer({visitors: [basicVisitor, exportsVisitor]});
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should get imports', () => {
+        const entries = analysis.getEntries(analysis.scopes[0]);
+        console.log("###",entries)
+        const foo = entries['foo'];
+        assert(foo);
+        const bar = entries['bar'];
+        assert(bar);
+        const Something = entries['Something'];
+        assert(Something);
+
+        assert.equal(foo.origin.path, 'some-module');
+        assert.equal(bar.origin.path, 'some-module');
+        assert.equal(Something.origin.path, './sth');
+
+        assert.equal(foo.origin.name, 'foo');
+        assert(!foo.origin.importDefault);
+
+        assert.equal(bar.origin.name, 'baz');
+        assert(!bar.origin.importDefault);
+
+        assert(!Something.origin.name);
+        assert(Something.origin.importDefault);
+    });
+});
+
+
+describe('exports', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.exports, {sourceType: 'module'});
+        analyzer = new Analyzer({visitors: [basicVisitor, exportsVisitor]});
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should get exports', () => {
+        const exports = analysis.getComponent('file', 'exports');
+        assert.deepEqual(exports, ['something', 'foo']);
+    });
+
+    it('should get exports', () => {
+        const somethingRange = [1, 13, 1, 22];
+        const fooRange = [3, 16, 3, 19];
+
+        const something = analysis.getComponent('file', 'exports.something');
+        assert(something);
+        assertSameLoc(analysis.rangeOf(something), somethingRange);
+        const foo = analysis.getComponent('file', 'exports.foo');
+        assertSameLoc(analysis.rangeOf(foo), fooRange);
+        assert(foo);
+
+    });
+
+});
 
 describe('provider and receiver', () => {
 
@@ -386,6 +461,10 @@ describe('Analyzer', () => {
         const entries = analysis.getEntries(scopes[0]);
         assertLength(Object.keys(entries), 5);
 
+        // TODO change into array:
+        // ['abc', 'abc.prop1']
+        // and check length of keys
+        //
         assert(entries['abc']);
         assert(entries['abc.prop1']);
         assert(entries['abc.prop1.deepProp']);
@@ -396,6 +475,13 @@ describe('Analyzer', () => {
         assert(!entries['something.not']);
         assert(entries['foo']);
         assert(entries['Abc']);
+        console.log("#############",Object.keys(entries))
+        // destructuring
+        assert(!entries['.destr1']);
+        assert(!entries['.destr2']);
+
+        assert(entries['destr1']);
+        assert(entries['destr2']);
 
         assert(!entries['noVar']);
 
@@ -507,14 +593,20 @@ describe('Analyzer', () => {
             // arguments in function expressions
             [[46, 4], [45, 31, 45, 35]],
 
-            [[98, 0], [93, 6, 93, 9]], // Abc
+            [[111, 0], [93, 6, 93, 9]], // Abc
+
+            [[116, 0], [114, 7, 114, 13]], // destr1
+            [[116, 8], [114, 15, 114, 21]], // destr2
+
+            [[119, 4], [118, 12, 118, 21]], // destrArg1
+            [[119, 15], [118, 23, 118, 32]], // destrArg2
         ];
 
         refToDef.forEach(([[line, column], defLoc, scopeLoc, text]) => {
             ref = analysis.refAt({
                 line, column
             });
-            assert(ref);
+            assert(ref, `reference at ${line}:${column} should exist`);
             if (text) {
                 assert.strictEqual(analysis.textOf(ref), text);
             }
