@@ -17,6 +17,7 @@ const mocks =
     implicit: fs.readFileSync(__dirname + '/../mocks/implicit.js', 'utf8'),
     exports: fs.readFileSync(__dirname + '/../mocks/exports.js', 'utf8'),
     imports: fs.readFileSync(__dirname + '/../mocks/imports.js', 'utf8'),
+    commonjs: fs.readFileSync(__dirname + '/../mocks/commonjs.js', 'utf8'),
 };
 
 const parse = require('babylon').parse;
@@ -41,6 +42,44 @@ const analyzerOpts = {
 };
 
 
+
+describe('commonJS', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.commonjs, {sourceType: 'module'});
+        analyzer = new Analyzer({visitors: [basicVisitor, exportsVisitor]});
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should understand CommonJS', () => {
+        const entries = analysis.scopes[0].entries;
+        console.log(analysis.refs   )
+        assert(entries['module.exports']);
+        assertSameLoc(
+            analysis.rangeOf(entries['module.exports.abc']),
+            [3, 8, 3, 11]
+        );
+        const abc = analysis.getComponent('file', 'exports.abc');
+        assert(abc);
+
+
+        assert(!entries['thisIsNotRequire'].origin);
+        assert(!entries['requireWithoutArgs'].origin);
+        assert.deepEqual(entries['something'].origin, {
+            name: '',
+            path: './b'
+        });
+        assert.deepEqual(entries['a'].origin, {
+            name: 'a',
+            path: './b'
+        });
+
+    });
+});
 
 describe('imports', () => {
 

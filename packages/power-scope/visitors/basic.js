@@ -96,7 +96,13 @@ module.exports = {
                 state.ctx.pop();
 
             state.exitObject();
-
+            // TODO create each time object with own "scope" of flatten properties, like this
+            // {
+            //   props: {'a':3, 'a.b': 3, 'a.b.c':4  }
+            //
+            //}
+            // then push as expression to stack
+            // `this` will be defined even without real scope
             const expr = state.expr.pop();
         }
     },
@@ -206,6 +212,13 @@ module.exports = {
             }
         },
         exit(node, state) {
+            if (node.callee.name == 'require' && node.arguments[0])
+                state.expr.push({
+                    origin: {
+                        name: '',
+                        path: node.arguments[0].value
+                    }
+                });
             //state.ctx.pop();
             // state.chains[state.chains.length - 1].push({
             //     key: '()'
@@ -301,18 +314,30 @@ module.exports = {
             });
         },
         exit(node, state) {
+            const expr = state.expr.pop();
+
             if (node.id.type == 'ObjectPattern') {
                 node.id.properties.forEach(prop => {
+                    //const fixture = Object.assign({}, expr);
+                    let origin;
+                    const prefix = (expr && expr.origin.name && (expr.origin.name + '.')) || '';
+                    if (expr && expr.origin) {
+                        origin = {
+                            name: prop.key.name,
+                            path: expr.origin.path,
+                        };
+                    }
                     state.declareVariable({
                         name: getName(prop),
                         loc: prop.key.loc,
                         scope: state.scopes[state.scopes.length - 1],
+                        origin,
                     });
                 });
                 return;
             }
 
-            const expr = state.expr.pop();
+
             const name = getName(node);
             //console.log("EEEE",expr)
             state.declareVariable({
