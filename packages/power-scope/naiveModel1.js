@@ -13,7 +13,7 @@ exports.stateMixin = {
             return;
         }
 
-        scope.entries[key || entity.name] = Object.assign({props: value}, entity);
+        scope.entries[key || entity.name] = Object.assign(entity, value);
 
         if (this.node.type == 'VariableDeclarator') {
             nodeMap.set(this.parent, scope.entries[key || entity.name]);
