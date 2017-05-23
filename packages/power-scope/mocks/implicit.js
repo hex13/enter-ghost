@@ -12,3 +12,7 @@ function foo(arg) {
 bear.is.animal;
 
 bear.is.brown;
+
+yeti;
+yeti.is;
+yeti.is.alive;

@@ -189,6 +189,9 @@ describe('implicit', () => {
             {path: 'bear.is', implicit: true},
             {path: 'bear.is.big', implicit: true},
             {path: 'bear.is.animal', implicit: true},
+            {path: 'yeti', implicit: true},
+            {path: 'yeti.is', implicit: true},
+            {path: 'yeti.is.alive', implicit: true},
         ];
         vars.forEach(v => {
             const entry = entries[v.path];
