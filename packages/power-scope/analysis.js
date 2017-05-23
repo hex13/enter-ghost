@@ -179,6 +179,16 @@ Analysis.prototype = {
             //console.log("YYYYY", entity);
             //console.log("REFIK", ref.map(part=>part.key).join(''));
         });
+
+        // set components for module.exports
+        if (this.scopes[0]) {
+            Object.keys(this.scopes[0].entries)
+                .filter(k => k.indexOf('module.exports.') == 0)
+                .map(k => this.scopes[0].entries[k])
+                .forEach((entry) => {
+                    this.setComponent('file', 'exports.' + entry.name, entry);
+                });
+        }
     }
 };
 
