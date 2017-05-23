@@ -100,7 +100,7 @@ Analyzer.prototype.analyze = function analyze(ast, opts) {
 
     estraverse.traverse(ast, mainVisitor);
 
-    analysis.postprocess();
+    analysis.postprocess(state);
     return analysis;
 }
 

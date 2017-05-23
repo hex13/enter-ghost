@@ -144,10 +144,20 @@ Analysis.prototype = {
     refsFor(def) {
         return def.refs; // TODO test this.
     },
-    postprocess() {
+    postprocess(state) {
         this.refs.forEach(ref_ => {
             const ref = ref_.slice();
-            const baseVariable = this.resolveRef([ref[0]]);
+            let baseVariable = this.resolveRef([ref[0]]);
+            if (!baseVariable) {
+                // declare implicit global variable
+                state.declareVariable({
+                    name: ref[0].key,
+                    scope: this.scopes[0],
+                    loc: {start:{column:0,line:1}, end:{line:1, column:0}},
+                    isImplicit: true,
+                    refs: [ref.slice()],
+                });
+            }
             while (ref.length) {
                 const entity = this.resolveRef(ref);
                 if (entity) {
