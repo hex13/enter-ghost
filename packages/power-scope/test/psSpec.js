@@ -211,30 +211,30 @@ describe('provider and receiver', () => {
     });
 });
 
-xdescribe('nodes', () => {
-
-    let analyzer;
-    let ast;
-    let analysis;
-    let scopes;
-    before(() => {
-        ast = parse(mocks.nodes);
-        analyzer = new Analyzer(analyzerOpts);
-        analysis = analyzer.analyze(ast);
-    });
-
-    it('should have appropriate comments', () => {
-        console.log("sSSSSSSSSSSS".repeat(10));
-        console.log(analysis.scopeAt({line:2,column:4}));
-        console.log("=3-3-3-33-3-".repeat(10));
-        const entry = analysis.entryAt({
-            line: 2,
-            column: 4
-        });
-        assert.equal(entry.name, 'abc');
-        assert.equal(entry.nodeId, 1);
-    });
-});
+// xdescribe('nodes', () => {
+//
+//     let analyzer;
+//     let ast;
+//     let analysis;
+//     let scopes;
+//     before(() => {
+//         ast = parse(mocks.nodes);
+//         analyzer = new Analyzer(analyzerOpts);
+//         analysis = analyzer.analyze(ast);
+//     });
+//
+//     it('should have appropriate comments', () => {
+//         console.log("sSSSSSSSSSSS".repeat(10));
+//         console.log(analysis.scopeAt({line:2,column:4}));
+//         console.log("=3-3-3-33-3-".repeat(10));
+//         const entry = analysis.entryAt({
+//             line: 2,
+//             column: 4
+//         });
+//         assert.equal(entry.name, 'abc');
+//         assert.equal(entry.nodeId, 1);
+//     });
+// });
 
 
 describe('implicit', () => {
@@ -487,9 +487,14 @@ describe('scopes', () => {
         analysis = analyzer.analyze(ast);
     });
 
-    it('should have appropriate scopes', () => {
+    it('scope count should be correct', () => {
         const scopes = analysis.getScopes();
         assert.equal(scopes.length, 8);
+    });
+
+    it('should have appropriate scopes', () => {
+        const scopes = analysis.getScopes();
+
         assertSameLoc(analysis.rangeOf(scopes[0]), [1, 0, 100, 0]);
         assertSameLoc(analysis.rangeOf(scopes[1]), [2, 0, 6, 1]);
         assertSameLoc(analysis.rangeOf(scopes[2]), [2, 16, 6, 1]);
@@ -541,12 +546,8 @@ describe('Analyzer', () => {
         // and check length of keys
         //
         assert(entries['abc']);
-        assert(entries['abc.prop1']);
-        assert(entries['abc.prop1.deepProp']);
-        assert.equal(entries['abc.prop1.deepProp'].name, 'deepProp');
-        assert(entries['abc.prop2']);
         assert(entries['def']);
-        assert(entries['something']);
+
         assert(!entries['something.not']);
         assert(entries['foo']);
         assert(entries['Abc']);
@@ -564,6 +565,20 @@ describe('Analyzer', () => {
         //assert(entries['abc.prop']);
         assert.equal(entries['def'].name, 'def');
         //console.log("@@@@".repeat(20), entries['def'].scope.entries);
+    });
+
+    it('should have appropriate entries (weird cases)', () => {
+        const entries = analysis.getEntries(scopes[0]);
+        assert(entries['something']);
+    });
+
+    it('should have appropriate entries (dotted)', () => {
+        const entries = analysis.getEntries(scopes[0]);
+        assert(entries['abc.prop1']);
+        assert(entries['abc.prop1.deepProp']);
+        assert.equal(entries['abc.prop1.deepProp'].name, 'deepProp');
+        assert(entries['abc.prop2']);
+
     });
 
     it('should return scopeAt', () => {
@@ -626,6 +641,7 @@ describe('Analyzer', () => {
         assertSameLoc(analysis.rangeOf(entry), [13, 10, 13, 13]);
     });
 
+
     it('should return definition for multiple element ref at given position', () => {
         let ref;
         let entry;
@@ -682,5 +698,13 @@ describe('Analyzer', () => {
 
         assertRefs(analysis, refToDef);
     });
+
+    it('should return definition for multiple element ref at given position (`this)', () => {
+        const refToDef = [
+
+        ];
+        assertRefs(analysis, refToDef);
+    });
+
 
 });
