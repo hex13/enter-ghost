@@ -44,7 +44,8 @@ exports.stateMixin = {
     },
 
     declareProperty(ctx, prop) {
-        prop.scope = ctx.scope;
+        prop.scope = ctx;
+        if (!ctx.entries) throw new Error('😱')
         const key = ctx.name + ctx.path.map(key => '.' + key).join('');
         this.declareVariable(prop, null, key);
     },

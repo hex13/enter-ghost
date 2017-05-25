@@ -45,6 +45,8 @@ Analysis.prototype = {
     // TODO support for hoisting / lookup in parent scopes
     entryAt(pos) {
         let scope = this.scopeAt(pos);
+        if (!scope)
+            return;
         let entity;
         do {
             let entries = this.getEntries(scope);
@@ -85,7 +87,7 @@ Analysis.prototype = {
         }
     },
     getEntry(scope, name) {
-        return scope.entries[name];
+        return scope? scope.entries[name] : undefined;
     },
     lookupEntry(scope, name) {
         let entity;

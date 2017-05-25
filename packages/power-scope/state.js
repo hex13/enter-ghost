@@ -11,6 +11,8 @@ function State(analysis) {
     this.path = [];
     this.nodeId = 0;
     this.functions = [];
+    this.dev = [];
+    this.ret = [{}];
     this.scopes = [new Scope({
         loc: {
             start: {

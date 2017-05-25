@@ -84,16 +84,18 @@ module.exports = {
     ObjectExpression: {
         enter(node, state) {
             state.enterObject();
-            state.expr.push([]);
 
             // TODO this is ugly
-            if (state.parent.type == 'CallExpression')
+            if (state.parent.type == 'CallExpression') {
                 state.ctx.push(null);
+            } else {
+                state.ctx.push(state.last('dev'));
+            }
         },
         exit(node, state) {
             // TODO this is ugly
-            if (state.parent.type == 'CallExpression')
-                state.ctx.pop();
+
+
 
             state.exitObject();
             // TODO create each time object with own "scope" of flatten properties, like this
@@ -103,7 +105,7 @@ module.exports = {
             //}
             // then push as expression to stack
             // `this` will be defined even without real scope
-            const expr = state.expr.pop();
+            state.last('ret').value = state.ctx.pop();
         }
     },
     Scope: {
@@ -307,14 +309,30 @@ module.exports = {
                 return;
             }
 
-            state.ctx.push({
+
+            state.dev.push({
                 name: getName(node),
                 path: [],
+                entries: Object.create(null),
                 scope: state.scopes[state.scopes.length - 1]
             });
+            state.ret.push({});
         },
         exit(node, state) {
             const expr = state.expr.pop();
+            const dev = state.dev.pop();
+            const ret = state.ret.pop();
+            console.log("RETURNED", ret.value);
+
+            if (ret.value && ret.value.entries) {
+                Object.keys(ret.value.entries).forEach(key => {
+                    const entry = ret.value.entries[key];
+
+                    entry.scope = state.scopes[state.scopes.length - 1],
+                    console.log("ENTRY$", entry)
+                    state.declareVariable(entry, null, key);
+                });
+            }
 
             if (node.id.type == 'ObjectPattern') {
                 node.id.properties.forEach(prop => {
@@ -346,7 +364,7 @@ module.exports = {
                 scope: state.scopes[state.scopes.length - 1],
             }, expr);
 
-            state.ctx.pop();
+        //    state.ctx.pop();
         }
     },
     ImportDeclaration: {
