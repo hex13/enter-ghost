@@ -602,7 +602,10 @@ describe('Analyzer', () => {
         // and defLoc is array: [startLine, startColumn, endLine, endColumn]
         const refToDef = [
             // we have chain `ooo.abc.def`. These are parts of it:
-            [[16, 4], [13, 10, 13, 13]], // `ooo`
+            {
+                ref: [16, 4], def: [13, 10, 13, 13]
+            }, // `ooo`
+
             [[16, 12], [13, 23, 13, 26]], // `ooo.abc`
             [[16, 10], [13, 17, 13, 20]], // `ooo.abc.def`
             // another chain, with method calling
@@ -644,7 +647,13 @@ describe('Analyzer', () => {
             [[119, 15], [118, 23, 118, 32]], // destrArg2
         ];
 
-        refToDef.forEach(([[line, column], defLoc, scopeLoc, text]) => {
+        refToDef.forEach((data) => {
+            let line, column, defLoc, scopeLoc, text;
+            if (data instanceof Array) {
+                [[line, column], defLoc, scopeLoc, text] = data;
+            } else {
+                ({ ref: [line, column], def: defLoc } = data);
+            }
             ref = analysis.refAt({
                 line, column
             });
