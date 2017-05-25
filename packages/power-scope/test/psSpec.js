@@ -1,4 +1,37 @@
 "use strict";
+
+function assertRefs(analysis, list) {
+    list.forEach((data) => {
+        let ref, entry;
+        let line, column, defLoc, scopeLoc, text;
+        if (data instanceof Array) {
+            [[line, column], defLoc, scopeLoc, text] = data;
+        } else {
+            ({ ref: [line, column], def: defLoc } = data);
+        }
+        ref = analysis.refAt({
+            line, column
+        });
+        assert(ref, `reference at ${line}:${column} should exist`);
+        if (text) {
+            assert.strictEqual(analysis.textOf(ref), text);
+        }
+        if (defLoc) {
+            entry = analysis.resolveRef(ref);
+            if (defLoc == 'not') {
+                assert.equal(entry, undefined);
+            } else {
+                assert(entry, `ref at ${line}:${column} should be resolved to an entry`);
+                assertSameLoc(analysis.rangeOf(entry), defLoc);
+            }
+        }
+        if (scopeLoc) {
+            assertSameLoc(entry.scope.loc, scopeLoc);
+        }
+    });
+}
+
+
 // TODO test scopes (declareScope, former analysis.scopes.push)
 // TODO test scopes set by function declaration
 const Analyzer = require('../analyzer');
@@ -647,34 +680,7 @@ describe('Analyzer', () => {
             [[119, 15], [118, 23, 118, 32]], // destrArg2
         ];
 
-        refToDef.forEach((data) => {
-            let line, column, defLoc, scopeLoc, text;
-            if (data instanceof Array) {
-                [[line, column], defLoc, scopeLoc, text] = data;
-            } else {
-                ({ ref: [line, column], def: defLoc } = data);
-            }
-            ref = analysis.refAt({
-                line, column
-            });
-            assert(ref, `reference at ${line}:${column} should exist`);
-            if (text) {
-                assert.strictEqual(analysis.textOf(ref), text);
-            }
-            if (defLoc) {
-                entry = analysis.resolveRef(ref);
-                if (defLoc == 'not') {
-                    assert.equal(entry, undefined);
-                } else {
-                    assert(entry, `ref at ${line}:${column} should be resolved to an entry`);
-                    assertSameLoc(analysis.rangeOf(entry), defLoc);
-                }
-            }
-            if (scopeLoc) {
-
-                assertSameLoc(entry.scope.loc, scopeLoc);
-            }
-        });
+        assertRefs(analysis, refToDef);
     });
 
 });
