@@ -85,17 +85,19 @@ module.exports = {
         enter(node, state) {
             state.enterObject();
 
-            // TODO this is ugly
-            if (state.parent.type == 'CallExpression') {
+            if (state.parent != (state.last('dev')||{}).owner && state.parent.type != 'ObjectProperty') {
                 state.ctx.push(null);
-            } else {
-                state.ctx.push(state.last('dev'));
+            } else if (state.parent.type != 'ObjectProperty'){
+                const ctx = state.last('dev') || {};
+                Object.assign(ctx, {
+                    path: [],
+                    entries: Object.create(null),
+                    scope: state.scopes[state.scopes.length - 1]
+                })
+                state.ctx.push(ctx);
             }
         },
         exit(node, state) {
-            // TODO this is ugly
-
-
 
             state.exitObject();
             // TODO create each time object with own "scope" of flatten properties, like this
@@ -105,7 +107,12 @@ module.exports = {
             //}
             // then push as expression to stack
             // `this` will be defined even without real scope
-            state.last('ret').value = state.ctx.pop();
+
+            if (state.parent != (state.last('dev')||{}).owner && state.parent.type != 'ObjectProperty') {
+                state.ctx.pop();
+            } else if (state.parent.type != 'ObjectProperty'){
+                state.last('ret').value = state.ctx.pop();
+            }
         }
     },
     Scope: {
@@ -312,9 +319,7 @@ module.exports = {
 
             state.dev.push({
                 name: getName(node),
-                path: [],
-                entries: Object.create(null),
-                scope: state.scopes[state.scopes.length - 1]
+                owner: node,
             });
             state.ret.push({});
         },

@@ -33,7 +33,7 @@ for (let i = 0; i < 10; i++) {
 
 }
 
-const something = someFunction({not:2}); 
+const something = someFunction({not:2}); const something1 = [{not1: 2}];
 
 foo; foo();
 

@@ -549,6 +549,8 @@ describe('Analyzer', () => {
         assert(entries['def']);
 
         assert(!entries['something.not']);
+        assert(!entries['something1.not1']);
+
         assert(entries['foo']);
         assert(entries['Abc']);
         console.log("#############",Object.keys(entries))
