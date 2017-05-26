@@ -649,31 +649,16 @@ describe('Analyzer', () => {
         // array of items in format: [refPos, defLoc]
         // where refPos is array: [line, column]
         // and defLoc is array: [startLine, startColumn, endLine, endColumn]
-        const refToDef = [
+        const cases = [
             // we have chain `ooo.abc.def`. These are parts of it:
             {
                 ref: [16, 4], def: [13, 10, 13, 13]
             }, // `ooo`
 
-            [[16, 12], [13, 23, 13, 26]], // `ooo.abc`
-            [[16, 10], [13, 17, 13, 20]], // `ooo.abc.def`
-            // another chain, with method calling
-            [[16, 23], [13, 32, 13, 36]], // `ooo.meth`
-            // arg1
-            [[25, 4], [24, 14, 24, 18]], // `ooo.meth`
-            // arg
-            [[13, 44], [13, 37, 13, 40], [13, 32, 13, 72]],
 
-            [[13, 53], [13, 17, 13, 20], null, 'this.abc'],
-            [[13, 58], [13, 10, 13, 13], null, 'this'],
-            [[52, 12], [50, 4, 50, 5], null, 'this'],
+            [[13, 44], [13, 37, 13, 40], [13, 32, 13, 72], 'arg'],
 
-            [[62, 36], [54, 8, 54, 9], null, 'this'], // this in arrow function
-            [[68, 24], 'not', null, 'this'], // this in function declaration
-            [[74, 24], 'not', null, 'this'], // this in function expression
 
-            [[80, 16], [54, 8, 54, 9], null, 'this'], // this in function expression as property
-            [[84, 31], [54, 8, 54, 9], null, 'this'], // this in arrow expression as property
 
             [[61, 24], [60, 26, 60, 27], null, 'a'],
             [[62, 25], [60, 26, 60, 27], null, 'a'],
@@ -696,7 +681,29 @@ describe('Analyzer', () => {
             [[119, 15], [118, 23, 118, 32]], // destrArg2
         ];
 
-        assertRefs(analysis, refToDef);
+        const casesWithDots = [
+            [[16, 12], [13, 23, 13, 26]], // `ooo.abc`
+            [[16, 10], [13, 17, 13, 20]], // `ooo.abc.def`
+            // another chain, with method calling
+            [[16, 23], [13, 32, 13, 36]], // `ooo.meth`
+            [[25, 4], [24, 14, 24, 18]], // `ooo.meth`
+        ];
+
+        const casesWithThis = [
+            [[80, 16], [54, 8, 54, 9], null, 'this'], // this in function expression as property
+            [[84, 31], [54, 8, 54, 9], null, 'this'], // this in arrow expression as property
+            [[68, 24], 'not', null, 'this'], // this in function declaration
+            [[74, 24], 'not', null, 'this'], // this in function expression
+            [[13, 53], [13, 17, 13, 20], null, 'this.abc'],
+            [[13, 58], [13, 10, 13, 13], null, 'this'],
+            [[52, 12], [50, 4, 50, 5], null, 'this'],
+
+            [[62, 36], [54, 8, 54, 9], null, 'this'], // this in arrow function
+        ];
+
+        assertRefs(analysis, cases);
+        assertRefs(analysis, casesWithThis);
+        assertRefs(analysis, casesWithDots);
     });
 
     it('should return definition for multiple element ref at given position (`this)', () => {
