@@ -679,14 +679,13 @@ describe('Analyzer', () => {
 
             [[119, 4], [118, 12, 118, 21]], // destrArg1
             [[119, 15], [118, 23, 118, 32]], // destrArg2
+            [[25, 4], [24, 14, 24, 18], null, 'arg1'],
         ];
 
         const casesWithDots = [
-            [[16, 12], [13, 23, 13, 26]], // `ooo.abc`
-            [[16, 10], [13, 17, 13, 20]], // `ooo.abc.def`
-            // another chain, with method calling
-            [[16, 23], [13, 32, 13, 36]], // `ooo.meth`
-            [[25, 4], [24, 14, 24, 18]], // `ooo.meth`
+            [[16, 12], [13, 23, 13, 26], null, 'ooo.abc.def'],
+            [[16, 10], [13, 17, 13, 20], null, 'ooo.abc'],
+            [[16, 23], [13, 32, 13, 36], null, 'ooo.meth'], // chain with method calling
         ];
 
         const casesWithThis = [
