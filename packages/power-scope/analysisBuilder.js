@@ -3,7 +3,7 @@ const { getName } = require('lupa-utils');
 
 const nodeMap = new WeakMap;
 global.nodeMap = nodeMap;
-exports.stateMixin = {
+module.exports = {
     declareVariable(entity, value, key) {
         //this.analysis.entities.push(Object.assign({props: value}, entity));
         //console.warn("DECLARE", entity);
@@ -49,7 +49,6 @@ exports.stateMixin = {
         const key = ctx.name + ctx.path.map(key => '.' + key).join('');
         this.declareVariable(prop, null, key);
     },
-
     enterObject() {
 
     },
@@ -74,6 +73,32 @@ exports.stateMixin = {
         });
 
         ctx.path.pop();
+    },
+    declareScope(scope) {
+        //console.log("<div style='color:red'>", scope.nodeType, this.ctx[this.ctx.length -2],"</div>")
+        const ctx = this.last('ctx');
+        //const ctx = (scope.parentType) == 'ArrowFunctionExpression' ? this.ctx[this.ctx.length - 2] : this.last('ctx');
+        //console.log('<br/><b>',scope.loc.start.line,scope.loc.start.column, ' ', ctx && ctx.name, '----', ctx && ctx.path.join('.'), '</b>');
+        if (scope.parentType == 'ArrowFunctionExpression' && scope.parent && scope.parent.parent) {
+            let curr = scope.parent.parent;
+            scope.thisPath = curr.thisPath;
+            scope.thisScope = curr.thisScope;
+        }
+        else if (ctx) {
+            scope.thisPath = ctx.name;
+            scope.thisScope = ctx.scope;
+            if (ctx.path.length > 1 ) {
+                scope.thisPath += '.' + ctx.path.slice(0, -1).join('.');
+            }
+        }
+        this.analysis.scopes.push(scope);
+    },
+    declareRef(ref) {
+        this.analysis.refs.push(ref);
+    },
+    declareEntity(node, entity) {
+        this.customEntities.push({node, entity});
     }
+
 
 }

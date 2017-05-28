@@ -32,7 +32,7 @@ function State(analysis) {
     this.customEntities = [];
 }
 
-const analysisBuilder = require('./analysisBuilder').stateMixin;
+const analysisBuilder = require('./analysisBuilder');
 
 State.prototype = Object.assign({
     prepareFromEstraverse(ctx, node, parent) {
@@ -70,31 +70,6 @@ State.prototype = Object.assign({
     pushFunctionScope(scope) {
         return this.functionScopes.push(scope);
     },
-    declareScope(scope) {
-        //console.log("<div style='color:red'>", scope.nodeType, this.ctx[this.ctx.length -2],"</div>")
-        const ctx = this.last('ctx');
-        //const ctx = (scope.parentType) == 'ArrowFunctionExpression' ? this.ctx[this.ctx.length - 2] : this.last('ctx');
-        //console.log('<br/><b>',scope.loc.start.line,scope.loc.start.column, ' ', ctx && ctx.name, '----', ctx && ctx.path.join('.'), '</b>');
-        if (scope.parentType == 'ArrowFunctionExpression' && scope.parent && scope.parent.parent) {
-            let curr = scope.parent.parent;
-            scope.thisPath = curr.thisPath;
-            scope.thisScope = curr.thisScope;
-        }
-        else if (ctx) {
-            scope.thisPath = ctx.name;
-            scope.thisScope = ctx.scope;
-            if (ctx.path.length > 1 ) {
-                scope.thisPath += '.' + ctx.path.slice(0, -1).join('.');
-            }
-        }
-        this.analysis.scopes.push(scope);
-    },
-    declareRef(ref) {
-        this.analysis.refs.push(ref);
-    },
-    declareEntity(node, entity) {
-        this.customEntities.push({node, entity});
-    }
 }, analysisBuilder);
 
 function wrap(obj, prop, func) {
