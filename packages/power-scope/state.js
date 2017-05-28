@@ -32,7 +32,7 @@ function State(analysis) {
     this.customEntities = [];
 }
 
-const naiveModel1 = require('./naiveModel1').stateMixin;
+const analysisBuilder = require('./analysisBuilder').stateMixin;
 
 State.prototype = Object.assign({
     prepareFromEstraverse(ctx, node, parent) {
@@ -95,7 +95,7 @@ State.prototype = Object.assign({
     declareEntity(node, entity) {
         this.customEntities.push({node, entity});
     }
-}, naiveModel1);
+}, analysisBuilder);
 
 function wrap(obj, prop, func) {
     const original = obj[prop];
