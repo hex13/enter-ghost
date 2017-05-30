@@ -4,7 +4,7 @@ const estraverse = require('estraverse');
 
 // TODO rename -> traverser? orchestrator?
 const Analysis = require('./analysis');
-const State = require('./state');
+const State = require('./state')(require('./analysisBuilder'));
 
 const { isScope } = require('./helpers');
 
@@ -71,13 +71,14 @@ function enterOrLeave(phase, state) {
 function Analyzer(opts = {}) {
     this.scopes = [];
     this.visitors = opts.visitors;
+    this.State = opts.State || State;
 }
 
 
 Analyzer.prototype.analyze = function analyze(ast, opts) {
     const analysis = new Analysis();
 
-    const state = new State(analysis);
+    const state = new this.State(analysis);
     state.visitors = this.visitors;
 
     let ids = [];
