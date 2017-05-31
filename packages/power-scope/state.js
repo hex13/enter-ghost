@@ -7,7 +7,7 @@ module.exports = (analysisBuilder) => {
         this.functionScopes = [];
         this.forScope = null;
         this.chains = [];
-        this.expr = [];
+        this.expr = [{value: 1}];
         this.props = [];
         this.path = [];
         this.nodeId = 0;

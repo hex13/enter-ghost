@@ -20,6 +20,8 @@ const mocks =
     commonjs: fs.readFileSync(__dirname + '/../mocks/commonjs.js', 'utf8'),
 
     objects: fs.readFileSync(__dirname + '/../mocks/6/objects.js', 'utf8'),
+    vars: fs.readFileSync(__dirname + '/../mocks/6/variables.js', 'utf8'),
+    arrays: fs.readFileSync(__dirname + '/../mocks/6/arrays.js', 'utf8'),
 };
 
 const parse = require('babylon').parse;
@@ -51,7 +53,7 @@ const analyzerOpts = {
 const State = require('../state')(require('../analysisBuilder6'));
 
 
-describe('commonJS', () => {
+describe('objects', () => {
 
     let analyzer;
     let ast;
@@ -63,7 +65,7 @@ describe('commonJS', () => {
         analysis = analyzer.analyze(ast);
     });
 
-    it('should understand CommonJS', () => {
+    it('should understand objects', () => {
         console.log(inspect(analysis.objects, {depth:null}));
         const obj = analysis.objects[0];
 
@@ -101,5 +103,50 @@ describe('commonJS', () => {
 
         assert.equal(thisMap.get(obj.props.meth.value), obj);
         assert.equal(thisMap.get(obj.props.funcExpr.value), obj);
+    });
+
+});
+
+
+describe('variables', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.vars, {sourceType: 'module'});
+        analyzer = new Analyzer({visitors: [sixVisitor], State});
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should understand variables', () => {
+        expect(analysis.declarators).eql([
+            {kind: 'const', name: 'someVariable'},
+            {kind: 'let', name: 'someOtherVariable'}
+        ])
+    });
+});
+
+
+
+
+describe('arrays', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.arrays, {sourceType: 'module'});
+        analyzer = new Analyzer({visitors: [sixVisitor], State});
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should understand arrays', () => {
+        expect(analysis.arrays.length).equal(2);
+        expect(analysis.arrays[0]).deep.equal([
+            1, 2, 4
+        ]);
     });
 });

@@ -22,6 +22,8 @@ module.exports = () => {
             enter(node, state) {
                 state.objects = [];
                 state.analysis.objects = [];
+                state.analysis.declarators = [];
+                state.analysis.arrays = [];
                 state.analysis.thisMap = new WeakMap;
                 state.thisMap = state.analysis.thisMap;
             }
@@ -34,11 +36,11 @@ module.exports = () => {
             },
             exit(node, state) {
                 const obj = state.objects.pop();
-                if (state.parent.type != 'ObjectProperty') {
+                const isObjectRoot = state.parent.type != 'ObjectProperty';
+                if (isObjectRoot) {
                     state.analysis.objects.push(obj);
-                } else {
-                    state.passValue(obj);
                 }
+                state.passValue(obj);
             }
         },
         Function: {
@@ -87,6 +89,34 @@ module.exports = () => {
                 // state.bindProperty(state.lastOf('objects'), binding);
                 // state.bindVariable(state.lastOf('objects'), binding, binding);
             }
+        },
+        //declarators
+        VariableDeclarator: {
+            enter(node, state) {
+                state.analysis.declarators.push({
+                    kind: state.parent.kind,
+                    name: node.id.name
+                });
+            },
+            exit(node, state) {
+            },
+        },
+        NumericLiteral: {
+            enter(node, state) {
+
+            },
+            exit(node, state) {
+                state.passValue(node.value);
+            },
+        },
+        // arrays
+        ArrayExpression: {
+            enter(node, state) {
+                state.expectValues();
+            },
+            exit(node, state) {
+                state.analysis.arrays.push(state.receiveValues())
+            },
         }
     }
 };
