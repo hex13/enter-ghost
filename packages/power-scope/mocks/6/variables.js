@@ -1,2 +1,5 @@
-const someVariable = 1;
-let someOtherVariable = 1;
+const someVariable = {
+    a() {
+        let someOtherVariable = 3;
+    }
+}

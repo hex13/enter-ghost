@@ -6,6 +6,33 @@ const fs = require('fs');
 
 const get = require('lodash/get');
 const _ = { get };
+
+function query(structure) {
+    return {
+        binding() {
+            return structure;
+        },
+        def() {
+            return structure.value;
+        },
+        var(name) {
+            return query(structure.vars[name]);
+        },
+        prop(path) {
+            const parts = path.split('.');
+            let curr = structure;
+            do {
+                const propName = parts.shift();
+                if (!Object.hasOwnProperty.call(curr.props, propName)) {
+                    throw new Error(`Property ${propName} doesn't exist.`);
+                }
+                curr = curr.props[propName];
+            } while (parts.length);
+            return query(curr);
+        }
+    };
+}
+
 const mocks =
 {
     basic: fs.readFileSync(__dirname + '/../mocks/basicMock.js', 'utf8'),
@@ -22,6 +49,7 @@ const mocks =
     objects: fs.readFileSync(__dirname + '/../mocks/6/objects.js', 'utf8'),
     vars: fs.readFileSync(__dirname + '/../mocks/6/variables.js', 'utf8'),
     arrays: fs.readFileSync(__dirname + '/../mocks/6/arrays.js', 'utf8'),
+    benchmark: fs.readFileSync(__dirname + '/../x.js', 'utf8'),
 };
 
 const parse = require('babylon').parse;
@@ -61,7 +89,7 @@ describe('objects', () => {
     let scopes;
     before(() => {
         ast = parse(mocks.objects, {sourceType: 'module'});
-        analyzer = new Analyzer({visitors: [sixVisitor], State});
+        analyzer = new Analyzer({visitors: [sixVisitor], State, postprocess: false});
         analysis = analyzer.analyze(ast);
     });
 
@@ -73,14 +101,15 @@ describe('objects', () => {
             {path: 'meth', range: [2, 4, 2, 8]},
             {path: 'funcExpr', range: []},
             {path: 'a', range: []},
-            {path: 'a.props.a1', range: [9, 8, 9, 10]},
-            {path: 'a.props.a1.props.a2', range: [10, 12, 10, 14]},
+            {path: 'a.a1', range: [9, 8, 9, 10]},
+            {path: 'a.a1.a2', range: [10, 12, 10, 14]},
             {path: 'boo', range: [13, 4, 13, 7]},
         ];
 
         //expect(obj.props).to.have.deep.keys(props.map(p => p.name));
         props.forEach(({path, range}) => {
-            const binding = _.get(obj.props, path);
+            const binding = query(obj).prop(path).binding(); // _.get(obj.props, path);
+            expect(binding).exist;
             const name = path.split('.').pop();
             expect(binding).have.property('name', name, 'Binding name should be the same as key name.');
             if (range.length) {
@@ -95,14 +124,12 @@ describe('objects', () => {
                 });
             }
         });
-
-        expect(obj.props).nested.property('a.value.props').to.have.keys('a1');
         expect(obj.props).nested.property('boo.value.props').to.eql({});
 
         const thisMap = analysis.thisMap;
 
-        assert.equal(thisMap.get(obj.props.meth.value), obj);
-        assert.equal(thisMap.get(obj.props.funcExpr.value), obj);
+        assert.equal(thisMap.get(query(obj).prop('meth').def()), obj);
+        assert.equal(thisMap.get(query(obj).prop('funcExpr').def()), obj);
     });
 
 });
@@ -116,37 +143,84 @@ describe('variables', () => {
     let scopes;
     before(() => {
         ast = parse(mocks.vars, {sourceType: 'module'});
-        analyzer = new Analyzer({visitors: [sixVisitor], State});
+        analyzer = new Analyzer({visitors: [sixVisitor], State, postprocess: false});
         analysis = analyzer.analyze(ast);
     });
 
     it('should understand variables', () => {
-        expect(analysis.declarators).eql([
-            {kind: 'const', name: 'someVariable'},
-            {kind: 'let', name: 'someOtherVariable'}
-        ])
+        analysis.declarators[0].init = undefined; // Don't check `init` for now
+        expect(analysis.declarators[0]).eql(
+            {kind: 'const', name: 'someVariable', init: undefined}
+        );
+
+        expect(analysis.declarators[1]).eql(
+            {kind: 'let', name: 'someOtherVariable', init: {value: 3}}
+        );
+
+    });
+
+    it('scopes should have variables', () => {
+        expect(analysis.scopes[0].vars).have.keys('someVariable');
+        expect(analysis.scopes[1].vars).have.keys('someOtherVariable');
+        //expect(analysis.scopes[1].vars).have.nested.property('someOtherVariable.value.value', 3);
+        expect(query(analysis.scopes[1]).var('someOtherVariable').def().value).equal(3);
     });
 });
 
 
+describe('scopes', () => {
 
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
 
-describe('arrays', () => {
+    const correctScopes = [
+            {range: [1, 0, 100, 0], isFunctionScope: true},
+            {range: [2, 0, 6, 1]},
+            {range: [2, 16, 6, 1], isFunctionScope: true},
+            {range: [3, 14, 5, 5]},
+            {range: [4, 8, 4, 41]},
+            {range: [4, 37, 4, 41]},
+            {range: [9, 11, 11, 5], isFunctionScope: true},
+    ];
+    before(() => {
+        ast = parse(mocks.scopes, {sourceType: 'module'});
+        analyzer = new Analyzer({visitors: [sixVisitor], State, postprocess: false});
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should understand scopes', () => {
+        console.log("X", inspect(analysis.declarators, {colors:true,depth: null}));
+        expect(analysis.scopes.length).equal(7);
+        correctScopes.forEach((correctScope, i) => {
+            expect(analysis.scopes[i].range).eql(correctScope.range);
+            expect(analysis.scopes[i].isFunctionScope).equal(!!correctScope.isFunctionScope);
+
+        });
+    });
+});
+
+xdescribe('benchmark', () => {
 
     let analyzer;
     let ast;
     let analysis;
     let scopes;
     before(() => {
-        ast = parse(mocks.arrays, {sourceType: 'module'});
-        analyzer = new Analyzer({visitors: [sixVisitor], State});
+        let t0 = Date.now(), t1, d;
+        ast = parse(mocks.benchmark, {sourceType: 'module'});
+        d = Date.now() - t0;
+        console.log("CZAAAAAAS PARSOWANIA", d)
+
+        analyzer = new Analyzer({visitors: [sixVisitor], State, postprocess: false});
+        t0 = Date.now();
         analysis = analyzer.analyze(ast);
+        d = Date.now() - t0;
+        console.log("CZAAAAAAS analizy", d)
+
     });
 
-    it('should understand arrays', () => {
-        expect(analysis.arrays.length).equal(2);
-        expect(analysis.arrays[0]).deep.equal([
-            1, 2, 4
-        ]);
+    it('...', () => {
     });
 });

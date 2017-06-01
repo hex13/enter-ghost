@@ -1,7 +1,9 @@
 const { getName } = require('lupa-utils');
+const _isFunctionScope = require('../helpers').isFunctionScope6;
+
 
 function ObjectRepr() {
-    this.props = {};
+    this.props = Object.create(null);
 }
 
 function Binding(identifier, value) {
@@ -78,27 +80,25 @@ module.exports = () => {
             //expectValue: true,
             exit(node, state) {
                 state.bindProperty(state.lastOf('objects'), new Binding(node.key, state.receiveValue()));
-
-                // TODO api proposal
-                // const binding = new Binding({
-                //     name: getName(node),
-                //     value: state.receiveValue(),
-                //     nameLoc: node.key.loc,
-                // }
-                // state.createPropertyBinding(state.lastOf('objects'), binding, binding);
-                // state.bindProperty(state.lastOf('objects'), binding);
-                // state.bindVariable(state.lastOf('objects'), binding, binding);
             }
         },
         //declarators
         VariableDeclarator: {
             enter(node, state) {
-                state.analysis.declarators.push({
+                const decl = {
                     kind: state.parent.kind,
                     name: node.id.name
-                });
+                };
+                // TODO check maybe push/pop can be replaced with mapping AST node id to value(s)
+                state.analysis.declarators.push(decl);
+                state.decl.push(decl);
+                state.expectValue();
             },
             exit(node, state) {
+                const decl = state.decl.pop();
+                decl.init = state.receiveValue();
+                state.last('blockScopedDecl').values.push(decl);
+                state.last('blockScopes').declarations.push(decl);
             },
         },
         NumericLiteral: {
@@ -106,7 +106,7 @@ module.exports = () => {
 
             },
             exit(node, state) {
-                state.passValue(node.value);
+                state.passValue({value: node.value});
             },
         },
         // arrays
@@ -117,6 +117,38 @@ module.exports = () => {
             exit(node, state) {
                 state.analysis.arrays.push(state.receiveValues())
             },
+        },
+
+        Scope6: {
+            enter(node, state) {
+                const isFunctionScope = _isFunctionScope(node, state.parent);
+                const loc = node.loc;
+                const scope = {
+                    isFunctionScope,
+                    range: [
+                        loc.start.line,
+                        loc.start.column,
+                        loc.end.line,
+                        loc.end.column,
+                    ],
+                    vars: Object.create(null),
+                    declarations: [
+
+                    ]
+                };
+                state.analysis.scopes.push(scope);
+                state.blockScopedDecl.push({values: []});
+                state.blockScopes.push(scope);
+            },
+            exit(node, state) {
+                const scope = state.blockScopes.pop();
+                scope.declarations.forEach(decl => {
+                    scope.vars[decl.name] = {
+                        value: decl.init
+                    };
+                });
+                state.blockScopedDecl.pop();
+            }
         }
     }
 };

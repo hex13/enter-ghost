@@ -8,12 +8,15 @@ module.exports = (analysisBuilder) => {
         this.forScope = null;
         this.chains = [];
         this.expr = [{value: 1}];
+        this.decl = [];
         this.props = [];
         this.path = [];
         this.nodeId = 0;
         this.functions = [];
         this.dev = [];
         this.ret = [{}];
+        this.blockScopedDecl = [];
+        this.functionScopedDecl = [];
         this.scopes = [new Scope({
             loc: {
                 start: {
