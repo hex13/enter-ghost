@@ -327,14 +327,13 @@ module.exports = {
             const expr = state.expr.pop();
             const dev = state.dev.pop();
             const ret = state.ret.pop();
-            console.log("RETURNED", ret.value);
+
 
             if (ret.value && ret.value.entries) {
                 Object.keys(ret.value.entries).forEach(key => {
                     const entry = ret.value.entries[key];
 
                     entry.scope = state.scopes[state.scopes.length - 1],
-                    console.log("ENTRY$", entry)
                     state.declareVariable(entry, null, key);
                 });
             }
