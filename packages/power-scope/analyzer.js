@@ -72,6 +72,7 @@ function Analyzer(opts = {}) {
     this.scopes = [];
     this.visitors = opts.visitors;
     this.State = opts.State || State;
+    this.postprocess = 'postprocess' in opts? opts.postprocess : true;
 }
 
 
@@ -101,7 +102,7 @@ Analyzer.prototype.analyze = function analyze(ast, opts) {
 
     estraverse.traverse(ast, mainVisitor);
 
-    analysis.postprocess(state);
+    if (this.postprocess) analysis.postprocess(state);
     return analysis;
 }
 
