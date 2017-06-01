@@ -6,7 +6,7 @@ const estraverse = require('estraverse');
 const Analysis = require('./analysis');
 const State = require('./state')(require('./analysisBuilder'));
 
-const { isScope } = require('./helpers');
+const { isScope, isScope6 } = require('./helpers');
 
 function invokeVisitor(visitor, node, type, phase, state) {
     if (visitor.hasOwnProperty(type)) {
@@ -55,6 +55,10 @@ function enterOrLeave(phase, state) {
         if (isScope(node)) {
             invokeVisitor(visitor, node, 'Scope', phase, state);
         }
+        if (isScope6(node)) {
+            invokeVisitor(visitor, node, 'Scope6', phase, state);
+        }
+
         if (isChainEnd(node, state)) {
             invokeVisitor(visitor, node, 'ChainEnd', phase, state);
         }
