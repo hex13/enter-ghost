@@ -38,6 +38,9 @@ module.exports = (analysisBuilder) => {
 
 
     State.prototype = Object.assign({
+        declareRef(ref) {
+            this.analysis.refs.push(ref);
+        },
         prepareFromEstraverse(ctx, node, parent) {
             this.node = node;
             this.parent = parent;

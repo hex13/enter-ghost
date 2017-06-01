@@ -50,6 +50,7 @@ const mocks =
     vars: fs.readFileSync(__dirname + '/../mocks/6/variables.js', 'utf8'),
     arrays: fs.readFileSync(__dirname + '/../mocks/6/arrays.js', 'utf8'),
     benchmark: fs.readFileSync(__dirname + '/../x.js', 'utf8'),
+    refs: fs.readFileSync(__dirname + '/../mocks/6/refs.js', 'utf8'),
 };
 
 const parse = require('babylon').parse;
@@ -198,6 +199,28 @@ describe('scopes', () => {
             expect(analysis.scopes[i].isFunctionScope).equal(!!correctScope.isFunctionScope);
 
         });
+    });
+});
+
+describe('refs', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
+        ast = parse(mocks.refs, {sourceType: 'module'});
+        analyzer = new Analyzer({visitors: [sixVisitor], State, postprocess: false});
+        analysis = analyzer.analyze(ast);
+    });
+
+    it('should understand refs', () => {
+        expect(analysis.refs.map(analysis.textOf)).eql([
+            'abc.def',
+            'ghi',
+            'jkl'
+        ]);
+        expect(analysis.refs[0][0].scope).equal(analysis.scopes[0]);
     });
 });
 

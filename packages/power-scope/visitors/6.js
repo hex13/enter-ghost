@@ -19,7 +19,7 @@ Binding.prototype = {
 };
 
 module.exports = () => {
-    return {
+    return Object.assign({
         Program: {
             enter(node, state) {
                 state.objects = [];
@@ -150,5 +150,5 @@ module.exports = () => {
                 state.blockScopedDecl.pop();
             }
         }
-    }
+    }, require('./refs'));
 };
