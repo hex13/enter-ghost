@@ -7,31 +7,51 @@ const fs = require('fs');
 const get = require('lodash/get');
 const _ = { get };
 
-function query(structure) {
-    return {
-        binding() {
-            return structure;
-        },
-        def() {
-            return structure.value;
-        },
-        var(name) {
-            return query(structure.vars[name]);
-        },
-        prop(path) {
-            const parts = path.split('.');
-            let curr = structure;
-            do {
-                const propName = parts.shift();
-                if (!Object.hasOwnProperty.call(curr.props, propName)) {
-                    throw new Error(`Property ${propName} doesn't exist.`);
-                }
-                curr = curr.props[propName];
-            } while (parts.length);
-            return query(curr);
-        }
-    };
+const services = require('../services');
+const getters = require('../getters');
+
+
+
+
+function createInquirer(services) {
+    return function query(structure) {
+        return {
+            data() {
+                return structure;
+            },
+            binding() {
+                return structure;
+            },
+            def() {
+                return structure.value;
+            },
+            var(name) {
+                return query(structure.vars[name]);
+            },
+            prop(path) {
+                const parts = path.split('.');
+                let curr = structure;
+                do {
+                    const propName = parts.shift();
+                    if (!Object.hasOwnProperty.call(curr.props, propName)) {
+                        throw new Error(`Property ${propName} doesn't exist.`);
+                    }
+                    curr = curr.props[propName];
+                } while (parts.length);
+                return query(curr);
+            },
+            refAt(pos) {
+                return query(structure.refAt(pos));
+            },
+            text() {
+                return services.textOf(structure);
+            }
+        };
+    }
 }
+
+const query = createInquirer(Object.assign({}, services, getters));
+
 
 const mocks =
 {
@@ -221,6 +241,16 @@ describe('refs', () => {
             'jkl'
         ]);
         expect(analysis.refs[0][0].scope).equal(analysis.scopes[0]);
+
+        expect(analysis.textOf(analysis.refAt({
+            line: 7,
+            column: 1
+        }))).equal('abc');
+
+        expect(query(analysis).refAt({
+            line: 7,
+            column: 4
+        }).text()).equal('abc.def');
     });
 });
 
