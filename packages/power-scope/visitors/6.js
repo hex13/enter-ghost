@@ -1,6 +1,14 @@
 const { getName } = require('lupa-utils');
 const _isFunctionScope = require('../helpers').isFunctionScope6;
 
+function loc2range(loc) {
+    return [
+        loc.start.line,
+        loc.start.column,
+        loc.end.line,
+        loc.end.column,
+    ];
+}
 
 function ObjectRepr() {
     this.props = Object.create(null);
@@ -8,7 +16,7 @@ function ObjectRepr() {
 
 function Binding(identifier, value) {
     this.name = identifier.name;
-    this.loc = identifier.loc;
+    this.range = loc2range(identifier.loc);
     this.value = value;
 }
 
@@ -87,7 +95,9 @@ module.exports = () => {
             enter(node, state) {
                 const decl = {
                     kind: state.parent.kind,
-                    name: node.id.name
+                    name: node.id.name,
+                    //loc: node.id.loc,
+                    range: loc2range(node.id.loc)
                 };
                 // TODO check maybe push/pop can be replaced with mapping AST node id to value(s)
                 state.analysis.declarators.push(decl);
@@ -125,16 +135,9 @@ module.exports = () => {
                 const loc = node.loc;
                 const scope = {
                     isFunctionScope,
-                    range: [
-                        loc.start.line,
-                        loc.start.column,
-                        loc.end.line,
-                        loc.end.column,
-                    ],
+                    range: loc2range(loc),
                     vars: Object.create(null),
-                    declarations: [
-
-                    ]
+                    declarations: []
                 };
                 state.analysis.scopes.push(scope);
                 state.blockScopedDecl.push({values: []});
@@ -144,7 +147,8 @@ module.exports = () => {
                 const scope = state.blockScopes.pop();
                 scope.declarations.forEach(decl => {
                     scope.vars[decl.name] = {
-                        value: decl.init
+                        value: decl.init,
+                        range: decl.range
                     };
                 });
                 state.blockScopedDecl.pop();

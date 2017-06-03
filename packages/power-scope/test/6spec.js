@@ -95,15 +95,7 @@ describe('objects', () => {
             const name = path.split('.').pop();
             expect(binding).have.property('name', name, 'Binding name should be the same as key name.');
             if (range.length) {
-                expect(binding).have.nested.property('loc.start').eql({
-                    line: range[0],
-                    column: range[1]
-                });
-
-                expect(binding).have.nested.property('loc.end').eql({
-                    line: range[2],
-                    column: range[3]
-                });
+                expect(query(binding).range()).eql(range);
             }
         });
         expect(obj.props).nested.property('boo.value.props').to.eql({});
@@ -132,11 +124,11 @@ describe('variables', () => {
     it('should understand variables', () => {
         analysis.declarators[0].init = undefined; // Don't check `init` for now
         expect(analysis.declarators[0]).eql(
-            {kind: 'const', name: 'someVariable', init: undefined}
+            {kind: 'const', name: 'someVariable', init: undefined, range: [1, 6, 1, 18]}
         );
 
         expect(analysis.declarators[1]).eql(
-            {kind: 'let', name: 'someOtherVariable', init: {value: 3}}
+        {kind: 'let', name: 'someOtherVariable', init: {value: 3}, range: [3, 12, 3, 29]}
         );
 
     });
@@ -208,10 +200,15 @@ describe('refs', () => {
             column: 1
         }))).equal('abc');
 
-        expect(query(analysis).refAt({
+        let ref;
+        ref = query(analysis).refAt({
             line: 7,
             column: 4
-        }).text()).equal('abc.def');
+        });
+        expect(ref.text()).equal('abc.def');
+        expect(ref.scope().var('abc').prop('def').range()).eql([4, 4, 4, 7]);
+        expect(ref.resolve().range()).eql([4, 4, 4, 7]);
+
     });
 });
 
