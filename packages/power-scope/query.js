@@ -13,6 +13,9 @@ module.exports = function createInquirer(services) {
             var(name) {
                 return query(structure.vars[name]);
             },
+            range() {
+                return structure.range;
+            },
             prop(path) {
                 const parts = path.split('.');
                 let curr = structure;
