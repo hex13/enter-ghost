@@ -19,19 +19,14 @@ module.exports = function createInquirer(services) {
             loc() {
                 return structure.loc;
             },
+            lookup() {
+                throw new Error('not implemented');
+            },
             resolve() {
-                // TODO
-                    // structure[0].scope.
-                    // this.lookup(structure[0].scope, textof)
                 let currScope = structure[0].scope;
                 const name = structure[0].key;
                 let variable = services.lookupEntry(currScope, name);
-                // find scope for variable
-                // do {
-                //     variable = query(currScope).var(structure[0].key).data();
-                //     currScope = currScope.parent;
-                // } while (currScope && !variable);
-                return query(variable).prop(structure.slice(2).map(k=>k.key).join('.'));
+                return query(variable).prop(structure.slice(2).map(k=>k.key).join(''));
                 //return query(currScope).var(structure[0].key).prop(structure.slice(2).map(k=>k.key).join('.'));
             },
             prop(path) {

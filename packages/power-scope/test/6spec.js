@@ -191,6 +191,7 @@ describe('refs', () => {
         expect(analysis.refs.map(analysis.textOf)).eql([
             'abc.def',
             'abc.def',
+            'abc.ghi.jkl',
             'ghi',
             'jkl'
         ]);
@@ -216,6 +217,14 @@ describe('refs', () => {
         });
         expect(ref.text()).equal('abc.def');
         expect(ref.resolve().range()).eql([4, 4, 4, 7]);
+
+        ref = query(analysis).refAt({
+            line: 10,
+            column: 12
+        });
+        expect(ref.text()).equal('abc.ghi.jkl');
+        expect(ref.resolve().range()).eql([4, 18, 4, 21]);
+
     });
 });
 
