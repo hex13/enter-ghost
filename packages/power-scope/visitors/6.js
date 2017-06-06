@@ -137,7 +137,8 @@ module.exports = () => {
                     isFunctionScope,
                     range: loc2range(loc),
                     vars: Object.create(null),
-                    declarations: []
+                    declarations: [],
+                    parent: state.last('blockScopes')
                 };
                 state.analysis.scopes.push(scope);
                 state.blockScopedDecl.push({values: []});

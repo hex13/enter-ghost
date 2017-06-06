@@ -16,9 +16,27 @@ module.exports = function createInquirer(services) {
             range() {
                 return structure.range;
             },
+            loc() {
+                return structure.loc;
+            },
+            resolve() {
+                // TODO
+                    // structure[0].scope.
+                    // this.lookup(structure[0].scope, textof)
+                let currScope = structure[0].scope;
+                const name = structure[0].key;
+                let variable = services.lookupEntry(currScope, name);
+                // find scope for variable
+                // do {
+                //     variable = query(currScope).var(structure[0].key).data();
+                //     currScope = currScope.parent;
+                // } while (currScope && !variable);
+                return query(variable).prop(structure.slice(2).map(k=>k.key).join('.'));
+                //return query(currScope).var(structure[0].key).prop(structure.slice(2).map(k=>k.key).join('.'));
+            },
             prop(path) {
                 const parts = path.split('.');
-                let curr = structure;
+                let curr = structure.value || structure;
                 do {
                     const propName = parts.shift();
                     if (!Object.hasOwnProperty.call(curr.props, propName)) {
@@ -33,6 +51,12 @@ module.exports = function createInquirer(services) {
             },
             text() {
                 return services.textOf(structure);
+            },
+            scope() {
+                if (Array.isArray(structure)) {
+                    return query(structure[0].scope);
+                }
+                throw new Error('This has no scope');
             }
         };
     }

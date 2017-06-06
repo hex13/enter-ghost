@@ -5,6 +5,9 @@ const abc = {
 };
 
 abc.def;
+function foo() {
+    abc.def;
+}
 
 ghi;
 

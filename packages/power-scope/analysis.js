@@ -3,7 +3,7 @@
 const { posInLoc } = require('./helpers');
 
 const assert = require('assert');
-const { lookupEntry, resolveRef, refAt, scopeAt, entryAt } = require('./services');
+const { lookupEntry, resolveRef, refAt, scopeAt, entryAt } = require('./services')(require('./getters'));
 const { getEntries, rangeOf, textOf, refsFor } = require('./getters');
 function Analysis() {
     this.scopes = [];

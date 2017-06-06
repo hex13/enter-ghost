@@ -7,8 +7,8 @@ const fs = require('fs');
 const get = require('lodash/get');
 const _ = { get };
 
-const services = require('../services');
-const getters = require('../getters');
+const getters = require('../getters6');
+const services = require('../services')(getters);
 
 const createInquirer = require('../query');
 const query = createInquirer(Object.assign({}, services, getters));
@@ -190,6 +190,7 @@ describe('refs', () => {
     it('should understand refs', () => {
         expect(analysis.refs.map(analysis.textOf)).eql([
             'abc.def',
+            'abc.def',
             'ghi',
             'jkl'
         ]);
@@ -209,6 +210,12 @@ describe('refs', () => {
         expect(ref.scope().var('abc').prop('def').range()).eql([4, 4, 4, 7]);
         expect(ref.resolve().range()).eql([4, 4, 4, 7]);
 
+        ref = query(analysis).refAt({
+            line: 9,
+            column: 8
+        });
+        expect(ref.text()).equal('abc.def');
+        expect(ref.resolve().range()).eql([4, 4, 4, 7]);
     });
 });
 
