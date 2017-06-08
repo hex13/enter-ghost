@@ -1,5 +1,8 @@
 module.exports = function createInquirer(services) {
     return function query(structure) {
+        if (!structure) {
+            throw new Error(`Query needs structure. Found ${structure}`);
+        }
         return {
             data() {
                 return structure;
@@ -23,11 +26,7 @@ module.exports = function createInquirer(services) {
                 throw new Error('not implemented');
             },
             resolve() {
-                let currScope = structure[0].scope;
-                const name = structure[0].key;
-                let variable = services.lookupEntry(currScope, name);
-                return query(variable).prop(structure.slice(2).map(k=>k.key).join(''));
-                //return query(currScope).var(structure[0].key).prop(structure.slice(2).map(k=>k.key).join('.'));
+                return query(services.resolveRef(structure))
             },
             prop(path) {
                 return query(services.getProperty(structure, path));
