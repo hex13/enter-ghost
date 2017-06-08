@@ -30,32 +30,9 @@ module.exports = (getters) => {
         }
 
         const scope = entity.scope;
+
         entries = getEntries(scope);
-
-        if (ref.length > 1) {
-            let op = '';
-            let curr = entity;
-            let path = name;
-            for (let i = 1; i < ref.length; i++) {
-                if (ref[i].key == '.') {
-                    op = 'prop';
-                } else {
-                    if (op == 'prop' && curr) {
-                        path = path + '.' + ref[i].key;
-                        curr = entries[path];
-                    } else {
-                        return;  // TODO test this.
-                    }
-                    if (!curr)  {
-                        return // TODO test this.
-                        //console.log("!!!!!ZN", ref.map(p=>p.key).join(''))
-                    }
-
-                }
-            }
-            return curr;
-        }
-        return entity;
+        return entries[name + ref.slice(1).map(k=>k.key).join('')] ;
     }
 
     function refAt(refs, pos) {
