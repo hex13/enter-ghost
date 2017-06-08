@@ -1,5 +1,8 @@
 "use strict";
 
+function loc2range(loc) {
+    return [loc.start.line, loc.start.column, loc.end.line, loc.end.column];
+}
 function assertRefs(analysis, list) {
     list.forEach((data) => {
         let ref, entry;
@@ -22,7 +25,11 @@ function assertRefs(analysis, list) {
                 assert.equal(entry, undefined);
             } else {
                 assert(entry, `ref at ${line}:${column} should be resolved to an entry`);
-                assertSameLoc(analysis.rangeOf(entry), defLoc);
+                try {
+                    assertSameLoc(analysis.rangeOf(entry), defLoc);
+                } catch (e) {
+                    throw new Error(`definition of reference \`${text}\` should have range ${defLoc}. Instead it has ${loc2range(analysis.rangeOf(entry))}`);
+                }
             }
         }
         if (scopeLoc) {
