@@ -30,16 +30,7 @@ module.exports = function createInquirer(services) {
                 //return query(currScope).var(structure[0].key).prop(structure.slice(2).map(k=>k.key).join('.'));
             },
             prop(path) {
-                const parts = path.split('.');
-                let curr = structure.value || structure;
-                do {
-                    const propName = parts.shift();
-                    if (!Object.hasOwnProperty.call(curr.props, propName)) {
-                        throw new Error(`Property ${propName} doesn't exist.`);
-                    }
-                    curr = curr.props[propName];
-                } while (parts.length);
-                return query(curr);
+                return query(services.getProperty(structure, path));
             },
             refAt(pos) {
                 return query(structure.refAt(pos));
