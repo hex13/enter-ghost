@@ -17,6 +17,9 @@ And these screenshots are only illustration (this is library, this is NOT editor
 
 API documentation (work in progress):
 
+Analysis.js [jump](analysis.js)
+===
+
 **entityAt** [jump](analysis.js#L39)
 
 **entryAt** [jump](analysis.js#L36)
