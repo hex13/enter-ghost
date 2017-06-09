@@ -10,15 +10,11 @@ It's intended as library for use in e.g. editor extensions to implement such fea
 - autocomplete
 etc.
 
-Notice that it has semantic understand of the code (it understand which `foo` is the one cursor is at, and it understands `this`).
-And these screenshots are only illustration (this is library, this is NOT editor extension! Although it can be used for make such extension)
-![screenshot](https://raw.githubusercontent.com/hex13/enter-ghost/master/packages/power-scope/screenshot1.png)
-![screenshot](https://raw.githubusercontent.com/hex13/enter-ghost/master/packages/power-scope/screenshot2.png)
-
 API documentation (work in progress):
+===
 
 Analysis.js [jump](analysis.js)
-===
+---
 
 **entityAt** [jump](analysis.js#L39)
 
