@@ -212,22 +212,25 @@ const basicVisitor = {
     VariableDeclaration: variableDeclarationVisitor,
     VariableDeclarator: {
         enter(node, state) {
+            state.ret.push({});
+
             if (node.id.type == 'ObjectPattern') {
                 return;
             }
-
 
             state.dev.push({
                 name: getName(node),
                 owner: node,
             });
-            state.ret.push({});
+
         },
         exit(node, state) {
             const expr = state.expr.pop();
             const dev = state.dev.pop();
             const ret = state.ret.pop();
-
+            if (!ret) {
+                console.error('err', node);
+            }
 
             if (ret.value && ret.value.entries) {
                 Object.keys(ret.value.entries).forEach(key => {

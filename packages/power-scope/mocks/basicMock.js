@@ -118,3 +118,5 @@ destr1; destr2;
 (function ({destrArg1, destrArg2}) {
     destrArg1; destrArg2;
 })();
+
+const { abcdef } = {};
