@@ -1,6 +1,7 @@
 const Analyzer = require('../analyzer');
 // TODO factory e.g.
-//const createAnalyzer = require('../createAnalyzer6');
+const createAnalyzer = require('../createAnalyzer6');
+
 
 const assert = require('assert');
 
@@ -49,29 +50,7 @@ const parse = require('babylon').parse;
 const { assertSameLoc, assertLengthWithWarning: assertLength } = require('../testHelpers');
 
 
-const basicVisitor = require('../visitors/basic');
-const additionalVisitor = require('../visitors/additional');
-const jsxVisitor = require('../visitors/jsx');
-const eduVisitor = require('../visitors/edu');
-const exportsVisitor = require('../visitors/exports');
-const outlineVisitor = require('../visitors/outline')({
-    components: ['jsx']
-});
-const commentsVisitor = require('../visitors/comments');
-const provider = require('../visitors/provider');
-const receiver = require('../visitors/receiver');
-
 const {inspect } = require('util');
-const sixVisitor = require('../visitors/6.js')({
-
-});
-
-const analyzerOpts = {
-    visitors: [sixVisitor]
-};
-
-const State = require('../state')(require('../analysisBuilder6'));
-
 
 describe('objects', () => {
 
@@ -81,8 +60,7 @@ describe('objects', () => {
     let scopes;
     before(() => {
         ast = parse(mocks.objects, {sourceType: 'module'});
-        analyzer = new Analyzer({visitors: [sixVisitor], State, postprocess: false});
-        //const analyzer = createAnalyzer();
+        analyzer = createAnalyzer();
         analysis = analyzer.analyze(ast);
     });
 
@@ -128,7 +106,7 @@ describe('variables', () => {
     let scopes;
     before(() => {
         ast = parse(mocks.vars, {sourceType: 'module'});
-        analyzer = new Analyzer({visitors: [sixVisitor], State, postprocess: false});
+        analyzer = createAnalyzer();
         analysis = analyzer.analyze(ast);
     });
 
@@ -172,7 +150,7 @@ describe('scopes', () => {
     ];
     before(() => {
         ast = parse(mocks.scopes, {sourceType: 'module'});
-        analyzer = new Analyzer({visitors: [sixVisitor], State, postprocess: false});
+        analyzer = createAnalyzer();
         analysis = analyzer.analyze(ast);
     });
 
@@ -195,7 +173,7 @@ describe('refs', () => {
     let scopes;
     before(() => {
         ast = parse(mocks.refs, {sourceType: 'module'});
-        analyzer = new Analyzer({visitors: [sixVisitor], State, postprocess: false});
+        analyzer = createAnalyzer();
         analysis = analyzer.analyze(ast);
     });
 
@@ -252,7 +230,7 @@ xdescribe('benchmark', () => {
         d = Date.now() - t0;
         console.log("CZAAAAAAS PARSOWANIA", d)
 
-        analyzer = new Analyzer({visitors: [sixVisitor], State, postprocess: false});
+        analyzer = createAnalyzer();
         t0 = Date.now();
         analysis = analyzer.analyze(ast);
         d = Date.now() - t0;
