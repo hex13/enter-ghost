@@ -1,4 +1,4 @@
-module.exports = function createInquirer(services) {
+module.exports = function Query(services) {
     return function query(structure) {
         if (!structure) {
             throw new Error(`Query needs structure. Found ${structure}`);
