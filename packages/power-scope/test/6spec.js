@@ -117,6 +117,15 @@ describe('variables', () => {
         expect(analysis.scopes[1].vars).have.keys('someOtherVariable');
         //expect(analysis.scopes[1].vars).have.nested.property('someOtherVariable.value.value', 3);
         expect(query(analysis.scopes[1]).var('someOtherVariable').def().value).equal(3);
+
+    });
+
+    it('should not throw when non existing variable is referenced', () => {
+        const nonExistingVariableRef = query(analysis).refAt({
+            line: 12, column: 0
+        });
+        expect(nonExistingVariableRef.text()).equal('nonExisting');
+        expect(nonExistingVariableRef.resolve().data()).to.not.exist;
     });
 });
 

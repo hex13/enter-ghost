@@ -9,6 +9,9 @@ module.exports = function createQuery () {
             let currScope = ref[0].scope;
             const name = ref[0].key;
             let variable = services.lookupEntry(currScope, name);
+            if (!variable) {
+                return;
+            }
             return getters.getProperty(variable, ref.slice(2).map(k=>k.key).join(''));
         }
     }));
