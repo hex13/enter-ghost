@@ -1,4 +1,7 @@
 const Analyzer = require('../analyzer');
+// TODO factory e.g.
+//const createAnalyzer = require('../createAnalyzer6');
+
 const assert = require('assert');
 
 const { expect } = require('chai');
@@ -79,6 +82,7 @@ describe('objects', () => {
     before(() => {
         ast = parse(mocks.objects, {sourceType: 'module'});
         analyzer = new Analyzer({visitors: [sixVisitor], State, postprocess: false});
+        //const analyzer = createAnalyzer();
         analysis = analyzer.analyze(ast);
     });
 
@@ -141,7 +145,8 @@ describe('variables', () => {
     });
 
     it('scopes should have variables', () => {
-        expect(analysis.scopes[0].vars).have.keys('someVariable');
+        //expect(analysis.scopes[0].vars).have.keys('someVariable');
+        expect(analysis.scopes[0].vars).have.keys(['someVariable', 'destrVariable']);
         expect(analysis.scopes[1].vars).have.keys('someOtherVariable');
         //expect(analysis.scopes[1].vars).have.nested.property('someOtherVariable.value.value', 3);
         expect(query(analysis.scopes[1]).var('someOtherVariable').def().value).equal(3);

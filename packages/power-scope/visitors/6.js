@@ -87,7 +87,8 @@ module.exports = () => {
             // TODO api proposal:
             //expectValue: true,
             exit(node, state) {
-                state.bindProperty(state.lastOf('objects'), new Binding(node.key, state.receiveValue()));
+                if (state.parent.type == 'ObjectExpression')
+                    state.bindProperty(state.lastOf('objects'), new Binding(node.key, state.receiveValue()));
             }
         },
         //declarators
