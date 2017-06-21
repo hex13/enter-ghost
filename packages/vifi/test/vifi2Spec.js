@@ -2,11 +2,11 @@
 
 const assert = require('assert');
 
-const vfs = require('../2');
+const vifi = require('../2');
 
 
 
-const { File } = vfs;
+const { File } = vifi;
 
 
 describe('when creating empty file', () => {
@@ -64,6 +64,30 @@ describe('when creating empty file', () => {
         });
     });
 
+});
 
 
+describe('when creating virtual file system', () => {
+    it('it should be possible to mount another virtual file system at \'/\' path', () => {
+        const vfs = vifi();
+        vfs.mount('/', {
+            read(file) {
+                return Promise.resolve(file.number);
+            },
+            write(file, data) {
+                return new Promise(resolve => {
+                    file.number += data;
+                    resolve();
+                });
+            }
+        });
+        const file = {number: 2};
+
+        return vfs.read(file).then(contents => {
+            assert.strictEqual(contents, 2, 'read() of the main file system should delegate action to the mounted file system');
+            return vfs.write(file, 3).then(() => {
+                assert.strictEqual(file.number, 5, 'write() of the main file system should delegate action to the mounted file system');
+            });
+        });
+    });
 });

@@ -25,6 +25,21 @@ class File {
     }
 }
 
-module.exports = {
-    File
-};
+function vfs() {
+    return {
+        read(file) {
+            return this._vfs.read(file);
+        },
+        write(file, data) {
+            return this._vfs.write(file, data);
+        },
+        mount(root, vfs) {
+            this._vfs = vfs;
+        }
+    }
+}
+
+
+
+vfs.File = File;
+module.exports = vfs;
