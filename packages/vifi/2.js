@@ -34,6 +34,26 @@ function vfs() {
             return this._vfs.write(file, data);
         },
         mount(root, vfs) {
+
+            if (vfs.readFile) {
+                const fs = vfs;
+                vfs = {
+                    read(file) {
+                        return new Promise(resolve => {
+                            fs.readFile(file.path, 'utf8', (err, data) => {
+                                resolve(data);
+                            });
+                        });
+                    },
+                    write(file, data) {
+                        return new Promise(resolve => {
+                            fs.writeFile(file.path, data, 'utf8', () => {
+                                resolve();
+                            })
+                        });
+                    }
+                }
+            }
             this._vfs = vfs;
         }
     }

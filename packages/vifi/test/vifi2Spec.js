@@ -90,4 +90,33 @@ describe('when creating virtual file system', () => {
             });
         });
     });
+
+    it('it should be possible to mount NodeJS like virtual file system at \'/\' path', () => {
+        let writtenData = [];
+        
+        const vfs = vifi();
+        vfs.mount('/', {
+            readFile(path, encoding, cb) {
+                cb(null, path + '::contents')
+            },
+            writeFile(path, data, encoding, cb) {
+                writtenData.push([path, data]);
+                cb(null);
+            }
+        });
+        const file = {path: '/some-file'};
+
+        return vfs.read(file).then(contents => {
+            assert.strictEqual(contents, '/some-file::contents', 'read() of the main file system should delegate action to the mounted file system');
+            return vfs.write(file, 3).then(() => {
+                console.log("TTT", writtenData)
+                assert.deepEqual(
+                    writtenData,
+                    [['/some-file', 3]],
+                    'write() of the main file system should delegate action to the mounted file system'
+                );
+            });
+        });
+    });
+
 });
