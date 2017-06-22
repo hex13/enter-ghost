@@ -67,8 +67,7 @@ describe('when creating empty file', () => {
 });
 
 
-describe('when creating virtual file system', () => {
-
+describe('having main virtual file system', () => {
     it('it should be possible to open file', () => {
         const vfs = vifi();
         const file = vfs.open('/whatever');
@@ -100,33 +99,38 @@ describe('when creating virtual file system', () => {
         });
     });
 
-    it('it should be possible to mount NodeJS like virtual file system at \'/\' path', () => {
-        let writtenData = [];
+    describe('and having NodeJS like virtual file system ', () => {
+        let writtenData;
 
-        const vfs = vifi();
-        vfs.mount('/', {
-            readFile(path, encoding, cb) {
-                cb(null, path + '::contents')
-            },
-            writeFile(path, data, encoding, cb) {
-                writtenData.push([path, data]);
-                cb(null);
-            }
+        beforeEach(() => {
+            writtenData = [];
         });
-        const file = vfs.open('/some-file');
-        file.number = 2;
 
-        return file.read().then(contents => {
-            assert.strictEqual(contents, '/some-file::contents', 'read() of the main file system should delegate action to the mounted file system');
-            return file.write(3).then(() => {
-                console.log("TTT", writtenData)
-                assert.deepEqual(
-                    writtenData,
-                    [['/some-file', 3]],
-                    'write() of the main file system should delegate action to the mounted file system'
-                );
+        it('it should be possible to mount NodeJS like virtual file system at \'/\' path', () => {
+            const vfs = vifi();
+            vfs.mount('/', {
+                readFile(path, encoding, cb) {
+                    cb(null, path + '::contents')
+                },
+                writeFile(path, data, encoding, cb) {
+                    writtenData.push([path, data]);
+                    cb(null);
+                }
+            });
+            const file = vfs.open('/some-file');
+            file.number = 2;
+
+            return file.read().then(contents => {
+                assert.strictEqual(contents, '/some-file::contents', 'read() of the main file system should delegate action to the mounted file system');
+                return file.write(3).then(() => {
+                    assert.deepEqual(
+                        writtenData,
+                        [['/some-file', 3]],
+                        'write() of the main file system should delegate action to the mounted file system'
+                    );
+                });
             });
         });
-    });
 
+    })
 });
