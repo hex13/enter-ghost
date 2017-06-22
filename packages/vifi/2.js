@@ -25,8 +25,8 @@ class File {
     }
 }
 
-function vfs() {
-    return {
+function vfs(vfsToMount) {
+    const mainVfs = {
         open(path) {
             const file = new File(path);
             file.connect(this);
@@ -61,7 +61,11 @@ function vfs() {
             }
             this._vfs = vfs;
         }
+    };
+    if (vfsToMount) {
+        mainVfs.mount('/', vfsToMount);
     }
+    return mainVfs;
 }
 
 

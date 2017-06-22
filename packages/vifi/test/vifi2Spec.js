@@ -115,8 +115,6 @@ describe('having main virtual file system', () => {
                     cb(null);
                 }
             }
-            vfs = vifi();
-            vfs.mount('/', fsMock);
         });
 
         function verify() {
@@ -134,9 +132,17 @@ describe('having main virtual file system', () => {
                 });
             });
         }
-        it('it should be possible to mount NodeJS like virtual file system at \'/\' path', () => {
+        it('it should be possible to mount NodeJS like virtual file system at \'/\' path (via ::mount)', () => {
+            vfs = vifi();
+            vfs.mount('/', fsMock);
             verify();
         });
+
+        it('it should be possible to mount NodeJS like virtual file system by injecting fs into factory', () => {
+            vfs = vifi(fsMock);
+            verify();
+        });
+
 
     })
 });
