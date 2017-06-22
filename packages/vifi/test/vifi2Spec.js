@@ -101,14 +101,12 @@ describe('having main virtual file system', () => {
 
     describe('and having NodeJS like virtual file system ', () => {
         let writtenData;
+        let fsMock;
+        let vfs;
 
         beforeEach(() => {
             writtenData = [];
-        });
-
-        it('it should be possible to mount NodeJS like virtual file system at \'/\' path', () => {
-            const vfs = vifi();
-            vfs.mount('/', {
+            fsMock = {
                 readFile(path, encoding, cb) {
                     cb(null, path + '::contents')
                 },
@@ -116,7 +114,12 @@ describe('having main virtual file system', () => {
                     writtenData.push([path, data]);
                     cb(null);
                 }
-            });
+            }
+            vfs = vifi();
+            vfs.mount('/', fsMock);
+        });
+
+        function verify() {
             const file = vfs.open('/some-file');
             file.number = 2;
 
@@ -130,6 +133,9 @@ describe('having main virtual file system', () => {
                     );
                 });
             });
+        }
+        it('it should be possible to mount NodeJS like virtual file system at \'/\' path', () => {
+            verify();
         });
 
     })
