@@ -89,12 +89,13 @@ describe('when creating virtual file system', () => {
                 });
             }
         });
-        const file = {number: 2};
+        const file = vfs.open('/whatever');
+        file.number = 2;
 
-        return vfs.read(file).then(contents => {
-            assert.strictEqual(contents, 2, 'read() of the main file system should delegate action to the mounted file system');
-            return vfs.write(file, 3).then(() => {
-                assert.strictEqual(file.number, 5, 'write() of the main file system should delegate action to the mounted file system');
+        return file.read().then(contents => {
+            assert.strictEqual(contents, 2, 'files open in main system should delegate "read" action to the mounted file system');
+            return file.write(3).then(() => {
+                assert.strictEqual(file.number, 5, 'files open in main system should delegate "write" action to the mounted file system');
             });
         });
     });

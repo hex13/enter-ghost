@@ -28,7 +28,9 @@ class File {
 function vfs() {
     return {
         open(path) {
-            return new File(path);
+            const file = new File(path);
+            file.connect(this);
+            return file;
         },
         read(file) {
             return this._vfs.read(file);
