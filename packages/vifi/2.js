@@ -27,6 +27,9 @@ class File {
 
 function vfs() {
     return {
+        open(path) {
+            return new File(path);
+        },
         read(file) {
             return this._vfs.read(file);
         },

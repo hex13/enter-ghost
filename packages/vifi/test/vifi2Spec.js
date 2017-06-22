@@ -68,6 +68,14 @@ describe('when creating empty file', () => {
 
 
 describe('when creating virtual file system', () => {
+
+    it('it should be possible to open file', () => {
+        const vfs = vifi();
+        const file = vfs.open('/whatever');
+        assert.strictEqual(file.path, '/whatever');
+        assert(file instanceof File);
+    });
+
     it('it should be possible to mount another virtual file system at \'/\' path', () => {
         const vfs = vifi();
         vfs.mount('/', {
@@ -93,7 +101,7 @@ describe('when creating virtual file system', () => {
 
     it('it should be possible to mount NodeJS like virtual file system at \'/\' path', () => {
         let writtenData = [];
-        
+
         const vfs = vifi();
         vfs.mount('/', {
             readFile(path, encoding, cb) {
