@@ -113,11 +113,12 @@ describe('when creating virtual file system', () => {
                 cb(null);
             }
         });
-        const file = {path: '/some-file'};
+        const file = vfs.open('/some-file');
+        file.number = 2;
 
-        return vfs.read(file).then(contents => {
+        return file.read().then(contents => {
             assert.strictEqual(contents, '/some-file::contents', 'read() of the main file system should delegate action to the mounted file system');
-            return vfs.write(file, 3).then(() => {
+            return file.write(3).then(() => {
                 console.log("TTT", writtenData)
                 assert.deepEqual(
                     writtenData,
