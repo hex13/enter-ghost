@@ -64,6 +64,43 @@ describe('when creating empty file', () => {
         });
     });
 
+    it('it should be possible to connect file to virtual file system and get a snapshot', () => {
+        const map = new Map;
+        const vfsMock = {
+            read(file) {
+                return Promise.resolve(map.get(file.path));
+            },
+            write(file, data) {
+                return new Promise(resolve => {
+                    map.set(file.path, data);
+                    resolve();
+                });
+            }
+        };
+        file.connect(vfsMock);
+        return file
+            .write('hello')
+            .then(() => file.snapshot())
+            .then(function writeToOriginalFile(snapshot) {
+                // for checking if snapshot is independent
+                return file
+                    .write('other data')
+                    .then(() => {
+                        return snapshot
+                    });
+            })
+            .then(snapshot => {
+                assert(snapshot instanceof File);
+                assert(snapshot != file);
+                assert.strictEqual(snapshot.path, file.path);
+
+                return snapshot.read();
+            }).then(contents => {
+                assert.strictEqual(contents, 'hello');
+        });
+    });
+
+
 });
 
 

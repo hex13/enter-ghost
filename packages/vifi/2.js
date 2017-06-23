@@ -23,6 +23,13 @@ class File {
     connect(vfs) {
         this._vfs = vfs;
     }
+    snapshot() {
+        const snapshot = new File(this.path);
+        return snapshot.write(this.read())
+            .then(() => {
+                return snapshot;
+            });
+    }
 }
 
 function vfs(vfsToMount) {
