@@ -64,7 +64,7 @@ describe('when creating empty file', () => {
         });
     });
 
-    it('it should be possible to connect file to virtual file system and get a snapshot', () => {
+    it('it should be possible get an independent snapshot after connecting file to virtual file system', () => {
         const map = new Map;
         const vfsMock = {
             read(file) {
