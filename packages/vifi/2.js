@@ -1,5 +1,7 @@
 "use strict";
 
+const { wrapClass } = require('./debug');
+
 class File {
     constructor(path, contents = '') {
         this._contents = Promise.resolve(contents);
@@ -53,18 +55,6 @@ class File {
     proxy(resolveTarget) {
         this._resolveTarget = resolveTarget;
     }
-}
-
-function wrapClass(Class) {
-    Object.getOwnPropertyNames(Class.prototype).forEach(prop => {
-        const originalMethod = Class.prototype[prop];
-        Class.prototype[prop] = function (...args) {
-            console.log(`${Class.name}::${prop}`, args)
-            const result = originalMethod.apply(this, args);
-            console.log('=>', result)
-            return result;
-        }
-    });
 }
 
 wrapClass(File);

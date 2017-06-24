@@ -1,6 +1,6 @@
 {
   "name": "vifi",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Virtual File System",
   "main": "index.js",
   "scripts": {
@@ -12,8 +12,7 @@
   },
   "author": "Łukasz Lityński",
   "license": "MIT",
-  "dependencies": {
-    "babel-preset-env": "^1.4.0",
+  "devDependencies": {
     "mocha": "^3.1.2"
   }
 }
