@@ -24,12 +24,12 @@ class File {
         return this._contents;
     }
     write(data) {
-        if (this._vfs) {
-            return this._vfs.write(this, data);
-        }
-
         if (this._resolveTarget) {
             return this._proxyMethod('write', data);
+        }
+
+        if (this._vfs) {
+            return this._vfs.write(this, data);
         }
 
         return new Promise(resolve => {
