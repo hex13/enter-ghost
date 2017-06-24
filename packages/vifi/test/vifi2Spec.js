@@ -110,6 +110,20 @@ describe('when creating empty file', () => {
         });
     });
 
+    it('it should be possible to get snapshot with custom class', () => {
+        class CustomFile extends File {
+            constructor(path, contents, ...extra) {
+                super(path, contents);
+                this.extra = extra;
+            }
+        }
+        return file.snapshot({cls: CustomFile, extra: ['yo', 'yo!']}).then(snapshot => {
+            assert(snapshot instanceof CustomFile);
+            assert.deepEqual(snapshot.extra, ['yo', 'yo!'], 'extra arguments should be passed to snapshot\'s constructor');
+        });
+
+    });
+
     // TODO remove code dupplication {
     it('it should be possible to proxy when passing function which returns file', () => {
         const target = new File('kotek', 'piesek');

@@ -38,12 +38,12 @@ class File {
     connect(vfs) {
         this._vfs = vfs;
     }
-    snapshot() {
-        const snapshot = new File(this.path);
-        return snapshot.write(this.read())
-            .then(() => {
-                return snapshot;
-            });
+    snapshot(opts = {}) {
+        const FileClass = opts.cls || File;
+        const extra = opts.extra || [];
+        return this
+            .read()
+            .then(contents => new FileClass(this.path, contents, ...extra));
     }
     _proxyMethod(meth, ...args) {
         return Promise.resolve(this._resolveTarget()).then(target => {
