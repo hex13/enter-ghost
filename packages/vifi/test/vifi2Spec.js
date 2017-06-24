@@ -119,7 +119,7 @@ describe('when creating empty file', () => {
                 assert.strictEqual(contents, 'piesek');
             })
             .then(() => file.write('drugi piesek'))
-            .then(() => file.read())
+            .then(() => target.read())
             .then(contents => {
                 assert.strictEqual(contents, 'drugi piesek');
             })
@@ -133,7 +133,7 @@ describe('when creating empty file', () => {
                 assert.strictEqual(contents, 'piesek');
             })
             .then(() => file.write('drugi piesek'))
-            .then(() => file.read())
+            .then(() => target.read())
             .then(contents => {
                 assert.strictEqual(contents, 'drugi piesek');
             })
