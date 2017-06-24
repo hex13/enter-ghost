@@ -110,6 +110,37 @@ describe('when creating empty file', () => {
         });
     });
 
+    // TODO remove code dupplication {
+    it('it should be possible to proxy when passing function which returns file', () => {
+        const target = new File('kotek', 'piesek');
+        file.proxy(() => target);
+        return file.read()
+            .then(contents => {
+                assert.strictEqual(contents, 'piesek');
+            })
+            .then(() => file.write('drugi piesek'))
+            .then(() => file.read())
+            .then(contents => {
+                assert.strictEqual(contents, 'drugi piesek');
+            })
+    });
+
+    it('it should be possible to proxy when passing function which returns promised file', () => {
+        const target = new File('kotek', 'piesek');
+        file.proxy(() => Promise.resolve(target));
+        return file.read()
+            .then(contents => {
+                assert.strictEqual(contents, 'piesek');
+            })
+            .then(() => file.write('drugi piesek'))
+            .then(() => file.read())
+            .then(contents => {
+                assert.strictEqual(contents, 'drugi piesek');
+            })
+    });
+    // TODO } remove code dupplication
+
+
 
 });
 

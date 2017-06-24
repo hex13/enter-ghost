@@ -4,17 +4,28 @@ class File {
     constructor(path, contents = '') {
         this._contents = Promise.resolve(contents);
         this.path = path;
+        this._resolveTarget = null;
     }
     read() {
+        if (this._resolveTarget) {
+            return this._proxyMethod('read');
+        }
+
         if (this._vfs) {
             return this._vfs.read(this);
         }
+
         return this._contents;
     }
     write(data) {
         if (this._vfs) {
             return this._vfs.write(this, data);
         }
+
+        if (this._resolveTarget) {
+            return this._proxyMethod('write', data);
+        }
+
         return new Promise(resolve => {
             this._contents = Promise.resolve(data);
             resolve();
@@ -29,6 +40,14 @@ class File {
             .then(() => {
                 return snapshot;
             });
+    }
+    _proxyMethod(meth, ...args) {
+        return Promise.resolve(this._resolveTarget()).then(target => {
+            return target[meth](...args);
+        });
+    }
+    proxy(resolveTarget) {
+        this._resolveTarget = resolveTarget;
     }
 }
 
