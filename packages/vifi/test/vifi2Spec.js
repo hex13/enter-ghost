@@ -9,6 +9,16 @@ const vifi = require('../2');
 const { File } = vifi;
 
 
+describe('when creating file', () => {
+    it('should be possible to pass initial contents in constructor', () => {
+        const file = new File('test', 'wlazł kotek na płotek');
+        return file.read().then(contents => {
+            assert.strictEqual(contents, 'wlazł kotek na płotek');
+        });
+    });
+
+});
+
 describe('when creating empty file', () => {
     let file;
     let mockPath = 'mock';

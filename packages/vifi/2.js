@@ -1,8 +1,8 @@
 "use strict";
 
 class File {
-    constructor(path) {
-        this._contents = Promise.resolve('');
+    constructor(path, contents = '') {
+        this._contents = Promise.resolve(contents);
         this.path = path;
     }
     read() {
