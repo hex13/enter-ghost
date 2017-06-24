@@ -7,6 +7,10 @@ class File {
         this._resolveTarget = null;
     }
     read() {
+        if (typeof arguments[arguments.length - 1] == 'function') {
+            throw new Error('File::read() doesn\'t support callback anymore');
+        }
+
         if (this._resolveTarget) {
             return this._proxyMethod('read');
         }
@@ -56,7 +60,9 @@ function wrapClass(Class) {
         const originalMethod = Class.prototype[prop];
         Class.prototype[prop] = function (...args) {
             console.log(`${Class.name}::${prop}`, args)
-            return originalMethod.apply(this, args);
+            const result = originalMethod.apply(this, args);
+            console.log('=>', result)
+            return result;
         }
     });
 }
