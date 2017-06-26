@@ -191,6 +191,19 @@ describe('having main virtual file system', () => {
         });
     });
 
+    it('it should be possible to register loader and load file as object', () => {
+        const vfs = vifi();
+        vfs.loader(file => {
+            return file.read().then(contents => {
+                return {text: contents};
+            });
+        });
+        const f = new File('abc.txt', 'To jest kotek');
+        return vfs.load(f).then(obj => {
+            assert.deepEqual(obj, {text: 'To jest kotek'});
+        });
+    });
+
     describe('and having NodeJS like virtual file system ', () => {
         let writtenData;
         let fsMock;

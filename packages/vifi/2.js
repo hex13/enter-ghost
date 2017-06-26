@@ -83,6 +83,9 @@ class NodeFsWrapper {
 }
 
 class MainFileSystem {
+    constructor() {
+        this._loaders = [];
+    }
     open(path) {
         const file = new File(path);
         file.connect(this);
@@ -100,7 +103,14 @@ class MainFileSystem {
         }
         this._vfs = vfs;
     }
+    loader(loader) {
+        this._loaders.push(loader);
+    }
+    load(file, opts) {
+        return this._loaders[0](file);
+    }
 }
+
 
 function vfs(vfsToMount) {
     const mainVfs = new MainFileSystem;
