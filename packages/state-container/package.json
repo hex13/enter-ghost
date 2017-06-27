@@ -2,7 +2,7 @@
   "name": "state-container",
   "version": "0.0.4",
   "description": "recordable state container. It allows for state injecting",
-  "main": "index.js",
+  "main": "stateContainer.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

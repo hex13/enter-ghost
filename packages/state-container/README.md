@@ -1,23 +1,33 @@
-/*### recordable state container. It allows for state injecting
+### Recordable state container. It allows you to program in modern OOP and still have time travelling and other goodies.
+
+Notice: this is an early version. Proof of concept. Not ready for production yet.
 
 ```javascript
 
-*/
-class Calc {
-   constructor(initial) {  // initial state is injected via powerful DI mechanism
-       this.number = initial; // initial state is automatically set
-   }
-   add(number) { // no more action types, action creators, switch-case bullshit. Just plain methods
-       this.number += number; // We don't force you to write immutable code. Mutations are allowed.
-       console.log(this); // all changes are recorded and dumped into standard output
-   }
-};
+        class Example extends Model {
+            constructor(value) {
+                super({ value }); // we pass initial state
+            }
+            inc(amount) {
+                // `this` is bound to state object.
+                // we mutate state directly
+                this.value += amount;
+            }
+        }
 
-const calc = new Calc(10); // we inject number 10.
-calc.add(Math.pow(2, 5));
+        const model = new Example(100);
 
-/*
+        model.subscribe(() => {
+            console.log("update your view here");
+            console.log("current state:", model.state);
+        });
 
+        // notice that each call will trigger handler passed in `subscribe`
+        model.inc(100);
+        model.inc(200);
+
+        console.log("UNDO!");
+
+        // this uses event sourcing under the hood:
+        model.undo();
 ```
-
-*/
