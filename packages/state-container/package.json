@@ -1,0 +1,12 @@
+{
+  "name": "state-container",
+  "version": "0.0.4",
+  "description": "recordable state container. It allows for state injecting",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "https://github.com/hex13/enter-ghost/tree/master/packages/state-container",
+  "author": "= <=>",
+  "license": "MIT"
+}
