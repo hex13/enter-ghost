@@ -4,6 +4,8 @@ Notice: this is an early version. Proof of concept. Not ready for production yet
 
 ```javascript
 
+        const { Model } = require('state-container');
+
         class Example extends Model {
             constructor(value) {
                 super({ value }); // we pass initial state
