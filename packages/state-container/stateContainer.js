@@ -22,13 +22,15 @@ exports.Model = class {
         this.ee.on('change', f);
     }
     undo() {
+        const calls = this._calls;
         this.reset();
         // event sourcing! (we replay previously stored method calls)
-        this._calls.slice(0, -1).forEach(([meth, args]) => {
+        calls.slice(0, -1).forEach(([meth, args]) => {
             this[meth](...args);
         });
     }
     reset() {
         this.state = JSON.parse(this._serializedInitialState);
+        this._calls = [];
     }
 };

@@ -93,6 +93,10 @@ describe('model', () => {
         model.inc(1000);
         model.undo();
         assert.deepEqual(model.state, {value: 210});
+
+        // second undo for checking if calls are reset
+        model.undo();
+        assert.deepEqual(model.state, {value: 110});
     });
 
     xit('should not trigger change handler, when Model methods are called', () => {
