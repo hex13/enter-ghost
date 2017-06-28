@@ -15,9 +15,12 @@ class Example extends Model {
     }
 }
 
+let _require = require;
 describe('example', () => {
     it('should work', () => {
+        const require = () => _require('..');
 
+        const { Model } = require('state-container');
         class Example extends Model {
             $getInitialState(value) {
                 return {value};
@@ -32,9 +35,14 @@ describe('example', () => {
             console.log("update your view here");
             console.log("current state:", model.state);
         });
+
+        // notice that each call will trigger handler passed in `subscribe`
         model.inc(100);
         model.inc(200);
+
         console.log("UNDO!");
+
+        // this uses event sourcing under the hood:
         model.$undo();
     });
 });
