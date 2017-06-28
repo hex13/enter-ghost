@@ -34,4 +34,13 @@ exports.Model = class {
         this.state = this.$getInitialState();
         this._calls = [];
     }
+    $dispatch({type, args}) {
+        this[type](...args);
+    }
+    $compatible() {
+        return {
+            dispatch: this.$dispatch.bind(this),
+            getState:() => this.state
+        }
+    }
 };

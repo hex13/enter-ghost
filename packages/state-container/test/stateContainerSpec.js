@@ -106,6 +106,27 @@ describe('model', () => {
         assert.deepEqual(model.state, {value: 110});
     });
 
+    it('should dispatch via `dispatch` method', () => {
+        const model = new Example;
+
+        model.$dispatch({type: 'inc', args:[1]});
+
+        assert.deepEqual(model.state, {value: 101});
+    });
+
+    it('should return compatibility interface and it should work', () => {
+        const model = new Example;
+
+        const store = model.$compatible();
+
+        store.dispatch({type: 'inc', args:[3]});
+
+        assert.deepEqual(store.getState(), {value: 103});
+        assert.deepEqual(model.state, {value: 103});
+
+    });
+
+
     xit('should not trigger change handler, when Model methods are called', () => {
         // TODO
         assert.equal('TEST CASE HAS BEEN WRITTEN', false);
