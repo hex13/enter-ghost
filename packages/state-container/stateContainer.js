@@ -13,7 +13,7 @@ exports.Model = class {
             const original = this[meth];
             this[meth] = (...args) => {
                 this._calls.push([meth, args]);
-                const res = original.apply(this.state, args);
+                const res = original.apply(this, [this.state].concat(args));
                 this.ee.emit('change')
                 return res;
             };
@@ -31,7 +31,7 @@ exports.Model = class {
         });
     }
     $reset() {
-        this.state = this.$getInitialState();
+        this.state = this.$initialState();
         this._calls = [];
     }
     $dispatch({type, args}) {

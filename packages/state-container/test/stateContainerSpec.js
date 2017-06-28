@@ -3,15 +3,15 @@ const assert = require('assert');
 const { Model } = require('..');
 
 class Example extends Model {
-    $getInitialState() {
+    $initialState() {
         return {value: 100};
     }
-    foo(a) {
+    foo(state, a) {
         return a + 1;
     }
-    inc(amount) {
+    inc(state, amount) {
         // TODO change to state as argument, instead of this
-        this.value += amount;
+        state.value += amount;
     }
 }
 
@@ -22,11 +22,11 @@ describe('example', () => {
 
         const { Model } = require('state-container');
         class Example extends Model {
-            $getInitialState(value) {
+            $initialState(value) {
                 return {value};
             }
-            inc(amount) {
-                this.value += amount;
+            inc(state, amount) {
+                state.value += amount;
             }
         }
 
