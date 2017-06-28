@@ -1,6 +1,6 @@
 {
   "name": "state-container",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "recordable state container. It allows for state injecting",
   "main": "stateContainer.js",
   "scripts": {

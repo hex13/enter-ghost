@@ -7,12 +7,10 @@ Notice: this is an early version. Proof of concept. Not ready for production yet
         const { Model } = require('state-container');
 
         class Example extends Model {
-            constructor(value) {
-                super({ value }); // we pass initial state
+            $getInitialState(value) {
+                return {value};
             }
             inc(amount) {
-                // `this` is bound to state object.
-                // we mutate state directly
                 this.value += amount;
             }
         }

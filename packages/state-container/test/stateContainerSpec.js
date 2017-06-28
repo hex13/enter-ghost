@@ -3,15 +3,14 @@ const assert = require('assert');
 const { Model } = require('..');
 
 class Example extends Model {
-    constructor() {
-        super({
-            value: 100
-        });
+    $getInitialState() {
+        return {value: 100};
     }
     foo(a) {
         return a + 1;
     }
     inc(amount) {
+        // TODO change to state as argument, instead of this
         this.value += amount;
     }
 }
@@ -20,8 +19,8 @@ describe('example', () => {
     it('should work', () => {
 
         class Example extends Model {
-            constructor(value) {
-                super({ value });
+            $getInitialState(value) {
+                return {value};
             }
             inc(amount) {
                 this.value += amount;
@@ -29,14 +28,14 @@ describe('example', () => {
         }
 
         const model = new Example(100);
-        model.subscribe(() => {
+        model.$subscribe(() => {
             console.log("update your view here");
             console.log("current state:", model.state);
         });
         model.inc(100);
         model.inc(200);
         console.log("UNDO!");
-        model.undo();
+        model.$undo();
     });
 });
 
@@ -53,7 +52,7 @@ describe('model', () => {
         const model = new Example;
         let updateCount = 0;
 
-        model.subscribe(() => {
+        model.$subscribe(() => {
             updateCount++;
         });
 
@@ -82,7 +81,7 @@ describe('model', () => {
         model.inc(10);
         model.inc(100);
         model.inc(1000);
-        model.reset();
+        model.$reset();
         assert.deepEqual(model.state, {value: 100});
     });
 
@@ -91,11 +90,11 @@ describe('model', () => {
         model.inc(10);
         model.inc(100);
         model.inc(1000);
-        model.undo();
+        model.$undo();
         assert.deepEqual(model.state, {value: 210});
 
         // second undo for checking if calls are reset
-        model.undo();
+        model.$undo();
         assert.deepEqual(model.state, {value: 110});
     });
 

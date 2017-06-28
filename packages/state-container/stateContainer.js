@@ -1,13 +1,14 @@
 const EventEmitter = require('events');
 
 exports.Model = class {
-    constructor(state = {}) {
-        this._serializedInitialState = JSON.stringify(state);
-        this.state = state;
+    constructor() {
         this.ee = new EventEmitter;
-        this._calls = [];
 
-        const methods = Object.getOwnPropertyNames(this.__proto__).filter(n => n != 'constructor');
+        this.$reset();
+
+        const methods = Object.getOwnPropertyNames(this.__proto__)
+            .filter(n => n != 'constructor' && n.charAt(0) != '$');
+
         methods.forEach(meth => {
             const original = this[meth];
             this[meth] = (...args) => {
@@ -18,19 +19,19 @@ exports.Model = class {
             };
         });
     }
-    subscribe(f) {
+    $subscribe(f) {
         this.ee.on('change', f);
     }
-    undo() {
+    $undo() {
         const calls = this._calls;
-        this.reset();
-        // event sourcing! (we replay previously stored method calls)
+        this.$reset();
+        // event sourcing (we replay previously stored method calls)
         calls.slice(0, -1).forEach(([meth, args]) => {
             this[meth](...args);
         });
     }
-    reset() {
-        this.state = JSON.parse(this._serializedInitialState);
+    $reset() {
+        this.state = this.$getInitialState();
         this._calls = [];
     }
 };
