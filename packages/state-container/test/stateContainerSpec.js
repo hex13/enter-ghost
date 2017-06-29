@@ -10,7 +10,6 @@ class Example extends Model {
         return a + 1;
     }
     inc(state, amount) {
-        // TODO change to state as argument, instead of this
         state.value += amount;
     }
 }
