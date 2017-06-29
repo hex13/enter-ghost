@@ -7,7 +7,7 @@ exports.Model = class {
         this.$reset();
 
         const methods = Object.getOwnPropertyNames(this.__proto__)
-            .filter(n => n != 'constructor' && n.charAt(0) != '$');
+            .filter(n => n != 'constructor' && n.charAt(0) != '$' && n.indexOf('get') != 0);
 
         methods.forEach(meth => {
             const original = this[meth];

@@ -21,6 +21,18 @@ class Example2 extends Model {
     }
 }
 
+class Example3 extends Model {
+    $initialState() {
+        return {};
+    }
+    get() {
+
+    }
+    getFoo() {
+
+    }
+}
+
 let _require = require;
 describe('example', () => {
     it('should work', () => {
@@ -142,8 +154,23 @@ describe('model', () => {
     });
 
 
-    xit('should not trigger change handler, when Model methods are called', () => {
-        // TODO
-        assert.equal('TEST CASE HAS BEEN WRITTEN', false);
+    it('should not trigger change handler,when $subscribe(), $compatible() or get.*() are called', () => {
+        [
+            new Example, // class with #get inherited from model
+            new Example3 // class which overrides #get
+        ].forEach(model => {
+            let c = 0;
+            model.$subscribe(() => c++);
+
+            // some calls
+            model.$subscribe(() => {});
+            model.$compatible(() => {});
+            model.get();
+            model.get('whatever');
+            model.getFoo && model.getFoo();
+
+            assert.equal(c, 0, `incorrect number of updates for ${model.constructor.name}`);
+        });
+
     });
 });
