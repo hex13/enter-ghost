@@ -15,6 +15,13 @@ class Example extends Model {
     }
 }
 
+
+class Example2 extends Model {
+    $initialState() {
+        return {a: 10, b: 20, c: 'kotek'};
+    }
+}
+
 let _require = require;
 describe('example', () => {
     it('should work', () => {
@@ -73,9 +80,16 @@ describe('model', () => {
         assert.equal(updateCount, 3);
     });
 
-    it('should have initial state set in constructor', () => {
-        const model = new Example;
-        assert.deepEqual(model.state, {value:100});
+    it('should have return correct initial state', () => {
+        const model = new Example2;
+        assert.deepEqual(model.state, {a: 10, b: 20, c: 'kotek'});
+
+        assert.deepEqual(model.get(), {a: 10, b: 20, c: 'kotek'});
+
+        assert.deepEqual(model.get('a'), 10);
+        assert.deepEqual(model.get('b'), 20);
+        assert.deepEqual(model.get('c'), 'kotek');
+        assert.deepEqual(model.get('toString'), undefined, 'it shouldn\'t return properties from Object.prototype');
     });
 
     it('should mutate state', () => {

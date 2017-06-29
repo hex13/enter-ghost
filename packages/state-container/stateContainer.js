@@ -43,4 +43,14 @@ exports.Model = class {
             getState:() => this.state
         }
     }
+    get(prop) {
+        const state = this.state;
+
+        if (!prop)
+            return state;
+
+        if (state.hasOwnProperty(prop)) {
+            return state[prop];
+        }
+    }
 };
