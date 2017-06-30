@@ -1,6 +1,7 @@
 const EventEmitter = require('events');
 
-exports.Model = class {
+
+class Model {
     constructor(...args) {
         this._initialArgs = args;
         this.ee = new EventEmitter;
@@ -59,5 +60,22 @@ exports.Model = class {
     }
     $initialState() {
         return {};
+    }
+    assignId(id) {
+        this.$$id = id;
+    }
+    $id() {
+        return this.$$id;
+    }
+};
+
+const generateId = (last => () => ++last)(0);
+
+module.exports = {
+    Model,
+    create(Cls, ...args) {
+        const model = new Cls(...args);
+        model.assignId(generateId());
+        return model;
     }
 };

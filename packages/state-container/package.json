@@ -1,12 +1,13 @@
 {
   "name": "state-container",
-  "version": "0.0.11",
-  "description": "recordable state container. It allows for state injecting",
+  "version": "0.0.14",
+  "description": "Recordable state container. OOP style",
   "main": "stateContainer.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": "https://github.com/hex13/enter-ghost/tree/master/packages/state-container",
   "author": "= <=>",
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": ["flux", "mvc", "model", "state", "replay", "event sourcing"]
 }

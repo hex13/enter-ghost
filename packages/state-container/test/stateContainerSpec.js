@@ -1,6 +1,7 @@
 const assert = require('assert');
 
 const { Model } = require('..');
+const sc = require('..');
 
 class Example extends Model {
     $initialState() {
@@ -41,6 +42,22 @@ class Example4 extends Model {
 
 
 let _require = require;
+
+describe('factory', () => {
+    it('should create models and assign unique ids (for 1000 objects)', () => {
+        const ids = new Set;
+        for (let i = 0; i < 1000; i++) {
+            const model = sc.create(Example4, 10, 20, 'kotek');
+            assert(model instanceof Example4);
+            assert.deepEqual(model.get(), {a: 10, b: 20, c: 'kotek'});
+            const id = model.$id();
+            assert(!ids.has(id));
+            ids.add(id);
+        }
+    });
+});
+
+
 describe('example', () => {
     it('should work', () => {
         const require = () => _require('..');
