@@ -33,6 +33,13 @@ class Example3 extends Model {
     }
 }
 
+class Example4 extends Model {
+    $initialState(a, b, c) {
+        return {a, b, c};
+    }
+}
+
+
 let _require = require;
 describe('example', () => {
     it('should work', () => {
@@ -103,6 +110,19 @@ describe('model', () => {
         assert.deepEqual(model.get('toString'), undefined, 'it shouldn\'t return properties from Object.prototype');
     });
 
+    it('should have return correct initial state (when passing args into constructor)', () => {
+        const model = new Example4(10, 20, 'kotek');
+        assert.deepEqual(model.state, {a: 10, b: 20, c: 'kotek'});
+
+        assert.deepEqual(model.get(), {a: 10, b: 20, c: 'kotek'});
+
+        assert.deepEqual(model.get('a'), 10);
+        assert.deepEqual(model.get('b'), 20);
+        assert.deepEqual(model.get('c'), 'kotek');
+        assert.deepEqual(model.get('toString'), undefined, 'it shouldn\'t return properties from Object.prototype');
+    });
+
+
     it('should mutate state', () => {
         const model = new Example;
         model.inc(10);
@@ -154,7 +174,7 @@ describe('model', () => {
     });
 
 
-    it('should not trigger change handler,when $subscribe(), $compatible() or get.*() are called', () => {
+    it('should not trigger change handler,when $subscribe(), $compatible(), $dbg() or get.*() are called', () => {
         [
             new Example, // class with #get inherited from model
             new Example3 // class which overrides #get
@@ -165,6 +185,8 @@ describe('model', () => {
             // some calls
             model.$subscribe(() => {});
             model.$compatible(() => {});
+            model.$dbg(() => {});
+
             model.get();
             model.get('whatever');
             model.getFoo && model.getFoo();

@@ -1,7 +1,8 @@
 const EventEmitter = require('events');
 
 exports.Model = class {
-    constructor() {
+    constructor(...args) {
+        this._initialArgs = args;
         this.ee = new EventEmitter;
 
         this.$reset();
@@ -31,7 +32,7 @@ exports.Model = class {
         });
     }
     $reset() {
-        this.state = this.$initialState();
+        this.state = this.$initialState(...this._initialArgs);
         this._calls = [];
     }
     $dispatch({type, args}) {
