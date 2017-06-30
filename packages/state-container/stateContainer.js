@@ -44,6 +44,9 @@ exports.Model = class {
             getState:() => this.state
         }
     }
+    $dbg() {
+        return JSON.stringify(this.state);
+    }
     get(prop) {
         const state = this.state;
 
