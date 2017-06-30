@@ -75,6 +75,12 @@ describe('example', () => {
 });
 
 describe('model', () => {
+
+    it('creating Model (without inheritance) should work', () => {
+        const model = new Model;
+        assert.deepEqual(model.get(), {});
+    });
+
     it('should call wrapped method and return correct result', () => {
         const model = new Example;
 

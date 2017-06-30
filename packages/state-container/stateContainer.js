@@ -54,4 +54,7 @@ exports.Model = class {
             return state[prop];
         }
     }
+    $initialState() {
+        return {};
+    }
 };
