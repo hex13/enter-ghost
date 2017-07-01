@@ -1,5 +1,10 @@
 const EventEmitter = require('events');
 
+// `constructor` is ES6 class constructor (inb4: thank you captain obvious XD).
+// methods beginning with `$`` are helpers
+// methods beginning with `get` are getters
+// rest of methods are actions
+// only actions are recorded.
 
 class Model {
     constructor(...args) {
