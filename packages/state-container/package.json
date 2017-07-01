@@ -1,6 +1,6 @@
 {
   "name": "state-container",
-  "version": "0.0.14",
+  "version": "0.0.16",
   "description": "Recordable state container. OOP style",
   "main": "stateContainer.js",
   "scripts": {

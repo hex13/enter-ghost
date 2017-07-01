@@ -55,8 +55,9 @@ class Model {
     }
     $transaction(callback, tempState) {
         const transaction = {
-            end: () => {
+            end: (resultState) => {
                 Object.assign(this.state, savedState);
+                Object.assign(this.state, resultState);
             },
         };
         let savedState = {};

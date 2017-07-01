@@ -52,6 +52,10 @@ class Example5 extends Model {
     }
 }
 
+function pseudoAjax() {
+    return Promise.resolve('Nevermore');
+}
+
 let _require = require;
 
 describe('factory', () => {
@@ -232,9 +236,6 @@ describe('model', () => {
 
     it('should handle transactions', () => {
         const model = new Example5;
-        function pseudoAjax() {
-            return Promise.resolve('Nevermore');
-        }
 
         return model.$transaction((transaction, aModel) => {
             return pseudoAjax().then(text => {
@@ -255,8 +256,17 @@ describe('model', () => {
 
             assert.equal(model.get('text'), 'Nevermore');
         });
-
-        return promise;
-
     });
+
+    it('should assign ending state in transactions', () => {
+        const model = new Example5;
+
+        model.$transaction((transaction, aModel) => {
+            transaction.end({status: 'error'});
+        }, {status: 'loading', a:1});
+
+        assert.equal(model.get('status'), 'error');
+        assert.equal(model.get('a'), undefined);
+    });
+
 });
