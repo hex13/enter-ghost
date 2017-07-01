@@ -53,11 +53,17 @@ class Model {
     $dbg() {
         return JSON.stringify(this.state);
     }
-    $transaction(callback) {
+    $transaction(callback, tempState) {
         const transaction = {
-            end() {
+            end: () => {
+                Object.assign(this.state, savedState);
             },
         };
+        let savedState = {};
+        Object.keys(tempState).forEach(k => {
+            savedState[k] = this.state[k];
+        });
+        Object.assign(this.state, tempState); // TODO extract as action
         return callback(transaction, this);
     }
     get(prop) {

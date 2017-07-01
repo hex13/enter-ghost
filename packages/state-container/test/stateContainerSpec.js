@@ -238,10 +238,22 @@ describe('model', () => {
 
         return model.$transaction((transaction, aModel) => {
             return pseudoAjax().then(text => {
+                // API proposal (to encapsulate temp state in transaction handler):
+                //transaction.set({status: 'loading', a: 1})
+
+                assert.equal(model.get('status'), 'loading');
+                assert.equal(model.get('a'), 1);
+
                 aModel.setText(text);
                 assert.equal(model.get('text'), 'Nevermore');
+
                 transaction.end();
             });
+        }, {status: 'loading', a:1}).then((a) => {
+            assert.equal(model.get('status'), 'normal');
+            assert.equal(model.get('a'), undefined);
+
+            assert.equal(model.get('text'), 'Nevermore');
         });
 
         return promise;
