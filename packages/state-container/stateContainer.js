@@ -48,6 +48,13 @@ class Model {
     $dbg() {
         return JSON.stringify(this.state);
     }
+    $transaction(callback) {
+        const transaction = {
+            end() {
+            },
+        };
+        return callback(transaction, this);
+    }
     get(prop) {
         const state = this.state;
 

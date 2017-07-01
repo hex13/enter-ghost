@@ -40,6 +40,17 @@ class Example4 extends Model {
     }
 }
 
+class Example5 extends Model {
+    $initialState() {
+        return {
+            status: 'normal',
+            text: ''
+        };
+    }
+    setText(state, text) {
+        state.text = text;
+    }
+}
 
 let _require = require;
 
@@ -216,6 +227,24 @@ describe('model', () => {
 
             assert.equal(c, 0, `incorrect number of updates for ${model.constructor.name}`);
         });
+
+    });
+
+    it('should handle transactions', () => {
+        const model = new Example5;
+        function pseudoAjax() {
+            return Promise.resolve('Nevermore');
+        }
+
+        return model.$transaction((transaction, aModel) => {
+            return pseudoAjax().then(text => {
+                aModel.setText(text);
+                assert.equal(model.get('text'), 'Nevermore');
+                transaction.end();
+            });
+        });
+
+        return promise;
 
     });
 });
