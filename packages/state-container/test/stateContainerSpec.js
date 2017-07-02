@@ -52,6 +52,24 @@ class Example5 extends Model {
     }
 }
 
+class Example6 extends Model {
+    gummibear() {
+
+    }
+    smurf() {
+
+    }
+    yogibear() {
+
+    }
+    sylvester() {
+
+    }
+    cinderella() {
+
+    }
+}
+
 function pseudoAjax() {
     return Promise.resolve('Nevermore');
 }
@@ -267,6 +285,21 @@ describe('model', () => {
 
         assert.equal(model.get('status'), 'error');
         assert.equal(model.get('a'), undefined);
+    });
+
+    it('should return autocorrect suggestion', () => {
+        const model = new Example6;
+        assert.equal(model.$autocorrect('gmbuear'), 'gummibear');
+        assert.equal(model.$autocorrect('cynDerela'), 'cinderella');
+        assert.equal(model.$autocorrect('Sylsveer'), 'sylvester');
+        assert.equal(model.$autocorrect('yobuear'), 'yogibear');
+        assert.equal(model.$autocorrect('smrf'), 'smurf');
+
+        assert.equal(model.$autocorrect('mmbear'), 'gummibear');
+        assert.equal(model.$autocorrect('ynDerelax'), 'cinderella');
+        assert.equal(model.$autocorrect('ylsveers'), 'sylvester');
+        assert.equal(model.$autocorrect('obuear'), 'yogibear');
+        assert.equal(model.$autocorrect('mrf'), 'smurf');
     });
 
 });

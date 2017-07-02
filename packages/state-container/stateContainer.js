@@ -1,10 +1,19 @@
 const EventEmitter = require('events');
 
+// for autocorrection
+const leven = require('leven');
+
 // `constructor` is ES6 class constructor (inb4: thank you captain obvious XD).
 // methods beginning with `$`` are helpers
 // methods beginning with `get` are getters
 // rest of methods are actions
 // only actions are recorded.
+function correct(phrase, texts) {
+    phrase = phrase.toLowerCase();
+    return texts
+        .map(t => [t,leven(t.toLowerCase(), phrase)])
+        .sort((a,b)=>{return a[1]-b[1]})[0][0];
+}
 
 class Model {
     constructor(...args) {
@@ -12,7 +21,6 @@ class Model {
         this.ee = new EventEmitter;
 
         this.$reset();
-
         const methods = Object.getOwnPropertyNames(this.__proto__)
             .filter(n => n != 'constructor' && n.charAt(0) != '$' && n.indexOf('get') != 0);
 
@@ -85,6 +93,10 @@ class Model {
     }
     $id() {
         return this.$$id;
+    }
+    $autocorrect(methodName) {
+        const props = Object.keys(this);
+        return correct(methodName, props);
     }
 };
 

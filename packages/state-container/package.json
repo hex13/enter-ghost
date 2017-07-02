@@ -1,6 +1,6 @@
 {
   "name": "state-container",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Recordable state container. OOP style",
   "main": "stateContainer.js",
   "scripts": {
@@ -9,5 +9,15 @@
   "repository": "https://github.com/hex13/enter-ghost/tree/master/packages/state-container",
   "author": "= <=>",
   "license": "MIT",
-  "keywords": ["flux", "mvc", "model", "state", "replay", "event sourcing"]
+  "keywords": [
+    "flux",
+    "mvc",
+    "model",
+    "state",
+    "replay",
+    "event sourcing"
+  ],
+  "dependencies": {
+    "leven": "^2.1.0"
+  }
 }
