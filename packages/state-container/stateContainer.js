@@ -21,6 +21,7 @@ class Model {
     constructor(...args) {
         this._initialArgs = args;
         this.ee = new EventEmitter;
+        this._parent = null;
 
         this.$reset();
         const methods = Object.getOwnPropertyNames(this.__proto__)
@@ -31,10 +32,14 @@ class Model {
             this[meth] = (...args) => {
                 this._calls.push([meth, args]);
                 const res = original.apply(this, [this.state].concat(args));
-                this.ee.emit('change')
+                this.$notify(this);
                 return res;
             };
         });
+    }
+    $notify(changedModel) {
+        this.ee.emit('change', changedModel);
+        this._parent && this._parent.$notify(changedModel);
     }
     $subscribe(f) {
         this.ee.on('change', f);
@@ -49,7 +54,16 @@ class Model {
     }
     $reset() {
         this.state = this.$initialState(...this._initialArgs);
+        for (let prop in this.state) {
+            const child = this.state[prop];
+            if (child instanceof Model) {
+                child.$connect(this);
+            }
+        }
         this._calls = [];
+    }
+    $connect(parent) {
+        this._parent = parent;
     }
     $dispatch({type, args}) {
         this[type](...args);

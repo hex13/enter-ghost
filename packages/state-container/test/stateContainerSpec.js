@@ -70,6 +70,29 @@ class Example6 extends Model {
     }
 }
 
+class Example7 extends Model {
+    $initialState() {
+        class Child extends Model {
+            $initialState() {
+                class GrandChild extends Model {
+                    $initialState() {
+                        return {y: 100};
+                    }
+                    bar(state, y) {
+                        state.y = y;
+                    }
+                }
+                return {x: 10, grandChild: new GrandChild};
+            }
+            foo(state, x) {
+                state.x = x;
+            }
+        }
+        return {
+            child: new Child
+        };
+    }
+}
 function pseudoAjax() {
     return Promise.resolve('Nevermore');
 }
@@ -125,6 +148,40 @@ describe('example', () => {
 });
 
 describe('model', () => {
+
+    describe('hierarchy', () => {
+        it('should create children and children should notify parent about updates', () => {
+            const root = new Example7;
+            let c = 0;
+            assert.deepEqual(root.get('child').get('x'), 10);
+            root.$subscribe((model) => {
+                c++;
+                assert.strictEqual(model, root.get('child'));
+            });
+            root.get('child').foo(13);
+            assert.equal(root.get('child').get('x'), 13);
+            assert.equal(c, 1);
+        });
+        it('should create grand children and grand children should notify parents and grand parents about updates', () => {
+            const root = new Example7;
+            let c = 0;
+            let d = 0;
+            assert.deepEqual(root.get('child').get('grandChild').get('y'), 100);
+            root.$subscribe((model) => {
+                assert.strictEqual(model, root.get('child').get('grandChild'));
+                c++;
+            });
+            root.get('child').$subscribe((model) => {
+                assert.strictEqual(model, root.get('child').get('grandChild'));
+                d++;
+            });
+
+            root.get('child').get('grandChild').bar(101);
+            assert.deepEqual(root.get('child').get('grandChild').get('y'), 101);
+            assert.equal(c, 1);
+            assert.equal(d, 1);
+        });
+    });
 
     it('creating Model (without inheritance) should work', () => {
         const model = new Model;
