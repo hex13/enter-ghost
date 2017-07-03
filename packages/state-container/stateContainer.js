@@ -88,6 +88,9 @@ class Model {
     }
     $connect({ parent, root }) {
         this._parent = parent;
+        // TODO partial connecting
+        //if (parent) this._parent = parent;
+        //if (root) this._root = root;
         this._root = root;
         this._localId = root.$register();
         this._connectChildren();
