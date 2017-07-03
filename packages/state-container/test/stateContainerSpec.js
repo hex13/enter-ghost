@@ -100,6 +100,8 @@ class Example7 extends Model {
     }
 }
 
+const Hierarchy = Example7;
+
 class Example8 extends Model {
     _privateMethod() {
 
@@ -164,23 +166,42 @@ describe('model', () => {
     describe('events', () => {
         it('it should record events and expose them via $events', () => {
             const model = new Example;
-            model.foo('a');
+            model.inc(10);
+            model.foo('a', {a: 4});
             expect(model.$events()).deep.equal([
-                createEvent(model, 'foo', ['a'])
+                createEvent(model, 'inc', [10]),
+                createEvent(model, 'foo', ['a', {a: 4}]),
             ]);
         });
-        // it('it should record events and expose them via $events (hierarchy)', () => {
-        //     const model = new Example7;
-        //     model.someAction('a');
-        //     expect(model.$events()).deep.equal([
-        //         createEvent('someAction', ['a'])
-        //     ]);
-        // });
+        it('it should record events and expose them via $events (models in hierarchy). Root should gather all events', () => {
+            const model = new Hierarchy;
+            const child = model.get('child');
+            const grandChild = child.get('grandChild');
+
+            model.someAction('a');
+            child.foo(1);
+            grandChild.bar(3);
+
+            expect(grandChild.$events()).deep.equal([
+                createEvent(grandChild, 'bar', [3])
+            ]);
+
+            expect(child.$events()).deep.equal([
+                createEvent(child, 'foo', [1])
+            ]);
+
+            expect(model.$events()).deep.equal([
+                createEvent(model, 'someAction', ['a']),
+                createEvent(child, 'foo', [1]),
+                createEvent(grandChild, 'bar', [3]),
+            ]);
+
+        });
     });
 
     describe('hierarchy', () => {
         it('should create children and children should notify parent about updates', () => {
-            const root = new Example7;
+            const root = new Hierarchy;
             let c = 0;
             assert.deepEqual(root.get('child').get('x'), 10);
 
@@ -194,13 +215,13 @@ describe('model', () => {
             assert.equal(c, 1);
         });
         it('should create children and grand children connected to hierarchy. $root should return root model', () => {
-            const root = new Example7;
+            const root = new Hierarchy;
             assert.strictEqual(root.$root(), root);
             assert.strictEqual(root.get('child').$root(), root);
             assert.strictEqual(root.get('child').get('grandChild').$root(), root);
         });
         it('should create grand children and grand children should notify parents and grand parents about updates', () => {
-            const root = new Example7;
+            const root = new Hierarchy;
             let c = 0;
             let d = 0;
             assert.deepEqual(root.get('child').get('grandChild').get('y'), 100);

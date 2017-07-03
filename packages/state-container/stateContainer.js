@@ -13,7 +13,7 @@ function correct(phrase, texts) {
 }
 
 function createEvent(model, type, args) {
-    return {type, args};
+    return {target: model.$identity(), type, args};
 }
 
 
@@ -51,6 +51,9 @@ class Model {
     }
     $record(event) {
         this._calls.push(event);
+        if (this._root !== this) {
+            this._root.$record(event);
+        }
     }
     $notify(changedModel) {
         this.ee.emit('change', changedModel);
@@ -129,6 +132,9 @@ class Model {
     }
     $id() {
         return this.$$id;
+    }
+    $identity() {
+        return this;
     }
     $root() {
         return this._root;
