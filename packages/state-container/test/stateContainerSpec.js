@@ -95,6 +95,13 @@ class Example7 extends Model {
         };
     }
 }
+
+class Example8 extends Model {
+    _privateMethod() {
+
+    }
+}
+
 function pseudoAjax() {
     return Promise.resolve('Nevermore');
 }
@@ -298,7 +305,8 @@ describe('model', () => {
     it('should not trigger change handler,when $subscribe(), $compatible(), $dbg() or get.*() are called', () => {
         [
             new Example, // class with #get inherited from model
-            new Example3 // class which overrides #get
+            new Example3, // class which overrides #get
+            new Example8, // class with private method
         ].forEach(model => {
             let c = 0;
             model.$subscribe(() => c++);
@@ -311,8 +319,10 @@ describe('model', () => {
             model.get();
             model.get('whatever');
             model.getFoo && model.getFoo();
+            model._privateMethod && model._privateMethod();
 
-            assert.equal(c, 0, `incorrect number of updates for ${model.constructor.name}`);
+            let expected = 0;
+            assert.equal(c, expected, `incorrect number of updates for ${model.constructor.name}. It should be ${expected} but is ${c}`);
         });
 
     });

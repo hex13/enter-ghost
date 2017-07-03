@@ -16,6 +16,7 @@ function correct(phrase, texts) {
 // `constructor` is ES6 class constructor (inb4: thank you captain obvious XD).
 // methods beginning with `$`` are helpers
 // methods beginning with `get` are getters
+// methods beginning with `_` are private methods
 // rest of methods are actions
 // only actions are recorded.
 
@@ -28,7 +29,11 @@ class Model {
 
         this.$reset();
         const methods = Object.getOwnPropertyNames(this.__proto__)
-            .filter(n => n != 'constructor' && n.charAt(0) != '$' && n.indexOf('get') != 0);
+            .filter(n => n != 'constructor'
+                && n.charAt(0) != '$'
+                && n.charAt(0) != '_'
+                && n.indexOf('get') != 0
+            );
 
         methods.forEach(meth => {
             const original = this[meth];
