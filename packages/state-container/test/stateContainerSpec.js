@@ -206,6 +206,18 @@ describe('model', () => {
             expect(root.get('child').$localId()).equal(ROOT_LOCAL_ID + 1);
             expect(root.get('child').get('grandChild').$localId()).equal(ROOT_LOCAL_ID + 2);
         });
+
+        it('should allow for undo whole hierarchy', () => {
+            const root = new Hierarchy;
+            root.get('child').foo(200);
+            expect(root.get('child').get('x')).equal(200);
+            root.get('child').foo(300);
+            expect(root.get('child').get('x')).equal(300);
+
+            root.$undo();
+            expect(root.get('child').get('x')).equal(200);
+        });
+
         it('should create children and children should notify parent about updates', () => {
             const root = new Hierarchy;
             let c = 0;
@@ -411,9 +423,10 @@ describe('model', () => {
         assert.equal(model.get('a'), undefined);
     });
 
+    // TODO remove autocorrection logic out of this package
     it('should return autocorrect suggestion', () => {
         const model = new Example6;
-        assert.equal(model.$autocorrect('gmbuear'), 'gummibear');
+        assert.equal(model.$autocorrect('gumbuear'), 'gummibear');
         assert.equal(model.$autocorrect('cynDerela'), 'cinderella');
         assert.equal(model.$autocorrect('Sylsveer'), 'sylvester');
         assert.equal(model.$autocorrect('yobuear'), 'yogibear');
