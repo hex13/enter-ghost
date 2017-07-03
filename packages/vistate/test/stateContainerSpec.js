@@ -133,7 +133,7 @@ describe('example', () => {
     it('should work', () => {
         const require = () => _require('..');
 
-        const { Model } = require('state-container');
+        const { Model } = require('vistate');
         class Example extends Model {
             $initialState() {
                 return {value: 100};

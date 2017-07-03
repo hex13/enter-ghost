@@ -5,7 +5,7 @@ Notice: this is an early version. Proof of concept. Not ready for production yet
 ```javascript
 
 const assert = require('assert'); 
-const { Model } = require('state-container');
+const { Model } = require('vistate');
 
 
 class Example extends Model {
