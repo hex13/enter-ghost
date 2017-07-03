@@ -164,6 +164,12 @@ describe('model', () => {
             assert.equal(root.get('child').get('x'), 13);
             assert.equal(c, 1);
         });
+        it('should create children and grand children connected to hierarchy. $root should return root model', () => {
+            const root = new Example7;
+            assert.strictEqual(root.$root(), root);
+            assert.strictEqual(root.get('child').$root(), root);
+            assert.strictEqual(root.get('child').get('grandChild').$root(), root);
+        });
         it('should create grand children and grand children should notify parents and grand parents about updates', () => {
             const root = new Example7;
             let c = 0;

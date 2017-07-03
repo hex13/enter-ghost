@@ -24,6 +24,7 @@ class Model {
         this._initialArgs = args;
         this.ee = new EventEmitter;
         this._parent = null;
+        this._root = this;
 
         this.$reset();
         const methods = Object.getOwnPropertyNames(this.__proto__)
@@ -54,18 +55,23 @@ class Model {
             this[meth](...args);
         });
     }
-    $reset() {
-        this.state = this.$initialState(...this._initialArgs);
+    _connectChildren() {
         for (let prop in this.state) {
             const child = this.state[prop];
             if (child instanceof Model) {
-                child.$connect(this);
+                child.$connect({parent: this, root: this._root});
             }
         }
+    }
+    $reset() {
+        this.state = this.$initialState(...this._initialArgs);
+        this._connectChildren();
         this._calls = [];
     }
-    $connect(parent) {
+    $connect({ parent, root }) {
         this._parent = parent;
+        this._root = root;
+        this._connectChildren();
     }
     $dispatch({type, args}) {
         this[type](...args);
@@ -111,6 +117,9 @@ class Model {
     }
     $id() {
         return this.$$id;
+    }
+    $root() {
+        return this._root;
     }
     $autocorrect(methodName) {
         const props = Object.keys(this);
