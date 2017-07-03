@@ -12,6 +12,10 @@ function correct(phrase, texts) {
         .sort((a,b)=>{return a[1]-b[1]})[0][0];
 }
 
+function createEvent(model, type, args) {
+    return {type, args};
+}
+
 
 // `constructor` is ES6 class constructor (inb4: thank you captain obvious XD).
 // methods beginning with `$`` are helpers
@@ -38,12 +42,15 @@ class Model {
         methods.forEach(meth => {
             const original = this[meth];
             this[meth] = (...args) => {
-                this._calls.push([meth, args]);
+                this.$record(createEvent(this, meth, args));
                 const res = original.apply(this, [this.state].concat(args));
                 this.$notify(this);
                 return res;
             };
         });
+    }
+    $record(event) {
+        this._calls.push(event);
     }
     $notify(changedModel) {
         this.ee.emit('change', changedModel);
@@ -56,8 +63,8 @@ class Model {
         const calls = this._calls;
         this.$reset();
         // event sourcing (we replay previously stored method calls)
-        calls.slice(0, -1).forEach(([meth, args]) => {
-            this[meth](...args);
+        calls.slice(0, -1).forEach(event => {
+            this.$dispatch(event)
         });
     }
     _connectChildren() {
@@ -130,12 +137,16 @@ class Model {
         const props = Object.keys(this);
         return correct(methodName, props);
     }
+    $events() {
+        return this._calls;
+    }
 };
 
 const generateId = (last => () => ++last)(0);
 
 module.exports = {
     Model,
+    createEvent,
     create(Cls, ...args) {
         const model = new Cls(...args);
         model.assignId(generateId());

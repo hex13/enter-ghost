@@ -1,8 +1,9 @@
 "use strict";
 
 const assert = require('assert');
+const { expect } = require('chai');
 
-const { Model } = require('..');
+const { Model, createEvent } = require('..');
 const sc = require('..');
 
 class Example extends Model {
@@ -73,6 +74,9 @@ class Example6 extends Model {
 }
 
 class Example7 extends Model {
+    someAction() {
+
+    }
     $initialState() {
         class Child extends Model {
             $initialState() {
@@ -157,12 +161,30 @@ describe('example', () => {
 });
 
 describe('model', () => {
+    describe('events', () => {
+        it('it should record events and expose them via $events', () => {
+            const model = new Example;
+            model.foo('a');
+            expect(model.$events()).deep.equal([
+                createEvent(model, 'foo', ['a'])
+            ]);
+        });
+        // it('it should record events and expose them via $events (hierarchy)', () => {
+        //     const model = new Example7;
+        //     model.someAction('a');
+        //     expect(model.$events()).deep.equal([
+        //         createEvent('someAction', ['a'])
+        //     ]);
+        // });
+    });
 
     describe('hierarchy', () => {
         it('should create children and children should notify parent about updates', () => {
             const root = new Example7;
             let c = 0;
             assert.deepEqual(root.get('child').get('x'), 10);
+
+
             root.$subscribe((model) => {
                 c++;
                 assert.strictEqual(model, root.get('child'));
