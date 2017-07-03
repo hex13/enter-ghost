@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { expect } = require('chai');
 
-const { Model, createEvent } = require('..');
+const { Model, createEvent, ROOT_LOCAL_ID } = require('..');
 const sc = require('..');
 
 class Example extends Model {
@@ -200,6 +200,12 @@ describe('model', () => {
     });
 
     describe('hierarchy', () => {
+        it('should assign local ids', () => {
+            const root = new Hierarchy;
+            expect(root.$localId()).equal(ROOT_LOCAL_ID);
+            expect(root.get('child').$localId()).equal(ROOT_LOCAL_ID + 1);
+            expect(root.get('child').get('grandChild').$localId()).equal(ROOT_LOCAL_ID + 2);
+        });
         it('should create children and children should notify parent about updates', () => {
             const root = new Hierarchy;
             let c = 0;

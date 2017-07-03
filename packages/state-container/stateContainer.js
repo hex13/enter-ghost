@@ -17,6 +17,7 @@ function createEvent(model, type, args) {
 }
 
 
+const ROOT_LOCAL_ID = 1234;
 // `constructor` is ES6 class constructor (inb4: thank you captain obvious XD).
 // methods beginning with `$`` are helpers
 // methods beginning with `get` are getters
@@ -30,6 +31,8 @@ class Model {
         this.ee = new EventEmitter;
         this._parent = null;
         this._root = this;
+        this._localId = ROOT_LOCAL_ID;
+        this._lastLocalId = this._localId;
 
         this.$reset();
         const methods = Object.getOwnPropertyNames(this.__proto__)
@@ -86,6 +89,7 @@ class Model {
     $connect({ parent, root }) {
         this._parent = parent;
         this._root = root;
+        this._localId = root.$register();
         this._connectChildren();
     }
     $dispatch({type, args}) {
@@ -96,6 +100,12 @@ class Model {
             dispatch: this.$dispatch.bind(this),
             getState:() => this.state
         }
+    }
+    $localId() {
+        return this._localId;
+    }
+    $register(model) {
+        return ++this._lastLocalId;
     }
     $dbg() {
         return JSON.stringify(this.state);
@@ -153,6 +163,7 @@ const generateId = (last => () => ++last)(0);
 module.exports = {
     Model,
     createEvent,
+    ROOT_LOCAL_ID,
     create(Cls, ...args) {
         const model = new Cls(...args);
         model.assignId(generateId());
