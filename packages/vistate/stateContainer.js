@@ -59,7 +59,7 @@ class Model {
     }
     $notify(changedModel) {
         this.ee.emit('change', changedModel);
-        this._parent && this._parent.$notify(changedModel);
+        this._root && (this._root != this) && this._root.$notify(changedModel);
     }
     $subscribe(f) {
         this.ee.on('change', f);

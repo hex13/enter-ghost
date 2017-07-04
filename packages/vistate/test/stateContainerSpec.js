@@ -238,24 +238,30 @@ describe('model', () => {
             assert.strictEqual(root.get('child').$root(), root);
             assert.strictEqual(root.get('child').get('grandChild').$root(), root);
         });
-        it('should create grand children and grand children should notify parents and grand parents about updates', () => {
+        it('should create grand children and grand children should notify root about updates', () => {
             const root = new Hierarchy;
-            let c = 0;
-            let d = 0;
+            let rootUpdates = 0;
+            let childUpdates = 0;
+            let grandChildUpdates = 0;
             assert.deepEqual(root.get('child').get('grandChild').get('y'), 100);
             root.$subscribe((model) => {
                 assert.strictEqual(model, root.get('child').get('grandChild'));
-                c++;
+                rootUpdates++;
             });
             root.get('child').$subscribe((model) => {
                 assert.strictEqual(model, root.get('child').get('grandChild'));
-                d++;
+                childUpdates++;
+            });
+            root.get('child').get('grandChild').$subscribe((model) => {
+                assert.strictEqual(model, root.get('child').get('grandChild'));
+                grandChildUpdates++;
             });
 
             root.get('child').get('grandChild').bar(101);
             assert.deepEqual(root.get('child').get('grandChild').get('y'), 101);
-            assert.equal(c, 1);
-            assert.equal(d, 1);
+            assert.equal(rootUpdates , 1);
+            assert.equal(childUpdates, 0);
+            assert.equal(grandChildUpdates, 1);
         });
     });
 
