@@ -33,6 +33,7 @@ class Model {
         this._localId = ROOT_LOCAL_ID;
         this._models = new Map;
         this._batch = null;
+        this._middleware = {};
 
         this.$reset();
         const methods = Object.getOwnPropertyNames(this.__proto__)
@@ -47,6 +48,7 @@ class Model {
             this[meth] = (...args) => {
                 this.$record(createEvent(this, meth, args));
                 const res = original.apply(this, [this.state].concat(args));
+                if (this._middleware.processResult) this._middleware.processResult.call(this, res);
                 this.$notify(this);
                 return res;
             };
@@ -68,6 +70,11 @@ class Model {
             }
         } else {
             this._root.$notify(changedModel);
+        }
+    }
+    $use(middlewares) {
+        for (let name in middlewares) {
+            this._middleware[name] = middlewares[name];
         }
     }
     $subscribe(f, subject = this) {
@@ -195,10 +202,19 @@ class Model {
 
 const generateId = (last => () => ++last)(0);
 
+
+// for compatibility with Redux style reducers
+const reducerMiddleware = {
+    processResult(state) {
+        this.state = state;
+    }
+}
+
 module.exports = {
     Model,
     createEvent,
     ROOT_LOCAL_ID,
+    reducerMiddleware,
     create(Cls, ...args) {
         const model = new Cls(...args);
         model.assignId(generateId());

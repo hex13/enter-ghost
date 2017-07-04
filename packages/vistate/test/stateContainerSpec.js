@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { expect } = require('chai');
 
-const { Model, createEvent, ROOT_LOCAL_ID } = require('..');
+const { Model, createEvent, ROOT_LOCAL_ID, reducerMiddleware } = require('..');
 const sc = require('..');
 
 class Example extends Model {
@@ -107,6 +107,19 @@ class Example8 extends Model {
 
     }
 }
+
+class ReducerModel extends Model {
+    $initialState() {
+        return {value: 100};
+    }
+    inc(state, amount) {
+        return {
+            value: state.value + amount
+        }
+    }
+}
+
+
 
 function pseudoAjax() {
     return Promise.resolve('Nevermore');
@@ -352,6 +365,29 @@ describe('model', () => {
 
     it('should mutate state', () => {
         const model = new Example;
+        model.inc(10);
+        model.inc(100);
+        model.inc(1000);
+        assert.deepEqual(model.state, {value: 1210});
+    });
+
+    it('should use processResult middleware', () => {
+        const model = new Example;
+        let c = 0;
+        model.$use({
+            processResult: () => {c++}
+        })
+        model.foo();
+        model.foo();
+        model.foo();
+        model.foo();
+        assert.strictEqual(c, 4);
+    });
+
+    it('should mutate state (using reducerMiddleware)', () => {
+        const model = new ReducerModel;
+        let c = 0;
+        model.$use(reducerMiddleware);
         model.inc(10);
         model.inc(100);
         model.inc(1000);
