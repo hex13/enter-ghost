@@ -272,7 +272,7 @@ describe('model', () => {
         assert.equal(model.foo(3), 4);
     });
 
-    it('should trigger change handler', () => {
+    it('should trigger change handler after each action', () => {
         const model = new Example;
         let updateCount = 0;
 
