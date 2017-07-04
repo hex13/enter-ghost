@@ -32,6 +32,7 @@ class Model {
         this._root = this;
         this._localId = ROOT_LOCAL_ID;
         this._models = new Map;
+        this._batch = null;
 
         this.$reset();
         const methods = Object.getOwnPropertyNames(this.__proto__)
@@ -60,7 +61,11 @@ class Model {
     $notify(changedModel) {
         const isRoot = this._root === this;
         if (isRoot) {
-            this.ee.emit('change', changedModel);
+            if (this._batch) {
+                this._batch.set(changedModel, true);
+            } else {
+                this.ee.emit('change', changedModel);
+            }
         } else {
             this._root.$notify(changedModel);
         }
@@ -69,7 +74,7 @@ class Model {
         const isRoot = this._root === this;
         if (isRoot) {
             this._root.ee.on('change', (changedModel) => {
-                if (subject === this || subject === changedModel) {
+                if (subject === this || subject.$localId() === changedModel.$localId()) {
                     f(changedModel)
                 }
             });
@@ -79,12 +84,19 @@ class Model {
 
     }
     $undo() {
+        this._batch = new Map;
         const calls = this._calls;
         this.$reset();
         // event sourcing (we replay previously stored method calls)
         calls.slice(0, -1).forEach(event => {
             this.$dispatch(event)
         });
+
+        const batch = this._batch;
+        this._batch = null;
+        Array.from(batch.keys()).forEach(model => {
+            this.$notify(model)
+        })
     }
     _connectChildren() {
         for (let prop in this.state) {
