@@ -244,6 +244,7 @@ describe('model', () => {
             let childUpdates = 0;
             let grandChildUpdates = 0;
             assert.deepEqual(root.get('child').get('grandChild').get('y'), 100);
+
             root.$subscribe((model) => {
                 assert.strictEqual(model, root.get('child').get('grandChild'));
                 rootUpdates++;
@@ -256,12 +257,43 @@ describe('model', () => {
                 assert.strictEqual(model, root.get('child').get('grandChild'));
                 grandChildUpdates++;
             });
-
             root.get('child').get('grandChild').bar(101);
+
             assert.deepEqual(root.get('child').get('grandChild').get('y'), 101);
             assert.equal(rootUpdates , 1);
             assert.equal(childUpdates, 0);
             assert.equal(grandChildUpdates, 1);
+        });
+        xit('undo should generate one update', () => {
+            const root = new Hierarchy;
+            let rootUpdates = 0;
+            let childUpdates = 0;
+            let grandChildUpdates = 0;
+
+            root.get('child').get('grandChild').bar(101);
+            root.get('child').get('grandChild').bar(101);
+            root.get('child').get('grandChild').bar(101);
+
+
+            root.$subscribe((model) => {
+                assert.strictEqual(model, root.get('child').get('grandChild'));
+                rootUpdates++;
+            });
+            root.get('child').$subscribe((model) => {
+                assert.strictEqual(model, root.get('child').get('grandChild'));
+                childUpdates++;
+            });
+            root.get('child').get('grandChild').$subscribe((model) => {
+                assert.strictEqual(model, root.get('child').get('grandChild'));
+                grandChildUpdates++;
+            });
+            root.$undo();
+
+            assert.deepEqual(root.get('child').get('grandChild').get('y'), 101);
+            assert.equal(rootUpdates , 1);
+            assert.equal(childUpdates, 0);
+            assert.equal(grandChildUpdates, 1);
+
         });
     });
 

@@ -58,11 +58,25 @@ class Model {
         }
     }
     $notify(changedModel) {
-        this.ee.emit('change', changedModel);
-        this._root && (this._root != this) && this._root.$notify(changedModel);
+        const isRoot = this._root === this;
+        if (isRoot) {
+            this.ee.emit('change', changedModel);
+        } else {
+            this._root.$notify(changedModel);
+        }
     }
-    $subscribe(f) {
-        this.ee.on('change', f);
+    $subscribe(f, subject = this) {
+        const isRoot = this._root === this;
+        if (isRoot) {
+            this._root.ee.on('change', (changedModel) => {
+                if (subject === this || subject === changedModel) {
+                    f(changedModel)
+                }
+            });
+        } else {
+            this._root.$subscribe(f, this);
+        }
+
     }
     $undo() {
         const calls = this._calls;
