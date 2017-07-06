@@ -17,18 +17,32 @@ function createEvent(model, type, args) {
 }
 
 class Transaction {
-    constructor({ onDone }) {
-        this.onDone = onDone;
+    constructor(handlers = {}) {
+        this.onEnd = handlers.onEnd;
+        this.onCommit = handlers.onCommit;
         this._tasks = [];
+        this._data = Object.create(null);
+
+        handlers.onInit && handlers.onInit(this);
+    }
+    data(k, v) {
+        if (k === undefined) return this._data;
+        if (v === undefined) return this._data[k];
+        this._data[k] = v;
     }
     task(cb) {
         this._tasks.push(cb);
     }
+    // cancel() {
+    //     this.onEnd && this.onEnd(this);
+    // }
     commit() {
         this._tasks.forEach(task => task());
+        this.onCommit && this.onCommit(this);
+        this.onEnd && this.onEnd(this);
     }
     end(resultState) {
-        this.onDone && this.onDone(resultState);
+        this.onEnd && this.onEnd(resultState);
     }
 }
 
@@ -175,7 +189,7 @@ class Model {
     }
     $transaction(callback, tempState) {
         const transaction = new Transaction({
-            onDone: resultState => {
+            onEnd: resultState => {
                 Object.assign(this.state, savedState);
                 Object.assign(this.state, resultState);
             }

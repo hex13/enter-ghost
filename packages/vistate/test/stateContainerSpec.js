@@ -506,7 +506,7 @@ describe('model', () => {
 
     describe('Transaction', () => {
         it('should allow for define tasks and commiting them', () => {
-            const transaction = new Transaction({});
+            const transaction = new Transaction();
             const model = new TransactionExampleModel;
             transaction.task(() => {
                 model.setText('koteł');
@@ -521,6 +521,60 @@ describe('model', () => {
             expect(model.get('category')).equal('zwierzę')
             //const transaction = model.$transaction();
 
+        });
+        it('should allow for keeping and retrieving data', () => {
+            const transaction = new Transaction();
+            let data;
+
+            data = transaction.data();
+            expect(data).deep.equal({});
+
+            data = transaction.data('kot');
+            expect(data).to.not.exist;
+
+            // once again
+            // to check if data() did not assign variable via side effect
+            data = transaction.data('kot');
+            expect(data).to.not.exist;
+
+            transaction.data('kot', 1234);
+            transaction.data('pies', 5678);
+            expect(transaction.data('kot')).to.equal(1234);
+            expect(transaction.data('pies')).to.equal(5678);
+        });
+        it('should call onCommit and onEnd handlers after commiting', () => {
+            let c = 0;
+            let d = 0;
+            const transaction = new Transaction({
+                onCommit(t) {
+                    c++;
+                    expect(t).equal(transaction);
+                },
+                onEnd(t) {
+                    d++;
+                    expect(t).equal(transaction);
+                }
+            });
+            expect(c).equal(0, 'it should not call onCommit during creation');
+            expect(d).equal(0, 'it should not call onEnd during creation');
+
+            transaction.commit();
+            expect(c).equal(1);
+            expect(d).equal(1);
+        });
+        it('should call onInit handler after creation', () => {
+            let c = 0;
+            let transactionFromOnInit;
+            const transaction = new Transaction({
+                onInit(t) {
+                    c++;
+                    transactionFromOnInit = t;
+                }
+            });
+            expect(c).equal(1);
+            expect(transactionFromOnInit).equal(transaction);
+            transaction.commit();
+            expect(c).equal(1, 'it should not call onInit during committing');
         });
     });
 
