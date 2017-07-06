@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { expect } = require('chai');
 
-const { Model, createEvent, ROOT_LOCAL_ID, reducerMiddleware } = require('..');
+const { Model, createEvent, ROOT_LOCAL_ID, reducerMiddleware, Transaction } = require('..');
 const sc = require('..');
 
 class Example extends Model {
@@ -43,15 +43,19 @@ class Example4 extends Model {
     }
 }
 
-class Example5 extends Model {
+class TransactionExampleModel extends Model {
     $initialState() {
         return {
             status: 'normal',
-            text: ''
+            text: '',
+            category: 'none',
         };
     }
     setText(state, text) {
         state.text = text;
+    }
+    setCategory(state, category) {
+        state.category = category;
     }
 }
 
@@ -477,7 +481,7 @@ describe('model', () => {
     });
 
     it('should handle transactions', () => {
-        const model = new Example5;
+        const model = new TransactionExampleModel;
 
         return model.$transaction((transaction, aModel) => {
             return pseudoAjax().then(text => {
@@ -500,8 +504,28 @@ describe('model', () => {
         });
     });
 
+    describe('Transaction', () => {
+        it('should allow for define tasks and commiting them', () => {
+            const transaction = new Transaction({});
+            const model = new TransactionExampleModel;
+            transaction.task(() => {
+                model.setText('koteł');
+            });
+            transaction.task(() => {
+                model.setCategory('zwierzę');
+            });
+            expect(model.get('text')).equal('');
+            expect(model.get('category')).equal('none')
+            transaction.commit();
+            expect(model.get('text')).equal('koteł');
+            expect(model.get('category')).equal('zwierzę')
+            //const transaction = model.$transaction();
+
+        });
+    });
+
     it('should assign ending state in transactions', () => {
-        const model = new Example5;
+        const model = new TransactionExampleModel;
 
         model.$transaction((transaction, aModel) => {
             transaction.end({status: 'error'});

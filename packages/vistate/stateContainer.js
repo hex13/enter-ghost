@@ -16,6 +16,23 @@ function createEvent(model, type, args) {
     return {target: model.$localId(), type, args};
 }
 
+class Transaction {
+    constructor({ onDone }) {
+        this.onDone = onDone;
+        this._tasks = [];
+    }
+    task(cb) {
+        this._tasks.push(cb);
+    }
+    commit() {
+        this._tasks.forEach(task => task());
+    }
+    end(resultState) {
+        this.onDone && this.onDone(resultState);
+    }
+}
+
+
 const ROOT_LOCAL_ID = 1234;
 // `constructor` is ES6 class constructor (inb4: thank you captain obvious XD).
 // methods beginning with `$`` are helpers
@@ -157,12 +174,12 @@ class Model {
         return JSON.stringify(this.state);
     }
     $transaction(callback, tempState) {
-        const transaction = {
-            end: (resultState) => {
+        const transaction = new Transaction({
+            onDone: resultState => {
                 Object.assign(this.state, savedState);
                 Object.assign(this.state, resultState);
-            },
-        };
+            }
+        });
         let savedState = {};
         Object.keys(tempState).forEach(k => {
             savedState[k] = this.state[k];
@@ -217,6 +234,7 @@ const reducerMiddleware = {
 module.exports = {
     Model,
     createEvent,
+    Transaction,
     ROOT_LOCAL_ID,
     reducerMiddleware,
     create(Cls, ...args) {
