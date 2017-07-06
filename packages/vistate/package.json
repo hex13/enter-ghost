@@ -4,7 +4,8 @@
   "description": "Recordable state container. OOP style",
   "main": "stateContainer.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha",
+    "coverage": "nyc --reporter=lcov npm test" 
   },
   "repository": "https://github.com/hex13/enter-ghost/tree/master/packages/vistate",
   "author": "= <=>",
