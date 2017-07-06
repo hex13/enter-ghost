@@ -220,6 +220,20 @@ describe('model', () => {
             expect(root.get('child').get('grandChild').$localId()).equal(ROOT_LOCAL_ID + 2);
         });
 
+        it('should call $afterChildAction on root', () => {
+            const root = new Hierarchy;
+            let actions = [];
+            root.$afterChildAction = function (model, name) {
+                actions.push([model.constructor.name, name])
+            }
+            root.get('child').foo();
+            root.get('child').get('grandChild').bar();
+            expect(actions).deep.equal([
+                ['Child', 'foo'],
+                ['GrandChild', 'bar'],
+            ]);
+        });
+
         it('should allow for undo whole hierarchy', () => {
             const root = new Hierarchy;
             root.get('child').foo(200);

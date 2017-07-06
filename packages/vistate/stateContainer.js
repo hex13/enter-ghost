@@ -50,6 +50,7 @@ class Model {
                 const res = original.apply(this, [this.state].concat(args));
                 if (this._middleware.processResult) this._middleware.processResult.call(this, res);
                 this.$notify(this);
+                this._root.$afterChildAction(this, meth);
                 return res;
             };
         });
@@ -59,6 +60,9 @@ class Model {
         if (this._root !== this) {
             this._root.$record(event);
         }
+    }
+    $afterChildAction(child, actionName) {
+
     }
     $notify(changedModel) {
         const isRoot = this._root === this;
