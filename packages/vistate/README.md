@@ -2,6 +2,8 @@
 
 Notice: this is an early version. Proof of concept. Not ready for production yet.
 
+for examples of use check test cases: <https://github.com/hex13/enter-ghost/blob/master/packages/vistate/test/stateContainerSpec.js>
+
 ```javascript
 
 const assert = require('assert'); 
