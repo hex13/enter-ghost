@@ -20,6 +20,19 @@ class Transaction {
     constructor(handlers = {}) {
         this.onEnd = handlers.onEnd;
         this.onCommit = handlers.onCommit;
+        for (let eventName in handlers) {
+            if (
+                eventName.slice(0, 2) == 'on'
+                && eventName != 'onEnd'
+                && eventName != 'onCommit'
+                && eventName != 'onInit'
+            ) {
+                const methName = eventName.charAt(2).toLowerCase() + eventName.slice(3);
+                this[methName] = () => {
+                    handlers[eventName](this);
+                }
+            }
+        }
         this._tasks = [];
         this._data = Object.create(null);
 

@@ -576,6 +576,19 @@ describe('model', () => {
             transaction.commit();
             expect(c).equal(1, 'it should not call onInit during committing');
         });
+        it('should call custom handler', () => {
+            let foo = 0;
+            let transactionFromOnInit;
+            const transaction = new Transaction({
+                onFoo(t) {
+                    foo++;
+                    transactionFromOnInit = t;
+                }
+            });
+            transaction.foo();
+            expect(foo).equal(1);
+            expect(transactionFromOnInit).equal(transaction);
+        });
     });
 
     it('should assign ending state in transactions', () => {
