@@ -9,9 +9,16 @@ class Transaction {
                 && eventName != 'onCommit'
                 && eventName != 'onInit'
             ) {
-                const methName = eventName.charAt(2).toLowerCase() + eventName.slice(3);
-                this[methName] = () => {
-                    handlers[eventName](this);
+                const taskName = eventName.charAt(2).toLowerCase() + eventName.slice(3);
+                const task = handlers[eventName];
+                if (typeof task == 'function') {
+                  this[taskName] = () => {
+                      handlers[eventName](this);
+                  }
+                } else if (Array.isArray(task)) {
+                  this[taskName] = () => {
+                      task.forEach(handler => handler(this));
+                  }
                 }
             }
         }

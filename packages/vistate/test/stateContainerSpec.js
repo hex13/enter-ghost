@@ -589,6 +589,29 @@ describe('model', () => {
             expect(foo).equal(1);
             expect(transactionFromOnInit).equal(transaction);
         });
+        it('should call custom handlers in array', () => {
+            let a = 0;
+            let b = 0;
+            let c = 0;
+            const transaction = new Transaction({
+                onFoo: [
+                  t => {
+                    a++; expect(t).equal(transaction);
+                  },
+                  t => {
+                    b++; expect(t).equal(transaction);
+                  },
+                  t => {
+                    c++; expect(t).equal(transaction);
+                  },
+                ]
+            });
+            transaction.foo();
+            expect(a).equal(1);
+            expect(b).equal(1);
+            expect(c).equal(1);
+            //expect(transactionFromOnInit).equal(transaction);
+        });
     });
 
     it('should assign ending state in transactions', () => {
