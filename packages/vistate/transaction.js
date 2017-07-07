@@ -41,7 +41,7 @@ class Transaction {
     commit() {
         this._tasks.forEach(task => task());
         this.onCommit && this.onCommit(this);
-        this.onEnd && this.onEnd(this);
+        this.end(this)
     }
     end(resultState) {
         this.onEnd && this.onEnd(resultState);
