@@ -504,6 +504,26 @@ describe('model', () => {
         });
     });
 
+    it('it should be possible to set state properties via set()', () => {
+        const model = new Model;
+        model.set('a', 10);
+        model.set('b', 20);
+        model.set('c', 'kotek');
+        model.set('a', 30);
+        model.set('d', {
+            e: 123
+        })
+
+        expect(model.get()).deep.equal({
+            a: 30,
+            b: 20,
+            c: 'kotek',
+            d: {
+                e: 123
+            }
+        });
+    })
+
     describe('Transaction', () => {
         it('should allow for define tasks and commiting them', () => {
             const transaction = new Transaction();

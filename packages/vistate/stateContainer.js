@@ -183,6 +183,9 @@ class Model {
             return state[prop];
         }
     }
+    set(state, k, v) {
+        state[k] = v;
+    }
     $initialState() {
         return {};
     }
