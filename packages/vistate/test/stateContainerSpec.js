@@ -606,11 +606,11 @@ describe('model', () => {
                   },
                 ]
             });
-            transaction.foo();
-            expect(a).equal(1);
-            expect(b).equal(1);
-            expect(c).equal(1);
-            //expect(transactionFromOnInit).equal(transaction);
+            return transaction.foo().then(() => {
+                expect(a).equal(1);
+                expect(b).equal(1);
+                expect(c).equal(1);
+            });
         });
         it('should call custom handlers in array (using promises)', () => {
             let a = 0;

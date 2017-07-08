@@ -22,23 +22,16 @@ class Transaction {
                 } else if (Array.isArray(task)) {
                   this[taskName] = () => {
                       const [first, ...rest] = task;
-                      let last = first(this);
-                      const isPromise = last && last.then;
-                      if (isPromise) {
-                          rest.forEach((handler, i) => {
-                              last = last.then(() => {
-                                  if (this.ended) {
-                                      return
-                                  }
-                                  return Promise.resolve(handler(this));
-                              });
+                      let last = Promise.resolve(first(this));
+                      rest.forEach((handler, i) => {
+                          last = last.then(() => {
+                              if (this.ended) {
+                                  return
+                              }
+                              return Promise.resolve(handler(this));
                           });
-                          return last;
-                      } else {
-                          rest.forEach(handler => {
-                              handler(this);
-                          })
-                      }
+                      });
+                      return last;
                   }
                 }
             }
