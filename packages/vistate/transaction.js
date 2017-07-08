@@ -37,14 +37,7 @@ class Transaction {
             }
         }
         this._tasks = [];
-        this._data = Object.create(null);
-
         handlers.onInit && handlers.onInit(this);
-    }
-    data(k, v) {
-        if (k === undefined) return this._data;
-        if (v === undefined) return this._data[k];
-        this._data[k] = v;
     }
     commit() {
         this._tasks.forEach(task => task());

@@ -522,26 +522,6 @@ describe('model', () => {
             //const transaction = model.$transaction();
 
         });
-        it('should allow for keeping and retrieving data', () => {
-            const transaction = new Transaction();
-            let data;
-
-            data = transaction.data();
-            expect(data).deep.equal({});
-
-            data = transaction.data('kot');
-            expect(data).to.not.exist;
-
-            // once again
-            // to check if data() did not assign variable via side effect
-            data = transaction.data('kot');
-            expect(data).to.not.exist;
-
-            transaction.data('kot', 1234);
-            transaction.data('pies', 5678);
-            expect(transaction.data('kot')).to.equal(1234);
-            expect(transaction.data('pies')).to.equal(5678);
-        });
         it('should call onCommit and onEnd handlers after commiting', () => {
             let c = 0;
             let d = 0;
