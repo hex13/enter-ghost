@@ -1,3 +1,5 @@
+"use strict";
+
 class Transaction {
     constructor(handlers = {}) {
         this.onEnd = handlers.onEnd;
@@ -17,7 +19,7 @@ class Transaction {
                 const task = handlers[eventName];
                 if (typeof task == 'function') {
                   this[taskName] = () => {
-                      handlers[eventName](this);
+                      return handlers[eventName](this);
                   }
                 } else if (Array.isArray(task)) {
                   this[taskName] = () => {
@@ -40,9 +42,14 @@ class Transaction {
         handlers.onInit && handlers.onInit(this);
     }
     commit() {
-        this._tasks.forEach(task => task());
-        this.onCommit && this.onCommit(this);
-        this.end(this)
+        const validate = Promise.resolve(this.validate && this.validate());
+        return validate.then(errors => {
+            if (errors) return;
+
+            this._tasks.forEach(task => task());
+            this.onCommit && this.onCommit(this);
+            this.end(this)
+        });
     }
     end(resultState) {
         this.ended = true;

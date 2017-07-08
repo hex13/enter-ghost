@@ -536,9 +536,10 @@ describe('model', () => {
             });
             expect(model.get('text')).equal('');
             expect(model.get('category')).equal('none')
-            transaction.commit();
-            expect(model.get('text')).equal('koteł');
-            expect(model.get('category')).equal('zwierzę')
+            return transaction.commit().then(() => {
+                expect(model.get('text')).equal('koteł');
+                expect(model.get('category')).equal('zwierzę')
+            });
             //const transaction = model.$transaction();
 
         });
@@ -558,9 +559,10 @@ describe('model', () => {
             expect(c).equal(0, 'it should not call onCommit during creation');
             expect(d).equal(0, 'it should not call onEnd during creation');
 
-            transaction.commit();
-            expect(c).equal(1);
-            expect(d).equal(1);
+            return transaction.commit().then(() => {
+                expect(c).equal(1);
+                expect(d).equal(1);
+            });
         });
         it('should call onInit handler after creation', () => {
             let c = 0;
@@ -648,6 +650,43 @@ describe('model', () => {
                 expect(c).equal(1);
             });
             //expect(transactionFromOnInit).equal(transaction);
+        });
+    });
+
+    it('should validate and commit if there are no errors', () => {
+        let validationCalled = 0;
+        let committed = 0;
+        const transaction = new Transaction({
+            onValidate() {
+                validationCalled++;
+            },
+            onCommit() {
+                committed++;
+            }
+        });
+        return transaction.commit().then(() => {
+            expect(validationCalled).equal(1);
+            expect(committed).equal(1);
+            expect(transaction.ended).equal(true);
+        });
+    });
+
+    it('should validate and don\'t commit if there are errors', () => {
+        let validationCalled = 0;
+        let committed = 0;
+        const transaction = new Transaction({
+            onValidate() {
+                validationCalled++;
+                return ['error', 'error2'];
+            },
+            onCommit() {
+                committed++;
+            }
+        });
+        return transaction.commit().then(() => {
+            expect(validationCalled).equal(1);
+            expect(committed).equal(0);
+            expect(transaction.ended).equal(false);
         });
     });
 
