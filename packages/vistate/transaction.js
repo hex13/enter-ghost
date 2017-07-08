@@ -2,6 +2,10 @@ class Transaction {
     constructor(handlers = {}) {
         this.onEnd = handlers.onEnd;
         this.onCommit = handlers.onCommit;
+        this.ended = false;
+
+        // TODO extract
+        // this._generateMethods(this, handlers);
         for (let eventName in handlers) {
             if (
                 eventName.slice(0, 2) == 'on'
@@ -17,7 +21,24 @@ class Transaction {
                   }
                 } else if (Array.isArray(task)) {
                   this[taskName] = () => {
-                      task.forEach(handler => handler(this));
+                      const [first, ...rest] = task;
+                      let last = first(this);
+                      const isPromise = last && last.then;
+                      if (isPromise) {
+                          rest.forEach((handler, i) => {
+                              last = last.then(() => {
+                                  if (this.ended) {
+                                      return
+                                  }
+                                  return Promise.resolve(handler(this));
+                              });
+                          });
+                          return last;
+                      } else {
+                          rest.forEach(handler => {
+                              handler(this);
+                          })
+                      }
                   }
                 }
             }
@@ -32,20 +53,36 @@ class Transaction {
         if (v === undefined) return this._data[k];
         this._data[k] = v;
     }
-    task(cb) {
-        this._tasks.push(cb);
-    }
-    // cancel() {
-    //     this.onEnd && this.onEnd(this);
-    // }
     commit() {
         this._tasks.forEach(task => task());
         this.onCommit && this.onCommit(this);
         this.end(this)
     }
     end(resultState) {
+        this.ended = true;
         this.onEnd && this.onEnd(resultState);
     }
 }
+
+const proposed = {
+    cancel() {
+        this.onEnd && this.onEnd(this);
+    },
+    validate(t) {
+        if (dataAreGood) {
+            return;
+        } else
+            return arrayWithErrors;
+    }
+};
+
+const deprecated = {
+    task(cb) {
+        console.error('Transaction::task() is deprecated. Use event based approach')
+        this._tasks.push(cb);
+    }
+};
+
+Object.assign(Transaction.prototype, deprecated);
 
 module.exports = Transaction;

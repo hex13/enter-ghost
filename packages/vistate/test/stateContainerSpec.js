@@ -612,7 +612,85 @@ describe('model', () => {
             expect(c).equal(1);
             //expect(transactionFromOnInit).equal(transaction);
         });
+        it('should call custom handlers in array (using promises)', () => {
+            let a = 0;
+            let b = 0;
+            let c = 0;
+            let resolveFirst;
+            const transaction = new Transaction({
+                onFoo: [
+                  t => {
+                    a++;
+                    expect(t).equal(transaction);
+                    return Promise.resolve();
+                  },
+                  t => {
+                    b++;
+                    expect(a).equal(1);
+                    expect(b).equal(1);
+                    expect(c).equal(0);
+                    expect(t).equal(transaction);
+                  },
+                  t => {
+                    c++;
+                    expect(t).equal(transaction);
+                  },
+                ]
+            });
+            const fooDone = transaction.foo();
+            expect(a).equal(1);
+            expect(b).equal(0);
+            expect(c).equal(0);
+
+            return fooDone.then(() => {
+                expect(a).equal(1);
+                expect(b).equal(1);
+                expect(c).equal(1);
+            });
+            //expect(transactionFromOnInit).equal(transaction);
+        });
     });
+
+    it('should not call handler after transaction has ended', () => {
+        let a = 0;
+        let b = 0;
+        let c = 0;
+        let resolveFirst;
+        const transaction = new Transaction({
+            onFoo: [
+              t => {
+                a++;
+                expect(t).equal(transaction);
+                return Promise.resolve();
+              },
+              t => {
+                b++;
+                expect(a).equal(1);
+                expect(b).equal(1);
+                expect(c).equal(0);
+                expect(t).equal(transaction);
+                t.end();
+              },
+              t => {
+                c++;
+                expect(t).equal(transaction);
+              },
+            ]
+        });
+        const fooDone = transaction.foo();
+        expect(a).equal(1);
+        expect(b).equal(0);
+        expect(c).equal(0);
+
+        // TODO catch
+        return fooDone.then(() => {
+            expect(a).equal(1);
+            expect(b).equal(1);
+            expect(c).equal(0);
+        });
+        //expect(transactionFromOnInit).equal(transaction);
+    });
+
 
     it('should assign ending state in transactions', () => {
         const model = new TransactionExampleModel;
