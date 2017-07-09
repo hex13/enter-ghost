@@ -4,9 +4,14 @@ Notice: this is an early version. Proof of concept. Not ready for production yet
 
 for examples of use check test cases: <https://github.com/hex13/enter-ghost/blob/master/packages/vistate/test/stateContainerSpec.js>
 
+Breaking changes:
+
+- no data() method in Transaction.
+- transaction methods return promise
+
 ```javascript
 
-const assert = require('assert'); 
+const assert = require('assert');
 const { Model } = require('vistate');
 
 
