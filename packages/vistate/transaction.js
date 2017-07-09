@@ -5,6 +5,7 @@ class Transaction {
         this.onEnd = handlers.onEnd;
         this.onCommit = handlers.onCommit;
         this.ended = false;
+        this.errors = [];
 
         // TODO extract
         // this._generateMethods(this, handlers);
@@ -44,7 +45,8 @@ class Transaction {
     commit() {
         const validate = Promise.resolve(this.validate && this.validate());
         return validate.then(errors => {
-            if (errors) return;
+            this.errors = errors || [];
+            if (this.errors.length) return;
 
             this._tasks.forEach(task => task());
             this.onCommit && this.onCommit(this);

@@ -653,7 +653,7 @@ describe('model', () => {
         });
     });
 
-    it('should validate and commit if there are no errors', () => {
+    it('should validate and commit if there are no errors (return undefined)', () => {
         let validationCalled = 0;
         let committed = 0;
         const transaction = new Transaction({
@@ -670,6 +670,26 @@ describe('model', () => {
             expect(transaction.ended).equal(true);
         });
     });
+
+    it('should validate and commit if there are no errors (return empty array) ', () => {
+        let validationCalled = 0;
+        let committed = 0;
+        const transaction = new Transaction({
+            onValidate() {
+                validationCalled++;
+                return [];
+            },
+            onCommit() {
+                committed++;
+            }
+        });
+        return transaction.commit().then(() => {
+            expect(validationCalled).equal(1);
+            expect(committed).equal(1);
+            expect(transaction.ended).equal(true);
+        });
+    });
+
 
     it('should validate and don\'t commit if there are errors', () => {
         let validationCalled = 0;
@@ -688,6 +708,33 @@ describe('model', () => {
             expect(committed).equal(0);
             expect(transaction.ended).equal(false);
         });
+    });
+
+    it('should have errors property and it should be empty when transaction is created', () => {
+        const transaction = new Transaction({
+            onValidate() {return ['error']}
+        });
+        expect(transaction.errors).deep.equal([]);
+    });
+
+    it('after failed validation it should assign to `errors`', () => {
+        const transaction = new Transaction({
+            onValidate() {return ['someError']}
+        });
+        return transaction.commit().then(() => {
+            expect(transaction.errors).deep.equal(['someError']);
+        });
+    });
+
+    it('after passed validation `errors` should be empty array', () => {
+        const transaction = new Transaction({
+            onValidate() {}
+        });
+        transaction.errors = ['some previous error'];
+        return transaction.commit().then(() => {
+            expect(transaction.errors).deep.equal([]);
+        });
+
     });
 
     it('should not call handler after transaction has ended', () => {
