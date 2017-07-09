@@ -27,6 +27,17 @@ const ROOT_LOCAL_ID = 1234;
 // rest of methods are actions
 // only actions are recorded.
 
+function _getProps(obj) {
+    const props = {};
+    let curr = obj;
+    for (let curr = obj; curr && curr !== Object.prototype; curr = curr.__proto__) {
+        Object.getOwnPropertyNames(curr).forEach(k => {
+            if (!props.hasOwnProperty(k)) props[k] = true;
+        });
+    }
+    return Object.keys(props);
+}
+
 class Model {
     constructor(...args) {
         this._initialArgs = args;
@@ -39,7 +50,7 @@ class Model {
         this._middleware = {};
 
         this.$reset();
-        const methods = Object.getOwnPropertyNames(this.__proto__)
+        const methods = _getProps(this.__proto__)
             .filter(n => n != 'constructor'
                 && n.charAt(0) != '$'
                 && n.charAt(0) != '_'
