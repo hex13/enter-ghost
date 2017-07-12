@@ -5,13 +5,14 @@
   "main": "analyzer.js",
   "scripts": {
     "test": "mocha test/psSpec.js",
-    "coverage": "nyc --reporter=lcov npm test"
+    "coverage": "nyc --reporter=lcov mocha",
+    "coverage6": "nyc --reporter=lcov mocha test/6spec.js"
   },
   "author": "= <=>",
   "license": "MIT",
   "devDependencies": {
     "chai": "^4.0.0",
-    "istanbul": "^0.4.5",
+    "lodash": "^4.17.4",
     "mocha": "^3.2.0",
     "nyc": "^10.3.2"
   },
