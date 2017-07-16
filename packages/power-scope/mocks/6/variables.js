@@ -8,3 +8,5 @@ const someVariable = {
 //const { destrVariable } = {
 const destrVariable = {
 }
+
+nonExisting;

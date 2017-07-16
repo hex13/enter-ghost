@@ -1,7 +1,7 @@
 module.exports = function Query(services) {
     return function query(structure) {
         if (!structure) {
-            throw new Error(`Query needs structure. Found ${structure}`);
+            //throw new Error(`Query needs structure. Found ${structure}. );
         }
         return {
             data() {
