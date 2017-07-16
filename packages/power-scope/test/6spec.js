@@ -1,5 +1,5 @@
 const Analyzer = require('../analyzer');
-// TODO factory e.g.
+
 const createAnalyzer = require('../createAnalyzer6');
 
 
@@ -16,20 +16,20 @@ const query = require('../createQuery6')();
 
 const mocks =
 {
-    basic: fs.readFileSync(__dirname + '/../mocks/basicMock.js', 'utf8'),
+    //basic: fs.readFileSync(__dirname + '/../mocks/basicMock.js', 'utf8'),
     scopes: fs.readFileSync(__dirname + '/../mocks/scopes.js', 'utf8'),
-    outline: fs.readFileSync(__dirname + '/../mocks/outline.js', 'utf8'),
-    comments: fs.readFileSync(__dirname + '/../mocks/comments.js', 'utf8'),
-    nodes: fs.readFileSync(__dirname + '/../mocks/nodes.js', 'utf8'),
-    jsx: fs.readFileSync(__dirname + '/../mocks/jsx.js', 'utf8'),
-    implicit: fs.readFileSync(__dirname + '/../mocks/implicit.js', 'utf8'),
-    exports: fs.readFileSync(__dirname + '/../mocks/exports.js', 'utf8'),
-    imports: fs.readFileSync(__dirname + '/../mocks/imports.js', 'utf8'),
-    commonjs: fs.readFileSync(__dirname + '/../mocks/commonjs.js', 'utf8'),
+    //outline: fs.readFileSync(__dirname + '/../mocks/outline.js', 'utf8'),
+    //comments: fs.readFileSync(__dirname + '/../mocks/comments.js', 'utf8'),
+    //nodes: fs.readFileSync(__dirname + '/../mocks/nodes.js', 'utf8'),
+    //jsx: fs.readFileSync(__dirname + '/../mocks/jsx.js', 'utf8'),
+    //implicit: fs.readFileSync(__dirname + '/../mocks/implicit.js', 'utf8'),
+    // exports: fs.readFileSync(__dirname + '/../mocks/exports.js', 'utf8'),
+    // imports: fs.readFileSync(__dirname + '/../mocks/imports.js', 'utf8'),
+    // commonjs: fs.readFileSync(__dirname + '/../mocks/commonjs.js', 'utf8'),
 
     objects: fs.readFileSync(__dirname + '/../mocks/6/objects.js', 'utf8'),
     vars: fs.readFileSync(__dirname + '/../mocks/6/variables.js', 'utf8'),
-    arrays: fs.readFileSync(__dirname + '/../mocks/6/arrays.js', 'utf8'),
+    //arrays: fs.readFileSync(__dirname + '/../mocks/6/arrays.js', 'utf8'),
     benchmark: fs.readFileSync(__dirname + '/../x.js', 'utf8'),
     refs: fs.readFileSync(__dirname + '/../mocks/6/refs.js', 'utf8'),
 };
