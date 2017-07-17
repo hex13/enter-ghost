@@ -16,13 +16,28 @@ function createEvent(model, type, args) {
     return {target: model.$localId(), type, args};
 }
 
-function createRecordable(original, name, cb) {
-    return (...args) => {
-        cb(name, args);
-        const res = original(...args);
-        return res;
+class Recorder {
+    constructor() {
+        this._calls = [];
+    }
+    record(event) {
+        this._calls.push(event);
+    }
+    reset() {
+        if (this._calls.length) this._calls = [];
+    }
+    getCalls() {
+        return this._calls;
+    }
+    createRecordable(model, original, name, onCall) {
+        return (...args) => {
+            onCall(createEvent(model, name, args));
+            const res = original(...args);
+            return res;
+        };
     };
-};
+}
+
 
 
 const Transaction = require('./transaction');
@@ -57,6 +72,7 @@ class Model {
         this._models = new Map;
         this._batch = null;
         this._middleware = {};
+        this._recorder = new Recorder;
 
         this.$reset();
         const methods = _getProps(this.__proto__)
@@ -66,12 +82,12 @@ class Model {
                 && n.indexOf('get') != 0
             );
 
-        const record = (name, args) => {
-            this.$record(createEvent(this, name, args));
+        const onCall = (event) => {
+            this.$record(event);
         }
 
         methods.forEach(name => {
-            this[name] = createRecordable(this._createAction(name), name, record);
+            this[name] = this._recorder.createRecordable(this, this._createAction(name), name, onCall);
         });
     }
     _createAction(meth) {
@@ -85,7 +101,7 @@ class Model {
         };
     }
     $record(event) {
-        this._calls.push(event);
+        this._recorder.record(event);
         if (this._root !== this) {
             this._root.$record(event);
         }
@@ -125,7 +141,7 @@ class Model {
     }
     $undo() {
         this._batch = new Map;
-        const calls = this._calls;
+        const calls = this._recorder.getCalls();
         this.$reset();
         // event sourcing (we replay previously stored method calls)
         calls.slice(0, -1).forEach(event => {
@@ -150,7 +166,7 @@ class Model {
         this._lastLocalId = this._localId;
         this.state = this.$initialState(...this._initialArgs);
         this._connectChildren();
-        this._calls = [];
+        this._recorder.reset();
     }
     $connect({ parent, root }) {
         this._parent = parent;
@@ -232,7 +248,7 @@ class Model {
         return correct(methodName, props);
     }
     $events() {
-        return this._calls;
+        return this._recorder.getCalls();
     }
 };
 
