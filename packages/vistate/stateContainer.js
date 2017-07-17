@@ -16,6 +16,15 @@ function createEvent(model, type, args) {
     return {target: model.$localId(), type, args};
 }
 
+function createRecordable(original, name, cb) {
+    return (...args) => {
+        cb(name, args);
+        const res = original(...args);
+        return res;
+    };
+};
+
+
 const Transaction = require('./transaction');
 
 
@@ -57,17 +66,23 @@ class Model {
                 && n.indexOf('get') != 0
             );
 
-        methods.forEach(meth => {
-            const original = this[meth];
-            this[meth] = (...args) => {
-                this.$record(createEvent(this, meth, args));
-                const res = original.apply(this, [this.state].concat(args));
-                if (this._middleware.processResult) this._middleware.processResult.call(this, res);
-                this.$notify(this);
-                this._root.$afterChildAction(this, meth);
-                return res;
-            };
+        const record = (name, args) => {
+            this.$record(createEvent(this, name, args));
+        }
+
+        methods.forEach(name => {
+            this[name] = createRecordable(this._createAction(name), name, record);
         });
+    }
+    _createAction(meth) {
+        const original = this[meth];
+        return (...args) => {
+            const res = original.apply(this, [this.state].concat(args));
+            this._root.$afterChildAction(this, meth);
+            if (this._middleware.processResult) this._middleware.processResult.call(this, res);
+            this.$notify(this);
+            return res;
+        };
     }
     $record(event) {
         this._calls.push(event);
