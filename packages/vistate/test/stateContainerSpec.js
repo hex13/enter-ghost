@@ -6,6 +6,10 @@ const { expect } = require('chai');
 const { Model, createEvent, ROOT_LOCAL_ID, reducerMiddleware, Transaction } = require('..');
 const sc = require('..');
 
+function $undo(model) {
+    return model.$undo();
+}
+
 class Example extends Model {
     $initialState() {
         return {value: 100};
@@ -176,7 +180,7 @@ describe('example', () => {
         console.log("UNDO!");
 
         // this uses event sourcing under the hood:
-        model.$undo();
+        $undo(model);
         assert.equal(model.state.value, 200);
 
     });
@@ -248,7 +252,7 @@ describe('model', () => {
             root.get('child').foo(300);
             expect(root.get('child').get('x')).equal(300);
 
-            root.$undo();
+            $undo(root);
             expect(root.get('child').get('x')).equal(200);
         });
 
@@ -321,7 +325,7 @@ describe('model', () => {
                 assert.strictEqual(model, root.get('child').get('grandChild'));
                 grandChildUpdates++;
             });
-            root.$undo();
+            $undo(root);
 
             assert.deepEqual(root.get('child').get('grandChild').get('y'), 101);
             assert.equal(rootUpdates , 1);
@@ -429,11 +433,11 @@ describe('model', () => {
         model.inc(10);
         model.inc(100);
         model.inc(1000);
-        model.$undo();
+        $undo(model);
         assert.deepEqual(model.state, {value: 210});
 
         // second undo for checking if calls are reset
-        model.$undo();
+        $undo(model);
         assert.deepEqual(model.state, {value: 110});
     });
 
