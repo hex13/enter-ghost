@@ -262,12 +262,33 @@ const reducerMiddleware = {
     }
 }
 
+const vistate = {
+    model(description) {
+        class AdHocModel extends Model {
+            $initialState() {
+                const state = {};
+                for (let k in description.data) {
+                    state[k] = description.data[k]
+                };
+                return state;
+            }
+        }
+        for (let k in description.actions) {
+            AdHocModel.prototype[k] = description.actions[k];
+        }
+
+        const model = new AdHocModel();
+        return model;
+    }
+};
+
 module.exports = {
     Model,
     createEvent,
     Transaction,
     ROOT_LOCAL_ID,
     reducerMiddleware,
+    vistate,
     create(Cls, ...args) {
         const model = new Cls(...args);
         model.assignId(generateId());

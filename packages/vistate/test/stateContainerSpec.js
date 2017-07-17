@@ -1,11 +1,13 @@
 "use strict";
 
+const FRAMEWORK = 'vistate';
 const assert = require('assert');
+
 const { expect } = require('chai');
 
 const { Model, createEvent, ROOT_LOCAL_ID, reducerMiddleware, Transaction } = require('..');
 const sc = require('..');
-
+const api = sc.vistate;
 function $undo(model) {
     return model.$undo();
 }
@@ -813,4 +815,46 @@ describe('model', () => {
         assert.equal(model.$autocorrect('mrf'), 'smurf');
     });
 
+});
+
+
+describe(`${FRAMEWORK} API:`, () => {
+    describe(`${FRAMEWORK}.model(description) creates model`, () => {
+        let model;
+        const initialState = {
+            name: 'John',
+            counter: 0,
+        };
+        beforeEach(() => {
+            model = api.model({
+                data: initialState,
+                actions: {
+                    inc(state) {
+                        state.counter++;
+                    },
+                }
+            });
+        });
+        it('that is instance of Model', () => {
+            expect(model).to.be.instanceof(Model);
+        });
+        it('that has correct initial state', () => {
+            const state = model.get();
+            expect(state).to.deep.equal({
+                name: 'John', counter: 0
+            });
+            expect(state).to.not.equal(initialState);
+        });
+        it('that has declared action which change state correctly', (done) => {
+            model.$subscribe(() => {
+                expect(model.get()).deep.equal({
+                    name: 'John',
+                    counter: 1,
+                })
+                done();
+            });
+            model.inc();
+        });
+
+    });
 });
