@@ -23,6 +23,14 @@ function createRecordable(func, name, model, onCall) {
         return res;
     };
 };
+function createRecorderMiddleware(model) {
+    return {
+        run: createRecordable,
+        args: [model, (event) => {
+            model._recorder.record(event);
+        }]
+    }
+}
 
 class Recorder {
     constructor() {
@@ -86,17 +94,11 @@ class Model {
                 && n.indexOf('get') != 0
             );
 
-        const onCall = (event) => {
-            this._recorder.record(event);
-        }
 
         methods.forEach(name => {
             const middlewares = [
                 this._createAction.bind(this),
-                {
-                    run: createRecordable,
-                    args: [this, onCall]
-                }
+                createRecorderMiddleware(this)
             ];
 
             this[name] = middlewares.reduce((prev, curr) => {
