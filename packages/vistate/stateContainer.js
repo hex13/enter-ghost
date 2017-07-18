@@ -36,6 +36,10 @@ class Recorder {
             return res;
         };
     };
+    undo(cb) {
+        this._calls.pop();
+        this._calls.forEach(cb);
+    }
 }
 
 
@@ -135,11 +139,12 @@ class Model {
 
     }
     $undo() {
-        const calls = this._recorder.getCalls();
-        this.$reset();
-        calls.slice(0, -1).forEach(event => {
-            this.$dispatch(event)
+        const tmp = new this.constructor();
+        this._recorder.undo(event => {
+            tmp.$dispatch(event)
         });
+        this.state = tmp.get();
+        this.$notify(this);
     }
     _connectChildren() {
         for (let prop in this.state) {
