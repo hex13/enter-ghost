@@ -87,7 +87,7 @@ class Model {
             );
 
         const onCall = (event) => {
-            this.$record(event);
+            this._recorder.record(event);
         }
 
         methods.forEach(name => {
@@ -103,12 +103,6 @@ class Model {
             this.$notify(this);
             return res;
         };
-    }
-    $record(event) {
-        this._recorder.record(event);
-        if (this._root !== this) {
-            this._root.$record(event);
-        }
     }
     $afterChildAction(child, actionName) {
 
@@ -159,6 +153,7 @@ class Model {
         //if (parent) this._parent = parent;
         //if (root) this._root = root;
         this._root = root;
+        this._recorder = root._recorder;
         this._localId = root.$register(this);
         this._connectChildren();
     }
@@ -242,7 +237,9 @@ const vistate = {
         return JSON.stringify(model.state);
     },
     events(model) {
-        return model._recorder.getCalls();
+        return model._recorder.getCalls().filter(event => {
+            return model.$root() == model || event.target == model.$localId();
+        });
     },
     autocorrect(model, methodName) {
         const props = Object.keys(model);
