@@ -9,7 +9,7 @@ const { Model, createEvent, ROOT_LOCAL_ID, reducerMiddleware, Transaction } = re
 const sc = require('..');
 const api = sc.vistate;
 function $undo(model) {
-    return model.$undo();
+    return api.undo(model);
 }
 
 class Example extends Model {

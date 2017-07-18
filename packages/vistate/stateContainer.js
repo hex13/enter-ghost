@@ -138,14 +138,6 @@ class Model {
         }
 
     }
-    $undo() {
-        const tmp = new this.constructor();
-        this._recorder.undo(event => {
-            tmp.$dispatch(event)
-        });
-        this.state = tmp.get();
-        this.$notify(this);
-    }
     _connectChildren() {
         for (let prop in this.state) {
             const child = this.state[prop];
@@ -255,6 +247,14 @@ const reducerMiddleware = {
 }
 
 const vistate = {
+    undo(model) {
+        const tmp = new model.constructor();
+        model._recorder.undo(event => {
+            tmp.$dispatch(event)
+        });
+        model.state = tmp.get();
+        model.$notify(model);
+    },
     model(description) {
         class AdHocModel extends Model {
             $initialState() {
