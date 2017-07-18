@@ -481,7 +481,6 @@ describe('model', () => {
             // some calls
             model.$subscribe(() => {});
             model.$compatible(() => {});
-            model.$dbg(() => {});
 
             model.get();
             model.get('whatever');

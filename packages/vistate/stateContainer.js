@@ -182,9 +182,6 @@ class Model {
         this._models.set(localId, model);
         return localId;
     }
-    $dbg() {
-        return JSON.stringify(this.state);
-    }
     $transaction(callback, tempState) {
         const transaction = new Transaction({
             onEnd: resultState => {
@@ -240,6 +237,9 @@ const reducerMiddleware = {
 }
 
 const vistate = {
+    dbg(model) {
+        return JSON.stringify(model.state);
+    },
     events(model) {
         return model._recorder.getCalls();
     },
