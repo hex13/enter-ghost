@@ -11,6 +11,9 @@ const api = sc.vistate;
 function $undo(model) {
     return api.undo(model);
 }
+function $events(model) {
+    return api.events(model);
+}
 
 class Example extends Model {
     $initialState() {
@@ -190,11 +193,11 @@ describe('example', () => {
 
 describe('model', () => {
     describe('events', () => {
-        it('it should record events and expose them via $events', () => {
+        it(`it should record events and expose them via ${FRAMEWORK}.events()`, () => {
             const model = new Example;
             model.inc(10);
             model.foo('a', {a: 4});
-            expect(model.$events()).deep.equal([
+            expect($events(model)).deep.equal([
                 createEvent(model, 'inc', [10]),
                 createEvent(model, 'foo', ['a', {a: 4}]),
             ]);
@@ -208,15 +211,15 @@ describe('model', () => {
             child.foo(1);
             grandChild.bar(3);
 
-            expect(grandChild.$events()).deep.equal([
+            expect($events(grandChild)).deep.equal([
                 createEvent(grandChild, 'bar', [3])
             ]);
 
-            expect(child.$events()).deep.equal([
+            expect($events(child)).deep.equal([
                 createEvent(child, 'foo', [1])
             ]);
 
-            expect(model.$events()).deep.equal([
+            expect($events(model)).deep.equal([
                 createEvent(model, 'someAction', ['a']),
                 createEvent(child, 'foo', [1]),
                 createEvent(grandChild, 'bar', [3]),

@@ -227,9 +227,6 @@ class Model {
     $root() {
         return this._root;
     }
-    $events() {
-        return this._recorder.getCalls();
-    }
 };
 
 const generateId = (last => () => ++last)(0);
@@ -243,6 +240,9 @@ const reducerMiddleware = {
 }
 
 const vistate = {
+    events(model) {
+        return model._recorder.getCalls();
+    },
     autocorrect(model, methodName) {
         const props = Object.keys(model);
         return correct(methodName, props);
