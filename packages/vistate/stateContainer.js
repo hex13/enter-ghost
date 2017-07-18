@@ -23,6 +23,19 @@ function createRecordable(func, name, model, onCall) {
         return res;
     };
 };
+
+function createActionMiddleware(model) {
+    return (original, meth) => {
+        return (...args) => {
+            const res = original.apply(model, [model.state].concat(args));
+            model._root.$afterChildAction(model, meth);
+            if (model._middleware.processResult) model._middleware.processResult.call(model, res);
+            model.$notify(model);
+            return res;
+        };
+    }
+}
+
 function createRecorderMiddleware(model) {
     return {
         run: createRecordable,
@@ -93,15 +106,6 @@ class Model {
         this._recorder.reset();
         // END TODO
 
-    }
-    _createAction(original, meth) {
-        return (...args) => {
-            const res = original.apply(this, [this.state].concat(args));
-            this._root.$afterChildAction(this, meth);
-            if (this._middleware.processResult) this._middleware.processResult.call(this, res);
-            this.$notify(this);
-            return res;
-        };
     }
     $afterChildAction(child, actionName) {
 
@@ -278,7 +282,7 @@ const vistate = {
 
         methods.forEach(name => {
             const middlewares = [
-                model._createAction.bind(model),
+                createActionMiddleware(model),
                 createRecorderMiddleware(model)
             ];
 
