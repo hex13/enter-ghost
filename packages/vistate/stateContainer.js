@@ -16,7 +16,7 @@ function createEvent(model, type, args) {
     return {target: model.$localId(), type, args};
 }
 
-function createRecordable(model, func, name, onCall) {
+function createRecordable(func, name, model, onCall) {
     return (...args) => {
         onCall(createEvent(model, name, args));
         const res = func(...args);
@@ -91,11 +91,20 @@ class Model {
         }
 
         methods.forEach(name => {
-            this[name] = createRecordable(this, this._createAction(name), name, onCall);
+            const middlewares = [
+                this._createAction.bind(this),
+                {
+                    run: createRecordable,
+                    args: [this, onCall]
+                }
+            ];
+
+            this[name] = middlewares.reduce((prev, curr) => {
+                return (curr.run || curr)(prev, name, ...(curr.args || []));
+            }, this[name]);
         });
     }
-    _createAction(meth) {
-        const original = this[meth];
+    _createAction(original, meth) {
         return (...args) => {
             const res = original.apply(this, [this.state].concat(args));
             this._root.$afterChildAction(this, meth);
