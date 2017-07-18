@@ -24,12 +24,27 @@ function createRecordable(func, name, model, onCall) {
     };
 };
 
+// for compatibility with Redux style reducers
+function createReducerMiddleware(model) {
+    return (func, name) => {
+        return (...args) => {
+            const newState = func(...args);
+            model.state = newState;
+        }
+    }
+}
+const reducerMiddleware = {
+    processResult(state) {
+        this.state = state;
+    }
+}
+
+
 function createActionMiddleware(model) {
     return (original, meth) => {
         return (...args) => {
             const res = original.apply(model, [model.state].concat(args));
             model._root.$afterChildAction(model, meth);
-            if (model._middleware.processResult) model._middleware.processResult.call(model, res);
             model.$notify(model);
             return res;
         };
@@ -96,7 +111,6 @@ class Model {
         this._root = this;
         this._localId = ROOT_LOCAL_ID;
         this._models = new Map;
-        this._middleware = {};
         this._recorder = new Recorder;
 
         // TODO refactor further
@@ -116,11 +130,6 @@ class Model {
             this.ee.emit('change', changedModel);
         } else {
             this._root.$notify(changedModel);
-        }
-    }
-    $use(middlewares) {
-        for (let name in middlewares) {
-            this._middleware[name] = middlewares[name];
         }
     }
     $subscribe(f, subject = this) {
@@ -222,12 +231,6 @@ class Model {
 const generateId = (last => () => ++last)(0);
 
 
-// for compatibility with Redux style reducers
-const reducerMiddleware = {
-    processResult(state) {
-        this.state = state;
-    }
-}
 
 const vistate = {
     dbg(model) {
@@ -253,7 +256,7 @@ const vistate = {
         model.state = tmp.get();
         model.$notify(model);
     },
-    model(description) {
+    model(description, params = {}) {
         let model;
         if (description instanceof Model) {
             model = description;
@@ -273,23 +276,31 @@ const vistate = {
             model = new AdHocModel();
         }
 
-        const methods = _getProps(model.__proto__)
+        let methods = _getProps(model.__proto__)
             .filter(n => n != 'constructor'
                 && n.charAt(0) != '$'
                 && n.charAt(0) != '_'
                 && n.indexOf('get') != 0
             );
 
+
         methods.forEach(name => {
             const middlewares = [
                 createActionMiddleware(model),
                 createRecorderMiddleware(model)
             ];
+            if (params.use) {
+                middlewares.push.apply(middlewares, params.use.map(middleware => {
+                    if (middleware == 'reducers')
+                        return createReducerMiddleware(model);
+                }));
+            }
 
             model[name] = middlewares.reduce((prev, curr) => {
                 return (curr.run || curr)(prev, name, ...(curr.args || []));
             }, model[name]);
         });
+
 
         model.state = model.$initialState(...model._initialArgs);
 
@@ -300,6 +311,7 @@ const vistate = {
             }
         }
         model._connectChildren();
+
 
         return model;
     }
