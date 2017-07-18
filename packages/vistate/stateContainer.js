@@ -56,7 +56,7 @@ class Recorder {
 const Transaction = require('./transaction');
 
 
-const ROOT_LOCAL_ID = 1234;
+const ROOT_LOCAL_ID = 1;
 // `constructor` is ES6 class constructor (inb4: thank you captain obvious XD).
 // methods beginning with `$`` are helpers
 // methods beginning with `get` are getters
@@ -92,25 +92,6 @@ class Model {
 
         this._recorder.reset();
         // END TODO
-
-        const methods = _getProps(this.__proto__)
-            .filter(n => n != 'constructor'
-                && n.charAt(0) != '$'
-                && n.charAt(0) != '_'
-                && n.indexOf('get') != 0
-            );
-
-
-        methods.forEach(name => {
-            const middlewares = [
-                this._createAction.bind(this),
-                createRecorderMiddleware(this)
-            ];
-
-            this[name] = middlewares.reduce((prev, curr) => {
-                return (curr.run || curr)(prev, name, ...(curr.args || []));
-            }, this[name]);
-        });
 
     }
     _createAction(original, meth) {
@@ -155,7 +136,6 @@ class Model {
         for (let prop in this.state) {
             let child = this.state[prop];
             if (child instanceof Model) {
-                child = this.state[prop] = vistate.model(child);
                 child.$connect({parent: this, root: this._root});
             }
         }
@@ -289,7 +269,32 @@ const vistate = {
             model = new AdHocModel();
         }
 
+        const methods = _getProps(model.__proto__)
+            .filter(n => n != 'constructor'
+                && n.charAt(0) != '$'
+                && n.charAt(0) != '_'
+                && n.indexOf('get') != 0
+            );
+
+        methods.forEach(name => {
+            const middlewares = [
+                model._createAction.bind(model),
+                createRecorderMiddleware(model)
+            ];
+
+            model[name] = middlewares.reduce((prev, curr) => {
+                return (curr.run || curr)(prev, name, ...(curr.args || []));
+            }, model[name]);
+        });
+
         model.state = model.$initialState(...model._initialArgs);
+
+        // create models from properties
+        for (let p in model.state) {
+            if (model.state[p] instanceof Model) {
+                model.state[p] = vistate.model(model.state[p])
+            }
+        }
         model._connectChildren();
 
         return model;
