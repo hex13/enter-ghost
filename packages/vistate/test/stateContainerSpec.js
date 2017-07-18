@@ -804,17 +804,17 @@ describe('model', () => {
     // TODO remove autocorrection logic out of this package
     it('should return autocorrect suggestion', () => {
         const model = new Example6;
-        assert.equal(model.$autocorrect('gumbuear'), 'gummibear');
-        assert.equal(model.$autocorrect('cynDerela'), 'cinderella');
-        assert.equal(model.$autocorrect('Sylsveer'), 'sylvester');
-        assert.equal(model.$autocorrect('yobuear'), 'yogibear');
-        assert.equal(model.$autocorrect('smrf'), 'smurf');
+        assert.equal(api.autocorrect(model, 'gumbuear'), 'gummibear');
+        assert.equal(api.autocorrect(model, 'cynDerela'), 'cinderella');
+        assert.equal(api.autocorrect(model, 'Sylsveer'), 'sylvester');
+        assert.equal(api.autocorrect(model, 'yobuear'), 'yogibear');
+        assert.equal(api.autocorrect(model, 'smrf'), 'smurf');
 
-        assert.equal(model.$autocorrect('mmbear'), 'gummibear');
-        assert.equal(model.$autocorrect('ynDerelax'), 'cinderella');
-        assert.equal(model.$autocorrect('ylsveers'), 'sylvester');
-        assert.equal(model.$autocorrect('obuear'), 'yogibear');
-        assert.equal(model.$autocorrect('mrf'), 'smurf');
+        assert.equal(api.autocorrect(model, 'mmbear'), 'gummibear');
+        assert.equal(api.autocorrect(model, 'ynDerelax'), 'cinderella');
+        assert.equal(api.autocorrect(model, 'ylsveers'), 'sylvester');
+        assert.equal(api.autocorrect(model, 'obuear'), 'yogibear');
+        assert.equal(api.autocorrect(model, 'mrf'), 'smurf');
     });
 
 });

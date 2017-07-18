@@ -227,10 +227,6 @@ class Model {
     $root() {
         return this._root;
     }
-    $autocorrect(methodName) {
-        const props = Object.keys(this);
-        return correct(methodName, props);
-    }
     $events() {
         return this._recorder.getCalls();
     }
@@ -247,6 +243,10 @@ const reducerMiddleware = {
 }
 
 const vistate = {
+    autocorrect(model, methodName) {
+        const props = Object.keys(model);
+        return correct(methodName, props);
+    },
     undo(model) {
         const tmp = new model.constructor();
         model._recorder.undo(event => {
