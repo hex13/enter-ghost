@@ -11,6 +11,9 @@ const api = sc.vistate;
 function $undo(model) {
     return api.undo(model);
 }
+function $reset(model) {
+    return api.reset(model);
+}
 function $events(model) {
     return api.events(model);
 }
@@ -431,7 +434,18 @@ describe('model', () => {
         model.inc(10);
         model.inc(100);
         model.inc(1000);
-        model.$reset();
+        $reset(model);
+        assert.deepEqual(model.state, {value: 100});
+    });
+
+    it('should reset state, and also recorder actions', () => {
+        const model = new Example;
+        model.inc(10);
+        model.inc(100);
+        model.inc(1000);
+        $reset(model);
+        model.inc(1000);
+        $undo(model);
         assert.deepEqual(model.state, {value: 100});
     });
 

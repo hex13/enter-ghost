@@ -252,6 +252,9 @@ const vistate = {
             return model.$root() == model || event.target == model.$localId();
         });
     },
+    reset(model) {
+        model.$reset();
+    },
     autocorrect(model, methodName) {
         const props = Object.keys(model);
         return correct(methodName, props);
