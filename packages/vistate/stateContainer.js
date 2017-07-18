@@ -86,7 +86,13 @@ class Model {
         this._middleware = {};
         this._recorder = new Recorder;
 
-        this.$reset();
+        // TODO refactor further
+        // inlined content of $reset method
+        this._lastLocalId = this._localId;
+        this.state = this.$initialState(...this._initialArgs);
+        this._recorder.reset();
+        // END TODO
+
         const methods = _getProps(this.__proto__)
             .filter(n => n != 'constructor'
                 && n.charAt(0) != '$'
@@ -151,12 +157,6 @@ class Model {
                 child.$connect({parent: this, root: this._root});
             }
         }
-    }
-    $reset() {
-        this._lastLocalId = this._localId;
-        this.state = this.$initialState(...this._initialArgs);
-        this._connectChildren();
-        this._recorder.reset();
     }
     $connect({ parent, root }) {
         this._parent = parent;
@@ -260,14 +260,18 @@ const vistate = {
         return correct(methodName, props);
     },
     undo(model) {
-        const tmp = new model.constructor();
+        const tmp = vistate.model(new model.constructor());
         model._recorder.undo(event => {
-            tmp.$dispatch(event)
+            tmp.$dispatch(event);
         });
         model.state = tmp.get();
         model.$notify(model);
     },
     model(description) {
+        if (description instanceof Model) {
+            description._connectChildren();
+            return description;
+        }
         class AdHocModel extends Model {
             $initialState() {
                 const state = {};
@@ -282,6 +286,7 @@ const vistate = {
         }
 
         const model = new AdHocModel();
+
         return model;
     }
 };
