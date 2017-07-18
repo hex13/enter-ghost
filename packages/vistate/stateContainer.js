@@ -16,6 +16,14 @@ function createEvent(model, type, args) {
     return {target: model.$localId(), type, args};
 }
 
+function createRecordable(model, func, name, onCall) {
+    return (...args) => {
+        onCall(createEvent(model, name, args));
+        const res = func(...args);
+        return res;
+    };
+};
+
 class Recorder {
     constructor() {
         this._calls = [];
@@ -29,13 +37,6 @@ class Recorder {
     getCalls() {
         return this._calls;
     }
-    createRecordable(model, original, name, onCall) {
-        return (...args) => {
-            onCall(createEvent(model, name, args));
-            const res = original(...args);
-            return res;
-        };
-    };
     undo(cb) {
         this._calls.pop();
         this._calls.forEach(cb);
@@ -90,7 +91,7 @@ class Model {
         }
 
         methods.forEach(name => {
-            this[name] = this._recorder.createRecordable(this, this._createAction(name), name, onCall);
+            this[name] = createRecordable(this, this._createAction(name), name, onCall);
         });
     }
     _createAction(meth) {
