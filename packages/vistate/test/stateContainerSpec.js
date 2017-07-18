@@ -177,7 +177,7 @@ describe('example', () => {
             }
         }
 
-        const model = new Example();
+        const model = $model(new Example());
         model.$subscribe(() => {
             console.log("update your view here");
             console.log("current state:", model.state);
@@ -199,7 +199,7 @@ describe('example', () => {
 describe('model', () => {
     describe('events', () => {
         it(`it should record events and expose them via ${FRAMEWORK}.events()`, () => {
-            const model = new Example;
+            const model = $model(new Example);
             model.inc(10);
             model.foo('a', {a: 4});
             expect($events(model)).deep.equal([
@@ -348,12 +348,12 @@ describe('model', () => {
     });
 
     it('creating Model (without inheritance) should work', () => {
-        const model = new Model;
+        const model = $model(new Model);
         assert.deepEqual(model.get(), {});
     });
 
     it('should call wrapped method and return correct result', () => {
-        const model = new Example;
+        const model = $model(new Example);
 
         assert.equal(model.foo(10), 11);
         assert.equal(model.foo(0), 1);
@@ -361,7 +361,7 @@ describe('model', () => {
     });
 
     it('should trigger change handler after each action', () => {
-        const model = new Example;
+        const model = $model(new Example);
         let updateCount = 0;
 
         model.$subscribe(() => {
@@ -376,7 +376,7 @@ describe('model', () => {
     });
 
     it('should have return correct initial state', () => {
-        const model = new Example2;
+        const model = $model(new Example2);
         assert.deepEqual(model.state, {a: 10, b: 20, c: 'kotek'});
 
         assert.deepEqual(model.get(), {a: 10, b: 20, c: 'kotek'});
@@ -388,7 +388,7 @@ describe('model', () => {
     });
 
     it('should have return correct initial state (when passing args into constructor)', () => {
-        const model = new Example4(10, 20, 'kotek');
+        const model = $model(new Example4(10, 20, 'kotek'));
         assert.deepEqual(model.state, {a: 10, b: 20, c: 'kotek'});
 
         assert.deepEqual(model.get(), {a: 10, b: 20, c: 'kotek'});
@@ -401,7 +401,7 @@ describe('model', () => {
 
 
     it('should mutate state', () => {
-        const model = new Example;
+        const model = $model(new Example);
         model.inc(10);
         model.inc(100);
         model.inc(1000);
@@ -409,7 +409,7 @@ describe('model', () => {
     });
 
     it('should use processResult middleware', () => {
-        const model = new Example;
+        const model = $model(new Example);
         let c = 0;
         model.$use({
             processResult: () => {c++}
@@ -422,7 +422,7 @@ describe('model', () => {
     });
 
     it('should mutate state (using reducerMiddleware)', () => {
-        const model = new ReducerModel;
+        const model = $model(new ReducerModel);
         let c = 0;
         model.$use(reducerMiddleware);
         model.inc(10);
@@ -452,7 +452,7 @@ describe('model', () => {
     });
 
     it('should undo state', () => {
-        const model = new Example;
+        const model = $model(new Example);
         model.inc(10);
         model.inc(100);
         model.inc(1000);
@@ -465,7 +465,7 @@ describe('model', () => {
     });
 
     it('should dispatch via `dispatch` method', () => {
-        const model = new Example;
+        const model = $model(new Example);
 
         model.$dispatch({type: 'inc', args:[1]});
 
@@ -473,7 +473,7 @@ describe('model', () => {
     });
 
     it('should return compatibility interface and it should work', () => {
-        const model = new Example;
+        const model = $model(new Example);
 
         const store = model.$compatible();
 
@@ -487,9 +487,9 @@ describe('model', () => {
 
     it('should not trigger change handler,when $subscribe(), $compatible(), $dbg() or get.*() are called', () => {
         [
-            new Example, // class with #get inherited from model
-            new Example3, // class which overrides #get
-            new Example8, // class with private method
+            $model(new Example), // class with #get inherited from model
+            $model(new Example3), // class which overrides #get
+            $model(new Example8), // class with private method
         ].forEach(model => {
             let c = 0;
             model.$subscribe(() => c++);
@@ -510,7 +510,7 @@ describe('model', () => {
     });
 
     it('should handle transactions', () => {
-        const model = new TransactionExampleModel;
+        const model = $model(new TransactionExampleModel);
 
         return model.$transaction((transaction, aModel) => {
             return pseudoAjax().then(text => {
@@ -534,7 +534,7 @@ describe('model', () => {
     });
 
     it('it should be possible to set state properties via set()', () => {
-        [new Model, new SubclassedModel].forEach(model => {
+        [$model(new Model), $model(new SubclassedModel)].forEach(model => {
             model.set('a', 10);
             model.set('b', 20);
             model.set('c', 'kotek');
@@ -557,7 +557,7 @@ describe('model', () => {
     describe('Transaction', () => {
         it('should allow for define tasks and commiting them', () => {
             const transaction = new Transaction();
-            const model = new TransactionExampleModel;
+            const model = $model(new TransactionExampleModel);
             transaction.task(() => {
                 model.setText('koteł');
             });
@@ -809,7 +809,7 @@ describe('model', () => {
 
 
     it('should assign ending state in transactions', () => {
-        const model = new TransactionExampleModel;
+        const model = $model(new TransactionExampleModel);
 
         model.$transaction((transaction, aModel) => {
             transaction.end({status: 'error'});
@@ -821,7 +821,7 @@ describe('model', () => {
 
     // TODO remove autocorrection logic out of this package
     it('should return autocorrect suggestion', () => {
-        const model = new Example6;
+        const model = $model(new Example6);
         assert.equal(api.autocorrect(model, 'gumbuear'), 'gummibear');
         assert.equal(api.autocorrect(model, 'cynDerela'), 'cinderella');
         assert.equal(api.autocorrect(model, 'Sylsveer'), 'sylvester');

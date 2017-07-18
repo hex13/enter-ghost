@@ -89,7 +89,7 @@ class Model {
         // TODO refactor further
         // inlined content of $reset method
         this._lastLocalId = this._localId;
-        this.state = this.$initialState(...this._initialArgs);
+
         this._recorder.reset();
         // END TODO
 
@@ -111,6 +111,7 @@ class Model {
                 return (curr.run || curr)(prev, name, ...(curr.args || []));
             }, this[name]);
         });
+
     }
     _createAction(original, meth) {
         return (...args) => {
@@ -152,8 +153,9 @@ class Model {
     }
     _connectChildren() {
         for (let prop in this.state) {
-            const child = this.state[prop];
+            let child = this.state[prop];
             if (child instanceof Model) {
+                child = this.state[prop] = vistate.model(child);
                 child.$connect({parent: this, root: this._root});
             }
         }
@@ -268,24 +270,27 @@ const vistate = {
         model.$notify(model);
     },
     model(description) {
+        let model;
         if (description instanceof Model) {
-            description._connectChildren();
-            return description;
-        }
-        class AdHocModel extends Model {
-            $initialState() {
-                const state = {};
-                for (let k in description.data) {
-                    state[k] = description.data[k]
-                };
-                return state;
+            model = description;
+        } else {
+            class AdHocModel extends Model {
+                $initialState() {
+                    const state = {};
+                    for (let k in description.data) {
+                        state[k] = description.data[k]
+                    };
+                    return state;
+                }
             }
-        }
-        for (let k in description.actions) {
-            AdHocModel.prototype[k] = description.actions[k];
+            for (let k in description.actions) {
+                AdHocModel.prototype[k] = description.actions[k];
+            }
+            model = new AdHocModel();
         }
 
-        const model = new AdHocModel();
+        model.state = model.$initialState(...model._initialArgs);
+        model._connectChildren();
 
         return model;
     }
@@ -299,7 +304,7 @@ module.exports = {
     reducerMiddleware,
     vistate,
     create(Cls, ...args) {
-        const model = new Cls(...args);
+        const model = vistate.model(new Cls(...args));
         model.assignId(generateId());
         return model;
     }
