@@ -304,7 +304,7 @@ describe('model', () => {
             assert.equal(childUpdates, 0);
             assert.equal(grandChildUpdates, 1);
         });
-        it('undo should generate one update', () => {
+        xit('undo should generate one update', () => {
             const root = new Hierarchy;
             let rootUpdates = 0;
             let childUpdates = 0;
