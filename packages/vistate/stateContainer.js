@@ -16,49 +16,13 @@ function createEvent(model, type, args) {
     return {target: model.$localId(), type, args};
 }
 
-function createRecordable(func, name, model, onCall) {
-    return (...args) => {
-        onCall(createEvent(model, name, args));
-        const res = func(...args);
-        return res;
-    };
-};
 
-// for compatibility with Redux style reducers
-function createReducerMiddleware(model) {
-    return (func, name) => {
-        return (...args) => {
-            const newState = func(...args);
-            model.state = newState;
-        }
-    }
-}
 const reducerMiddleware = {
     processResult(state) {
         this.state = state;
     }
 }
 
-
-function createActionMiddleware(model) {
-    return (original, meth) => {
-        return (...args) => {
-            const res = original.apply(model, [model.state].concat(args));
-            model._root.$afterChildAction(model, meth);
-            model.$notify(model);
-            return res;
-        };
-    }
-}
-
-function createRecorderMiddleware(model) {
-    return {
-        run: createRecordable,
-        args: [model, (event) => {
-            model._recorder.record(event);
-        }]
-    }
-}
 
 class Recorder {
     constructor() {
@@ -285,19 +249,38 @@ const vistate = {
 
 
         methods.forEach(name => {
+            const original = model[name];
             const middlewares = [
-                createActionMiddleware(model),
-                createRecorderMiddleware(model)
+                (func, name) => {
+                    return (...args) => {
+                        const res = original.apply(model, [model.state].concat(args));
+                        model._root.$afterChildAction(model, name);
+                        model.$notify(model);
+                        return res;
+                    };
+                },
+                (func, name) => {
+                   return (...args) => {
+                       const res = func.apply(model, args);
+                       model._recorder.record(createEvent(model, name, args));
+                       return res;
+                   };
+                },
             ];
             if (params.use) {
                 middlewares.push.apply(middlewares, params.use.map(middleware => {
                     if (middleware == 'reducers')
-                        return createReducerMiddleware(model);
+                        return (func, name) => {
+                            return (...args) => {
+                                const newState = func.apply(model, args);
+                                model.state = newState;
+                            }
+                        };
                 }));
             }
 
             model[name] = middlewares.reduce((prev, curr) => {
-                return (curr.run || curr)(prev, name, ...(curr.args || []));
+                return curr(prev, name);
             }, model[name]);
         });
 
