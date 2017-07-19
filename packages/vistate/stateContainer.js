@@ -197,6 +197,22 @@ const generateId = (last => () => ++last)(0);
 
 
 const vistate = {
+    middlewares: {
+        runHandlerAndNotify(actionData) {
+            const { original, value, model, name, args } = actionData;
+            const res = original.apply(model, [model.state].concat(args));
+            model._root.$afterChildAction(model, name);
+            model.$notify(model);
+            actionData.value = res;
+        },
+        record(actionData) {
+           const { value, model, name, args } = actionData;
+           model._recorder.record(createEvent(model, name, args));
+       },
+       reducers(actionData) {
+           actionData.model.state = actionData.value;
+       }
+    },
     dbg(model) {
         return JSON.stringify(model.state);
     },
@@ -251,24 +267,14 @@ const vistate = {
         methods.forEach(name => {
             const original = model[name];
             const middlewares = [
-                (actionData) => {
-                    const { original, value, model, name, args } = actionData;
-                    const res = original.apply(model, [model.state].concat(args));
-                    model._root.$afterChildAction(model, name);
-                    model.$notify(model);
-                    actionData.value = res;
-                },
-                (actionData) => {
-                   const { value, model, name, args } = actionData;
-                   model._recorder.record(createEvent(model, name, args));
-               }
+                vistate.middlewares.runHandlerAndNotify,
+                vistate.middlewares.record,
             ];
             if (params.use) {
                 middlewares.push.apply(middlewares, params.use.map(middleware => {
-                    if (middleware == 'reducers')
-                        return (actionData) => {
-                            actionData.model.state = actionData.value;
-                        }
+                    if (vistate.middlewares.hasOwnProperty(middleware))
+                        return vistate.middlewares[middleware];
+                    else throw new Error('no middleware: \'' + middleware + '\'')
                 }));
             }
 
