@@ -251,37 +251,33 @@ const vistate = {
         methods.forEach(name => {
             const original = model[name];
             const middlewares = [
-                (func, name) => {
-                    return (...args) => {
-                        const res = original.apply(model, [model.state].concat(args));
-                        model._root.$afterChildAction(model, name);
-                        model.$notify(model);
-                        return res;
-                    };
+                (input, name, ...args) => {
+                    const res = original.apply(model, [model.state].concat(args));
+                    model._root.$afterChildAction(model, name);
+                    model.$notify(model);
+                    return res;
                 },
-                (func, name) => {
-                   return (...args) => {
-                       const res = func.apply(model, args);
-                       model._recorder.record(createEvent(model, name, args));
-                       return res;
-                   };
-                },
+                (input, name, ...args) => {
+                   model._recorder.record(createEvent(model, name, args));
+                   return input;
+               }
             ];
             if (params.use) {
                 middlewares.push.apply(middlewares, params.use.map(middleware => {
                     if (middleware == 'reducers')
-                        return (func, name) => {
-                            return (...args) => {
-                                const newState = func.apply(model, args);
-                                model.state = newState;
-                            }
-                        };
+                        return (input, name, ...args) => {
+                            model.state = input;
+                        }
                 }));
             }
 
-            model[name] = middlewares.reduce((prev, curr) => {
-                return curr(prev, name);
-            }, model[name]);
+            model[name] = (...args) => {
+                let result = original;
+                middlewares.forEach(curr => {
+                    result = curr(result, name, ...args);
+                });
+                return result;
+            }
         });
 
 
