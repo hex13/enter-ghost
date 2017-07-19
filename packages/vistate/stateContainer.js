@@ -251,32 +251,33 @@ const vistate = {
         methods.forEach(name => {
             const original = model[name];
             const middlewares = [
-                (input, name, ...args) => {
+                (actionData) => {
+                    const { original, value, model, name, args } = actionData;
                     const res = original.apply(model, [model.state].concat(args));
                     model._root.$afterChildAction(model, name);
                     model.$notify(model);
-                    return res;
+                    actionData.value = res;
                 },
-                (input, name, ...args) => {
+                (actionData) => {
+                   const { value, model, name, args } = actionData;
                    model._recorder.record(createEvent(model, name, args));
-                   return input;
                }
             ];
             if (params.use) {
                 middlewares.push.apply(middlewares, params.use.map(middleware => {
                     if (middleware == 'reducers')
-                        return (input, name, ...args) => {
-                            model.state = input;
+                        return (actionData) => {
+                            actionData.model.state = actionData.value;
                         }
                 }));
             }
 
             model[name] = (...args) => {
-                let result = original;
+                const actionData = { original, value: undefined, model, name, args };
                 middlewares.forEach(curr => {
-                    result = curr(result, name, ...args);
+                    curr(actionData);
                 });
-                return result;
+                return actionData.value;
             }
         });
 
