@@ -240,6 +240,7 @@ const vistate = {
         let model;
         if (description instanceof Model) {
             model = description;
+            if (model._INITIALIZED) return model;
         } else {
             class AdHocModel extends Model {
                 $initialState() {
@@ -297,9 +298,12 @@ const vistate = {
             }
         }
         model._connectChildren();
-
-
+        model._INITIALIZED = true;
+        model._metadata = {type: description.type};
         return model;
+    },
+    metadata(model) {
+        return model._metadata;
     }
 };
 

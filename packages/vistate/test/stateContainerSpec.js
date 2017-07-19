@@ -20,6 +20,10 @@ function $events(model) {
 function $model(...args) {
     return api.model(...args);
 }
+function $typeName(model) {
+    const md = api.metadata(model);
+    return md.type;
+}
 class Example extends Model {
     $initialState() {
         return {value: 100};
@@ -94,34 +98,39 @@ class Example6 extends Model {
     }
 }
 
-class Example7 extends Model {
+class Hierarchy extends Model {
     someAction() {
 
     }
     $initialState() {
-        class Child extends Model {
-            $initialState() {
-                class GrandChild extends Model {
-                    $initialState() {
-                        return {y: 100};
+        const Child = {
+            type: 'Child',
+            data: {
+                x: 10,
+                grandChild:  api.model({
+                    type: 'GrandChild',
+                    data: {
+                        y: 100
+                    },
+                    actions: {
+                        bar(state, y) {
+                            state.y = y;
+                        },
                     }
-                    bar(state, y) {
-                        state.y = y;
-                    }
-                }
-                return {x: 10, grandChild: new GrandChild};
-            }
-            foo(state, x) {
-                state.x = x;
+                })
+            },
+            actions: {
+                foo(state, x) {
+                    state.x = x;
+                },
             }
         }
         return {
-            child: new Child
+            child: api.model(Child)
         };
     }
 }
 
-const Hierarchy = Example7;
 
 class Example8 extends Model {
     _privateMethod() {
@@ -245,7 +254,7 @@ describe('model', () => {
             const root = $model(new Hierarchy);
             let actions = [];
             root.$afterChildAction = function (model, name) {
-                actions.push([model.constructor.name, name])
+                actions.push([$typeName(model), name])
             }
             root.get('child').foo();
             root.get('child').get('grandChild').bar();
