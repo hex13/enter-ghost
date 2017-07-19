@@ -5,7 +5,7 @@
   "main": "stateContainer.js",
   "scripts": {
     "test": "mocha",
-    "coverage": "nyc --reporter=lcov npm test" 
+    "coverage": "nyc --reporter=lcov npm test"
   },
   "repository": "https://github.com/hex13/enter-ghost/tree/master/packages/vistate",
   "author": "= <=>",
@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "chai": "^4.0.2",
+    "mocha": "^3.4.2",
     "nyc": "^11.0.3"
   }
 }
