@@ -126,13 +126,6 @@ class Model {
         this._localId = root.$register(this);
         this._connectChildren();
     }
-    $dispatch({target, type, args}) {
-        let model = this;
-        if (target && target != ROOT_LOCAL_ID ) {
-            model = this._models.get(target);
-        }
-        model[type](...args);
-    }
     $localId() {
         return this._localId;
     }
@@ -206,10 +199,16 @@ const vistate = {
         const props = Object.keys(model);
         return correct(methodName, props);
     },
+    dispatch(model, {target, type, args}) {
+        if (target && target != ROOT_LOCAL_ID ) {
+            model = model._models.get(target);
+        }
+        model[type](...args);
+    },
     undo(model) {
         const tmp = vistate.model(new model.constructor());
         model._recorder.undo(event => {
-            tmp.$dispatch(event);
+            this.dispatch(tmp, event);
         });
         model.state = tmp.get();
         model.$notify(model);

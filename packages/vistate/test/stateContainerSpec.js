@@ -479,7 +479,7 @@ describe('model', () => {
     it('should dispatch via `dispatch` method', () => {
         const model = $model(new Example);
 
-        model.$dispatch({type: 'inc', args:[1]});
+        api.dispatch(model, {type: 'inc', args:[1]});
 
         assert.deepEqual(model.state, {value: 101});
     });
