@@ -160,7 +160,7 @@ function pseudoAjax() {
 let _require = require;
 
 describe('factory', () => {
-    it('should create models and assign unique ids (for 1000 objects)', () => {
+    xit('should create models and assign unique ids (for 1000 objects)', () => {
         const ids = new Set;
         for (let i = 0; i < 1000; i++) {
             const model = sc.create(Example4, 10, 20, 'kotek');
@@ -293,9 +293,9 @@ describe('model', () => {
         });
         it('should create children and grand children connected to hierarchy. $root should return root model', () => {
             const root = $model(new Hierarchy);
-            assert.strictEqual(root.$root(), root);
-            assert.strictEqual(root.get('child').$root(), root);
-            assert.strictEqual(root.get('child').get('grandChild').$root(), root);
+            assert.strictEqual(api.root(root), root);
+            assert.strictEqual(api.root(root.get('child')), root);
+            assert.strictEqual(api.root(root.get('child').get('grandChild')), root);
         });
         it('should create grand children and grand children should notify root about updates', () => {
             const root = $model(new Hierarchy);

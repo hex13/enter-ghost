@@ -120,18 +120,6 @@ class Model {
     $initialState() {
         return {};
     }
-    assignId(id) {
-        this.$$id = id;
-    }
-    $id() {
-        return this.$$id;
-    }
-    $identity() {
-        return this;
-    }
-    $root() {
-        return this._root;
-    }
 };
 
 const generateId = (last => () => ++last)(0);
@@ -146,7 +134,7 @@ const vistate = {
     },
     events(model) {
         return this.component(this.root(model), 'events').filter(event => {
-            return model.$root() == model || event.target == model.$localId();
+            return this.root(model) == model || event.target == model.$localId();
         });
     },
     component(model, id, value) {
@@ -265,9 +253,4 @@ module.exports = {
     Transaction,
     ROOT_LOCAL_ID,
     vistate,
-    create(Cls, ...args) {
-        const model = vistate.model(new Cls(...args));
-        model.assignId(generateId());
-        return model;
-    }
 };
