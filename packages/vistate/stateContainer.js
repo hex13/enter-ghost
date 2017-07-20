@@ -5,6 +5,8 @@ const EventEmitter = require('events');
 // for autocorrection
 const leven = require('leven');
 
+const middleware = require('./middleware');
+
 function correct(phrase, texts) {
     phrase = phrase.toLowerCase();
     return texts
@@ -12,9 +14,6 @@ function correct(phrase, texts) {
         .sort((a,b)=>{return a[1]-b[1]})[0][0];
 }
 
-function createEvent(model, type, args) {
-    return {target: model.$localId(), type, args};
-}
 
 
 const reducerMiddleware = {
@@ -197,22 +196,7 @@ const generateId = (last => () => ++last)(0);
 
 
 const vistate = {
-    middlewares: {
-        runHandlerAndNotify(actionData) {
-            const { original, value, model, name, args } = actionData;
-            const res = original.apply(model, [model.state].concat(args));
-            model._root.$afterChildAction(model, name);
-            model.$notify(model);
-            actionData.value = res;
-        },
-        record(actionData) {
-           const { value, model, name, args } = actionData;
-           model._recorder.record(createEvent(model, name, args));
-       },
-       reducers(actionData) {
-           actionData.model.state = actionData.value;
-       }
-    },
+    middleware,
     dbg(model) {
         return JSON.stringify(model.state);
     },
@@ -268,13 +252,13 @@ const vistate = {
         methods.forEach(name => {
             const original = model[name];
             const middlewares = [
-                vistate.middlewares.runHandlerAndNotify,
-                vistate.middlewares.record,
+                vistate.middleware.runHandlerAndNotify,
+                vistate.middleware.record,
             ];
             if (params.use) {
                 middlewares.push.apply(middlewares, params.use.map(middleware => {
-                    if (vistate.middlewares.hasOwnProperty(middleware))
-                        return vistate.middlewares[middleware];
+                    if (vistate.middleware.hasOwnProperty(middleware))
+                        return vistate.middleware[middleware];
                     else throw new Error('no middleware: \'' + middleware + '\'')
                 }));
             }
@@ -309,7 +293,6 @@ const vistate = {
 
 module.exports = {
     Model,
-    createEvent,
     Transaction,
     ROOT_LOCAL_ID,
     reducerMiddleware,

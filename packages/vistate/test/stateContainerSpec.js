@@ -5,7 +5,9 @@ const assert = require('assert');
 
 const { expect } = require('chai');
 
-const { Model, createEvent, ROOT_LOCAL_ID, reducerMiddleware, Transaction } = require('..');
+const { Model, ROOT_LOCAL_ID, reducerMiddleware, Transaction } = require('..');
+const createEvent = require('../createEvent');
+
 const sc = require('..');
 const api = sc.vistate;
 function $undo(model) {
