@@ -24,25 +24,6 @@ function _connectChildren(root, model, data) {
         }
     }
 }
-class Recorder {
-    constructor() {
-        this._calls = [];
-    }
-    record(event) {
-        this._calls.push(event);
-    }
-    reset() {
-        if (this._calls.length) this._calls = [];
-    }
-    getCalls() {
-        return this._calls;
-    }
-    undo(cb) {
-        this._calls.pop();
-        this._calls.forEach(cb);
-    }
-}
-
 
 
 
@@ -158,7 +139,8 @@ const generateId = (last => () => ++last)(0);
 
 
 const vistate = {
-    middleware,
+    systems: middleware,
+    //systemInstances: Object.create(null),
     dbg(model) {
         return JSON.stringify(model.state);
     },
@@ -167,12 +149,15 @@ const vistate = {
             return model.$root() == model || event.target == model.$localId();
         });
     },
-    component(model, name, value) {
-        const key = '_' + name;
+    component(model, id, value) {
+        const componentsById = model._componentsById;
         if (value !== undefined) {
-            model[key] = value;
+            componentsById[id] = value;
         }
-        return model[key];
+        return componentsById[id];
+    },
+    system(name) {
+        if (this.systems.hasOwnProperty(name)) return this.systems[name]();
     },
     root(model) {
         return model._root;
@@ -190,13 +175,13 @@ const vistate = {
         }
         model[type](...args);
     },
-    dispatchToMiddleware(model, action) {
-        model._components.forEach(c => {
-            c.middleware(action, c.data, vistate);
+    dispatchToSystems(model, action) {
+        model._componentRefs.forEach(c => {
+            c.system.dispatch(action, c.data, vistate);
         });
     },
     undo(model) {
-        this.dispatchToMiddleware(model, {model, name: '$undo'});
+        this.dispatchToSystems(model, {model, name: '$undo'});
     },
     model(description, params = {}) {
         let model;
@@ -219,7 +204,9 @@ const vistate = {
             model = new AdHocModel();
         }
 
-        this.component(model, 'recorder', new Recorder);
+        model._componentsById = Object.create(null);
+
+
 
         let methods = _getProps(model.__proto__)
             .filter(n => n != 'constructor'
@@ -228,28 +215,30 @@ const vistate = {
                 && n.indexOf('get') != 0
             );
 
-        const components = [
-            {middleware: vistate.middleware.runHandlerAndNotify},
-            {middleware: vistate.middleware.record},
+        const componentRefs = [
+            {system: this.system('runHandlerAndNotify')},
+            {system: this.system('record')},
         ];
 
         methods.forEach(name => {
             const original = model[name];
             if (params.use) {
-                components.push.apply(components, params.use.map(middleware => {
-                    if (vistate.middleware.hasOwnProperty(middleware))
-                        return {middleware: vistate.middleware[middleware]};
-                    else throw new Error('no middleware: \'' + middleware + '\'')
+                componentRefs.push.apply(componentRefs, params.use.map(system => {
+                        return {system: this.system(system)};
                 }));
             }
 
             model[name] = (...args) => {
                 const actionData = { original, value: undefined, model, name, args };
-                this.dispatchToMiddleware(model, actionData)
+                this.dispatchToSystems(model, actionData)
                 return actionData.value;
             }
         });
-        model._components = components;
+        model._componentRefs = componentRefs;
+
+        componentRefs.forEach(c => {
+            c.system.register && c.system.register(model, this);
+        });
 
         model.state = model.$initialState(...model._initialArgs);
 
