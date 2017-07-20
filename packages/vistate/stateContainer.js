@@ -133,12 +133,6 @@ class Model {
         }
         model[type](...args);
     }
-    $compatible() {
-        return {
-            dispatch: this.$dispatch.bind(this),
-            getState:() => this.state
-        }
-    }
     $localId() {
         return this._localId;
     }

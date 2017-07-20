@@ -484,18 +484,6 @@ describe('model', () => {
         assert.deepEqual(model.state, {value: 101});
     });
 
-    it('should return compatibility interface and it should work', () => {
-        const model = $model(new Example);
-
-        const store = model.$compatible();
-
-        store.dispatch({type: 'inc', args:[3]});
-
-        assert.deepEqual(store.getState(), {value: 103});
-        assert.deepEqual(model.state, {value: 103});
-
-    });
-
 
     it('should not trigger change handler,when $subscribe(), $compatible(), $dbg() or get.*() are called', () => {
         [
@@ -508,7 +496,6 @@ describe('model', () => {
 
             // some calls
             model.$subscribe(() => {});
-            model.$compatible(() => {});
 
             model.get();
             model.get('whatever');
