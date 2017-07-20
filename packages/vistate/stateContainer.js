@@ -19,14 +19,11 @@ function _connectChildren(root, model, data) {
         let child = data[prop];
         if (child instanceof Model) {
             child._root = root;
-            child._recorder = root._recorder;
             child._localId = root.$register(child);
             _connectChildren(root, child, child.state);
         }
     }
 }
-
-
 class Recorder {
     constructor() {
         this._calls = [];
@@ -45,6 +42,7 @@ class Recorder {
         this._calls.forEach(cb);
     }
 }
+
 
 
 
@@ -165,9 +163,19 @@ const vistate = {
         return JSON.stringify(model.state);
     },
     events(model) {
-        return model._recorder.getCalls().filter(event => {
+        return this.component(this.root(model), 'recorder').getCalls().filter(event => {
             return model.$root() == model || event.target == model.$localId();
         });
+    },
+    component(model, name, value) {
+        const key = '_' + name;
+        if (value !== undefined) {
+            model[key] = value;
+        }
+        return model[key];
+    },
+    root(model) {
+        return model._root;
     },
     reset(model) {
         model.$reset();
@@ -182,13 +190,13 @@ const vistate = {
         }
         model[type](...args);
     },
-    undo(model) {
-        const tmp = vistate.model(new model.constructor());
-        model._recorder.undo(event => {
-            this.dispatch(tmp, event);
+    dispatchToMiddleware(model, action) {
+        model._components.forEach(c => {
+            c.middleware(action, c.data, vistate);
         });
-        model.state = tmp.get();
-        model.$notify(model);
+    },
+    undo(model) {
+        this.dispatchToMiddleware(model, {model, name: '$undo'});
     },
     model(description, params = {}) {
         let model;
@@ -211,6 +219,8 @@ const vistate = {
             model = new AdHocModel();
         }
 
+        this.component(model, 'recorder', new Recorder);
+
         let methods = _getProps(model.__proto__)
             .filter(n => n != 'constructor'
                 && n.charAt(0) != '$'
@@ -218,12 +228,13 @@ const vistate = {
                 && n.indexOf('get') != 0
             );
 
+        const components = [
+            {middleware: vistate.middleware.runHandlerAndNotify},
+            {middleware: vistate.middleware.record},
+        ];
+
         methods.forEach(name => {
             const original = model[name];
-            const components = [
-                {middleware: vistate.middleware.runHandlerAndNotify},
-                {middleware: vistate.middleware.record},
-            ];
             if (params.use) {
                 components.push.apply(components, params.use.map(middleware => {
                     if (vistate.middleware.hasOwnProperty(middleware))
@@ -234,13 +245,11 @@ const vistate = {
 
             model[name] = (...args) => {
                 const actionData = { original, value: undefined, model, name, args };
-                components.forEach(c => {
-                    c.middleware(actionData, c.data);
-                });
+                this.dispatchToMiddleware(model, actionData)
                 return actionData.value;
             }
         });
-
+        model._components = components;
 
         model.state = model.$initialState(...model._initialArgs);
 
@@ -250,7 +259,6 @@ const vistate = {
                 model.state[p] = vistate.model(model.state[p])
             }
         }
-        model._recorder = new Recorder;
 
         _connectChildren(model._root, model, model.state);
         model._INITIALIZED = true;
