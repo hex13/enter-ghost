@@ -77,13 +77,7 @@ class Model {
         this._root = this;
         this._localId = ROOT_LOCAL_ID;
         this._models = new Map;
-
-
-        // TODO refactor further
-        // inlined content of $reset method
         this._lastLocalId = this._localId;
-        // END TODO
-
     }
     $afterChildAction(child, actionName) {
 
