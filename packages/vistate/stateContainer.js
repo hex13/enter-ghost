@@ -14,14 +14,6 @@ function correct(phrase, texts) {
         .sort((a,b)=>{return a[1]-b[1]})[0][0];
 }
 
-
-
-const reducerMiddleware = {
-    processResult(state) {
-        this.state = state;
-    }
-}
-
 function _connectChildren(root, model, data) {
     for (let prop in data) {
         let child = data[prop];
@@ -282,7 +274,6 @@ module.exports = {
     Model,
     Transaction,
     ROOT_LOCAL_ID,
-    reducerMiddleware,
     vistate,
     create(Cls, ...args) {
         const model = vistate.model(new Cls(...args));

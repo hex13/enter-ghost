@@ -5,7 +5,7 @@ const assert = require('assert');
 
 const { expect } = require('chai');
 
-const { Model, ROOT_LOCAL_ID, reducerMiddleware, Transaction } = require('..');
+const { Model, ROOT_LOCAL_ID, Transaction } = require('..');
 const createEvent = require('../createEvent');
 
 const sc = require('..');
@@ -432,7 +432,7 @@ describe('model', () => {
         assert.strictEqual(c, 4);
     });
 
-    it('should mutate state (using reducerMiddleware)', () => {
+    it('should mutate state (using reducer middleware)', () => {
         const model = $model(new ReducerModel, {
             use: ['reducers']
         });
