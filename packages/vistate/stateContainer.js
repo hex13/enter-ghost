@@ -218,25 +218,24 @@ const vistate = {
                 && n.indexOf('get') != 0
             );
 
-
         methods.forEach(name => {
             const original = model[name];
-            const middlewares = [
-                vistate.middleware.runHandlerAndNotify,
-                vistate.middleware.record,
+            const components = [
+                {middleware: vistate.middleware.runHandlerAndNotify},
+                {middleware: vistate.middleware.record},
             ];
             if (params.use) {
-                middlewares.push.apply(middlewares, params.use.map(middleware => {
+                components.push.apply(components, params.use.map(middleware => {
                     if (vistate.middleware.hasOwnProperty(middleware))
-                        return vistate.middleware[middleware];
+                        return {middleware: vistate.middleware[middleware]};
                     else throw new Error('no middleware: \'' + middleware + '\'')
                 }));
             }
 
             model[name] = (...args) => {
                 const actionData = { original, value: undefined, model, name, args };
-                middlewares.forEach(curr => {
-                    curr(actionData);
+                components.forEach(c => {
+                    c.middleware(actionData, c.data);
                 });
                 return actionData.value;
             }
