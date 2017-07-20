@@ -145,7 +145,7 @@ const vistate = {
         return JSON.stringify(model.state);
     },
     events(model) {
-        return this.component(this.root(model), 'recorder').getCalls().filter(event => {
+        return this.component(this.root(model), 'events').filter(event => {
             return model.$root() == model || event.target == model.$localId();
         });
     },

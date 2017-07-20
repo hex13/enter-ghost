@@ -1,24 +1,5 @@
 const createEvent = require('./createEvent');
 
-class Recorder {
-    constructor() {
-        this._calls = [];
-    }
-    record(event) {
-        this._calls.push(event);
-    }
-    reset() {
-        if (this._calls.length) this._calls = [];
-    }
-    getCalls() {
-        return this._calls;
-    }
-    undo(cb) {
-        this._calls.pop();
-        this._calls.forEach(cb);
-    }
-}
-
 
 const systems = {
     runHandlerAndNotify() {
@@ -36,23 +17,21 @@ const systems = {
     record() {
         return {
             register(model, api) {
-                api.component(model, 'recorder', new Recorder);
+                api.component(model, 'events', []);
             },
             dispatch(actionData, data, api) {
                const { value, model, name, args } = actionData;
-               const recorder = api.component(api.root(model), 'recorder');
+               const events = api.component(api.root(model), 'events');
                if (name == '$undo') {
                    const tmp = api.model(new model.constructor());
-                   recorder.undo(event => {
-                       api.dispatch(tmp, event);
-                   });
-
+                   events.pop();
+                   events.forEach(event => api.dispatch(tmp, event))
                    model.state = tmp.get();
                    model.$notify(model);
                    return;
                } else if (name.charAt(0) == '$') return;
 
-               recorder.record(createEvent(model, name, args));
+               events.push(createEvent(model, name, args));
             }
         }
    },
