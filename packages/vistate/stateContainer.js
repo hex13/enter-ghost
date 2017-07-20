@@ -22,6 +22,18 @@ const reducerMiddleware = {
     }
 }
 
+function _connectChildren(root, model, data) {
+    for (let prop in data) {
+        let child = data[prop];
+        if (child instanceof Model) {
+            child._root = root;
+            child._recorder = root._recorder;
+            child._localId = root.$register(child);
+            _connectChildren(root, child, child.state);
+        }
+    }
+}
+
 
 class Recorder {
     constructor() {
@@ -70,17 +82,14 @@ class Model {
     constructor(...args) {
         this._initialArgs = args;
         this.ee = new EventEmitter;
-        this._parent = null;
         this._root = this;
         this._localId = ROOT_LOCAL_ID;
         this._models = new Map;
-        this._recorder = new Recorder;
+
 
         // TODO refactor further
         // inlined content of $reset method
         this._lastLocalId = this._localId;
-
-        this._recorder.reset();
         // END TODO
 
     }
@@ -107,24 +116,6 @@ class Model {
             this._root.$subscribe(f, this);
         }
 
-    }
-    _connectChildren() {
-        for (let prop in this.state) {
-            let child = this.state[prop];
-            if (child instanceof Model) {
-                child.$connect({parent: this, root: this._root});
-            }
-        }
-    }
-    $connect({ parent, root }) {
-        this._parent = parent;
-        // TODO partial connecting
-        //if (parent) this._parent = parent;
-        //if (root) this._root = root;
-        this._root = root;
-        this._recorder = root._recorder;
-        this._localId = root.$register(this);
-        this._connectChildren();
     }
     $localId() {
         return this._localId;
@@ -274,9 +265,12 @@ const vistate = {
                 model.state[p] = vistate.model(model.state[p])
             }
         }
-        model._connectChildren();
+        model._recorder = new Recorder;
+
+        _connectChildren(model._root, model, model.state);
         model._INITIALIZED = true;
         model._metadata = {type: description.type};
+
         return model;
     },
     metadata(model) {
