@@ -876,4 +876,25 @@ describe(`${FRAMEWORK} API:`, () => {
         });
 
     });
+    describe(`${FRAMEWORK}.collection() creates collection`, () => {
+        let collection;
+
+        beforeEach(() => {
+            collection = api.collection();
+        });
+
+        it('that is instance of Model', () => {
+            expect(collection).to.be.instanceof(Model);
+        });
+        it('that is empty when created', () => {
+            expect(collection.get()).deep.equal([]);
+        });
+
+        it('that allows for adding elements', () => {
+            collection.add(123);
+            collection.add(456);
+            expect(collection.get()).deep.equal([123, 456]);
+        });
+
+    });
 });

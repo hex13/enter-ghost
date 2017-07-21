@@ -245,6 +245,21 @@ const vistate = {
     },
     metadata(model) {
         return model._metadata;
+    },
+    collection() {
+        return this.model({
+            data: {
+                list: []
+            },
+            actions: {
+                add(state, item) {
+                    state.list.push(item);
+                },
+                get(state) {
+                    return this.state.list;
+                }
+            }
+        });
     }
 };
 
