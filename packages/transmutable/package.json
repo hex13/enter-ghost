@@ -1,0 +1,15 @@
+{
+  "name": "transmutable",
+  "version": "0.0.3",
+  "description": "immutable objects that pretend to be mutable",
+  "main": "transmutable.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "immutable", "immutability", "copy-on-write", "cow", "deep", "clone", "mutations"
+  ],
+  "author": "= <=>",
+  "license": "MIT",
+  "repository": "https://github.com/hex13/enter-ghost/tree/master/packages/transmutable"
+}
