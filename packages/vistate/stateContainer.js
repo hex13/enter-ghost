@@ -5,6 +5,8 @@ const EventEmitter = require('events');
 // for autocorrection
 const leven = require('leven');
 
+const transmutable = require('transmutable').transmutable();
+
 const middleware = require('./middleware');
 
 function correct(phrase, texts) {
@@ -229,6 +231,7 @@ const vistate = {
         });
 
         model.state = model.$initialState(...model._initialArgs);
+        model.stagedState = transmutable.fork(model.state);
 
         // create models from properties
         for (let p in model.state) {
@@ -240,7 +243,8 @@ const vistate = {
         _connectChildren(model._root, model, model.state);
         model._INITIALIZED = true;
         model._metadata = {type: description.type};
-
+        // TODO remove it
+        //model.valueOf = () => model.constructor.name;
         return model;
     },
     metadata(model) {
@@ -254,6 +258,10 @@ const vistate = {
             actions: {
                 add(state, item) {
                     state.list.push(item);
+                    // TODO connect list item
+                    // item._root = this;
+                    // item._localId = this.$register(item);
+
                 },
                 get(state) {
                     return this.state.list;

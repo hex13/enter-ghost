@@ -33,6 +33,9 @@ class Example extends Model {
     foo(state, a) {
         return a + 1;
     }
+    doFoo(state, a) {
+        state.value = a + 1;
+    }
     inc(state, amount) {
         state.value += amount;
     }
@@ -381,7 +384,22 @@ describe('model', () => {
         assert.equal(model.foo(3), 4);
     });
 
-    it('should trigger change handler after each action', () => {
+    it('should trigger change handler after each action which mutates state', () => {
+        const model = $model(new Example);
+        let updateCount = 0;
+
+        model.$subscribe(() => {
+            updateCount++;
+        });
+
+        model.doFoo();
+        model.doFoo();
+        model.doFoo();
+
+        assert.equal(updateCount, 3);
+    });
+
+    it('should not trigger change handler after actions that don\'t mutate state', () => {
         const model = $model(new Example);
         let updateCount = 0;
 
@@ -393,8 +411,10 @@ describe('model', () => {
         model.foo();
         model.foo();
 
-        assert.equal(updateCount, 3);
+        assert.equal(updateCount, 0);
     });
+
+
 
     it('should have return correct initial state', () => {
         const model = $model(new Example2);

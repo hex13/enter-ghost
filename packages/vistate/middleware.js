@@ -1,4 +1,5 @@
 const createEvent = require('./createEvent');
+const transmutable = require('transmutable').transmutable();
 
 
 const systems = {
@@ -7,9 +8,20 @@ const systems = {
             dispatch(actionData) {
                 const { original, value, model, name, args } = actionData;
                 if (name.charAt(0) == '$') return;
-                const res = original.apply(model, [model.state].concat(args));
+
+                const res = original.apply(model, [model.stagedState.stage].concat(args));
+                const oldState = model.state;
+
+                // TODO remove this (I use it for experimenting with making dev tools)
+                //window.doAction([name, model.stagedState.mutations.slice()]);
+
+                model.state = model.stagedState.commit();
+
+                if (oldState !== model.state) {
+                    model.$notify(model);
+                }
+
                 model._root.$afterChildAction(model, name);
-                model.$notify(model);
                 actionData.value = res;
             }
         }
@@ -38,7 +50,9 @@ const systems = {
    reducers() {
        return {
            dispatch(actionData) {
-               actionData.model.state = actionData.value;
+               const { model } = actionData;
+               model.stagedState = transmutable.fork(actionData.value);
+               model.state = model.stagedState.commit();
            }
        }
    }

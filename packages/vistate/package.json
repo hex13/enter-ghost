@@ -19,7 +19,8 @@
     "event sourcing"
   ],
   "dependencies": {
-    "leven": "^2.1.0"
+    "leven": "^2.1.0",
+    "transmutable": "*"
   },
   "devDependencies": {
     "chai": "^4.0.2",
