@@ -9,6 +9,7 @@ const createExample = () => ({
     c: {
         d: 100
     },
+    arr: [1, 2, 3],
     still: {
 
     },
@@ -66,20 +67,20 @@ describe('Transmutable', () => {
         assert.deepStrictEqual(output, expected);
     });
 
-    it('returns a new modified object after commit()', () => {
+    it('returns a new modified object after commit() and does it in a smart way (with dirty checking)', () => {
 
         t.stage.mutated.something = 3;
         expected.mutated.something = 3;
 
         const copied = t.commit();
 
-        assert.deepStrictEqual(copied, expected)
+        assert.deepStrictEqual(copied, expected);
         assert(copied !== original);
         assert(copied.a === original.a);
         assert(copied.b === original.b);
         assert(copied.mutated !== original.mutated);
         assert(copied.still === original.still);
-
+        assert(copied.arr === original.arr);
     });
 
     it('accumulates changes after commit (thus allows for commiting changes incrementally)', () => {
@@ -94,6 +95,14 @@ describe('Transmutable', () => {
         const copied = t.commit();
 
         assert.deepStrictEqual(copied, expected)
+    });
+
+    it('allows for use arrays', () => {
+        t.stage.arr.push(4);
+        const copied = t.commit();
+
+        assert.deepStrictEqual(original.arr, createExample().arr)
+        assert.deepStrictEqual(copied.arr, [1, 2, 3, 4])
     });
 
 });

@@ -24,7 +24,13 @@ function cloneDeepWithDirtyChecking(o, mutations) {
     const copy = (o, objPath = []) => {
         if (!isDirty(mutations, objPath)) return o;
 
-        const o2 = {};
+        let o2;
+        if (Array.isArray(o)) {
+            o2 = o.slice();
+        } else o2 = {};
+
+        // NOTE currently we're doing for...in also for arrays (is this correct?)
+
         for (let k in o) {
             if (typeof o[k] =='object') {
                 const propPath = new Array(objPath.length + 1);
