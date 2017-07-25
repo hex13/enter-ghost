@@ -112,7 +112,17 @@ class Hierarchy extends Model {
                 grandChild:  api.model({
                     type: 'GrandChild',
                     data: {
-                        y: 100
+                        y: 100,
+                        grandGrandChild: api.model({
+                            data: {
+                                z: 102
+                            },
+                            actions: {
+                                baz(state) {
+                                    state.z++;
+                                }
+                            }
+                        })
                     },
                     actions: {
                         bar(state, y) {
