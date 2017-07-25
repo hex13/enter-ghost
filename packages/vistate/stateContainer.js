@@ -260,6 +260,15 @@ const vistate = {
                 }
             }
         });
+    },
+    delegateTo(childName, methodName) {
+        return (state) => {
+            if (state.hasOwnProperty(childName)) {
+                const model = state[childName];
+                console.log("######TG", model[methodName]());
+            }
+
+        }
     }
 };
 

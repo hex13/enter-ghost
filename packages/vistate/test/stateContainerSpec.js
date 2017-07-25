@@ -897,4 +897,35 @@ describe(`${FRAMEWORK} API:`, () => {
         });
 
     });
+
+    xdescribe(`${FRAMEWORK}.delegateTo() allows for delegating actions`, () => {
+        let model;
+
+        beforeEach(() => {
+            model = api.model({
+                data: {
+                    counter: api.model({
+                        data: {v: 100},
+                        actions: {inc: state => state.v++},
+                    })
+                },
+                actions: {
+                        //inc: api.delegateTo('counter', 'inc'),
+                        inc: delegateTo('counter'),
+                        inc: state => state.counter.inc()
+                }
+            });
+        });
+
+        it('that is instance of Model', () => {
+            expect(model).to.be.instanceof(Model);
+        });
+
+        it('that allow for delegating actions to child models', () => {
+            model.inc();
+            expect(model.get('counter').get()).deep.equal({v: 101})
+        });
+
+
+    });
 });
