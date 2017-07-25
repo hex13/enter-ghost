@@ -9,5 +9,6 @@ Monorepo of various tools
 * [san-escobar](https://github.com/hex13/enter-ghost/tree/master/packages/san-escobar) - powerful HTML logging for NodeJS applications
 * [state-container](https://github.com/hex13/enter-ghost/tree/master/packages/state-container) - this packaged was renamed to vistate
 * [trace-machine](https://github.com/hex13/enter-ghost/tree/master/packages/trace-machine) - Trace Machine tracks JS objects in real time and emit events through emitter
+* [transmutable](https://github.com/hex13/enter-ghost/tree/master/packages/transmutable) - immutable objects that pretend to be mutable
 * [vifi](https://github.com/hex13/enter-ghost/tree/master/packages/vifi) - Virtual File System
 * [vistate](https://github.com/hex13/enter-ghost/tree/master/packages/vistate) - Recordable state container. OOP style
