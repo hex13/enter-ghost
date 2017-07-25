@@ -46,18 +46,22 @@ function cloneDeepWithDirtyChecking(o, mutations) {
 
 function Transmutable(o) {
     this.mutations = [];
+    this.target = o;
+
     const createStage = (o, path = []) => {
+        const getTarget = () => typeof o == 'function'? o(): o;
+        const proxy = new Proxy(getTarget(), {
+            get: (nonUsedProxyTarget, name) => {
+                // transmutable.target can change
+                // so we want to have always the current target
+                const target = getTarget();
 
-        const keys = Object.keys(o);
-
-        const proxy = new Proxy(o, {
-            get: (target, name) => {
                 if (typeof target[name] == 'object') {
                     return createStage(target[name], path.concat(name));
                 }
                 return target[name];
             },
-            set: (target, k, v) => {
+            set: (nonUsedProxyTarget, k, v) => {
                 const mutPath = [];
                 for (let i = 0; i < path.length + 1; i++) {
                     mutPath.push(path[i] || k)
@@ -68,8 +72,8 @@ function Transmutable(o) {
         });
         return proxy;
     }
-    this.stage = createStage(o);
-    this.target = o;
+
+    this.stage = createStage(() => this.target);
 }
 
 Transmutable.prototype.pushTo = function pushTo(target) {
@@ -94,6 +98,7 @@ Transmutable.prototype.pushTo = function pushTo(target) {
 
 Transmutable.prototype.commit = function commit() {
     const copied = cloneDeepWithDirtyChecking(this.target, this.mutations);
+    this.target = copied;
     this.pushTo(copied);
     return copied;
 }

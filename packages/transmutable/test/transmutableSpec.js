@@ -82,14 +82,18 @@ describe('Transmutable', () => {
 
     });
 
-    it('resets its internal state after commiting (thus allows for being reused)', () => {
+    it('accumulates changes after commit (thus allows for commiting changes incrementally)', () => {
+        expected.a = 200;
         expected.b = 20;
+
         t.stage.a = 200;
         t.commit();
+        assert.strictEqual(t.stage.a, 200);
+
         t.stage.b = 20;
         const copied = t.commit();
-        assert.deepStrictEqual(copied, expected)
 
+        assert.deepStrictEqual(copied, expected)
     });
 
 });
