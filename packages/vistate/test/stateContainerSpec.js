@@ -932,6 +932,32 @@ describe(`${FRAMEWORK} API:`, () => {
             expect(collection.get()).deep.equal([123, 456]);
         });
 
+        it('that triggers change handlers after element actions', () => {
+            const model = api.model({
+                data: {
+                    v: 0,
+                },
+                actions: {
+                    foo(state) {
+                        state.v = 1234;
+                    }
+                }
+            });
+            collection.add(model);
+
+            let c = 0;
+            collection.$subscribe(() => {
+                c++;
+            });
+
+            model.foo();
+            model.foo();
+            model.foo();
+
+            expect(c).equal(3);
+        });
+
+
     });
 
     xdescribe(`${FRAMEWORK}.delegateTo() allows for delegating actions`, () => {

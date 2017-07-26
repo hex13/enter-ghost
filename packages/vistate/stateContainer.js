@@ -263,8 +263,10 @@ const vistate = {
                 add(state, item) {
                     state.list.push(item);
                     // TODO connect list item
-                    // item._root = this;
-                    // item._localId = this.$register(item);
+                    if (item instanceof Model) {
+                        item._root = this;
+                        item._localId = this.$register(item);
+                    }
 
                 },
                 get(state) {
