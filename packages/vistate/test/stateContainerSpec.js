@@ -226,9 +226,15 @@ describe('model', () => {
             const model = $model(new Example);
             model.inc(10);
             model.foo('a', {a: 4});
-            expect($events(model)).deep.equal([
+            const events = $events(model);
+            expect(events).deep.equal([
                 createEvent(model, 'inc', [10]),
                 createEvent(model, 'foo', ['a', {a: 4}]),
+            ]);
+            let md = api.metadata(events[0]);
+
+            expect(md.mutations).deep.equal([
+                [['value'], 110]
             ]);
         });
         it('it should record events and expose them via $events (models in hierarchy). Root should gather all events', () => {

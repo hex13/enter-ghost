@@ -27,7 +27,7 @@ function _connectChildren(root, model, data) {
     }
 }
 
-
+const metadata = new WeakMap;
 
 const Transaction = require('./transaction');
 
@@ -247,8 +247,12 @@ const vistate = {
         //model.valueOf = () => model.constructor.name;
         return model;
     },
-    metadata(model) {
-        return model._metadata;
+    metadata(model, md) {
+        if (md) {
+            metadata.set(model, md);
+            return
+        }
+        return model._metadata || metadata.get(model);
     },
     collection() {
         return this.model({

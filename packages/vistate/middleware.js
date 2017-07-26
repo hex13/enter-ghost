@@ -12,9 +12,7 @@ const systems = {
                 const res = original.apply(model, [model.stagedState.stage].concat(args));
                 const oldState = model.state;
 
-                // TODO remove this (I use it for experimenting with making dev tools)
-                //window.doAction([name, model.stagedState.mutations.slice()]);
-
+                actionData.mutations = model.stagedState.mutations.slice();
                 model.state = model.stagedState.commit();
 
                 if (oldState !== model.state) {
@@ -43,7 +41,10 @@ const systems = {
                    return;
                } else if (name.charAt(0) == '$') return;
 
-               events.push(createEvent(model, name, args));
+               const event = createEvent(model, name, args);
+               events.push(event);
+               api.metadata(event, actionData);
+
             }
         }
    },
