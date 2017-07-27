@@ -64,17 +64,12 @@ class Model {
 
     }
     $subscribe(f, subject = this) {
-        const isRoot = this._root === this;
-        if (isRoot) {
-            this._root.ee.on('change', (changedModel) => {
-                if (subject === this || subject.$localId() === changedModel.$localId()) {
-                    f(changedModel)
-                }
-            });
-        } else {
-            this._root.$subscribe(f, this);
-        }
-
+        const model = this._root;
+        model._root.ee.on('change', (changedModel) => {
+            if (subject === model || subject.$localId() === changedModel.$localId()) {
+                f(changedModel)
+            }
+        });
     }
     $localId() {
         return this._localId;
