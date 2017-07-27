@@ -16,7 +16,7 @@ const systems = {
                 model.state = model.stagedState.commit();
 
                 if (oldState !== model.state) {
-                    model.$notify(model);
+                    actionData.changed = true;
                 }
 
                 model._root.$afterChildAction(model, name);
@@ -37,7 +37,7 @@ const systems = {
                    events.pop();
                    events.forEach(event => api.dispatch(tmp, event))
                    model.state = tmp.get();
-                   model.$notify(model);
+                   actionData.changed = true;
                    return;
                } else if (name.charAt(0) == '$') return;
 
@@ -47,6 +47,22 @@ const systems = {
 
             }
         }
+   },
+   notifier() {
+       function notify(currentModel, changedModel) {
+           const isRoot = currentModel._root === currentModel;
+           if (isRoot) {
+               currentModel.ee.emit('change', changedModel);
+           } else {
+               notify(currentModel._root, changedModel);
+           }
+       }
+
+       return {
+           dispatch({ model, changed }) {
+               if (changed) notify(model, model);
+           }
+       }
    },
    reducers() {
        return {

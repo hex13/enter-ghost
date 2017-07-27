@@ -63,14 +63,6 @@ class Model {
     $afterChildAction(child, actionName) {
 
     }
-    $notify(changedModel) {
-        const isRoot = this._root === this;
-        if (isRoot) {
-            this.ee.emit('change', changedModel);
-        } else {
-            this._root.$notify(changedModel);
-        }
-    }
     $subscribe(f, subject = this) {
         const isRoot = this._root === this;
         if (isRoot) {
@@ -208,6 +200,7 @@ const vistate = {
         const componentRefs = [
             {system: this.system('runHandlerAndNotify')},
             {system: this.system('record')},
+            {system: this.system('notifier')},
         ];
 
         methods.forEach(name => {
