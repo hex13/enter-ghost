@@ -50,7 +50,16 @@ const systems = {
    },
    notifier() {
        return {
-           dispatch({ model, changed }) {
+           dispatch({ model, changed, name, payload: f }) {
+               if (name == '$subscribe') {
+                   const root = model._root;
+                   root.ee.on('change', (changedModel) => {
+                       if (model === root || model.$localId() === changedModel.$localId()) {
+                           f(changedModel)
+                       }
+                   });
+                   return;
+               }
                if (changed) {
                    model._root.ee.emit('change', model);
                }

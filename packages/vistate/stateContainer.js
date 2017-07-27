@@ -63,13 +63,8 @@ class Model {
     $afterChildAction(child, actionName) {
 
     }
-    $subscribe(f, subject = this) {
-        const model = this._root;
-        model._root.ee.on('change', (changedModel) => {
-            if (subject === model || subject.$localId() === changedModel.$localId()) {
-                f(changedModel)
-            }
-        });
+    $subscribe(f, model = this) {
+        vistate.dispatchToSystems(model, {model, name: '$subscribe', payload: f});
     }
     $localId() {
         return this._localId;
