@@ -49,18 +49,11 @@ const systems = {
         }
    },
    notifier() {
-       function notify(currentModel, changedModel) {
-           const isRoot = currentModel._root === currentModel;
-           if (isRoot) {
-               currentModel.ee.emit('change', changedModel);
-           } else {
-               notify(currentModel._root, changedModel);
-           }
-       }
-
        return {
            dispatch({ model, changed }) {
-               if (changed) notify(model, model);
+               if (changed) {
+                   model._root.ee.emit('change', model);
+               }
            }
        }
    },
