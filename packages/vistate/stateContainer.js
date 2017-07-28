@@ -1,6 +1,5 @@
 "use strict";
 
-const EventEmitter = require('events');
 
 // for autocorrection
 const leven = require('leven');
@@ -54,7 +53,6 @@ function _getProps(obj) {
 class Model {
     constructor(...args) {
         this._initialArgs = args;
-        this.ee = new EventEmitter;
         this._root = this;
         this._localId = ROOT_LOCAL_ID;
         this._models = new Map;

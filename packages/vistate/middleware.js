@@ -1,6 +1,6 @@
 const createEvent = require('./createEvent');
 const transmutable = require('transmutable').transmutable();
-
+const EventEmitter = require('events');
 
 const systems = {
     runHandlerAndNotify() {
@@ -27,6 +27,7 @@ const systems = {
         return {
             register(model, api) {
                 api.component(model, 'events', []);
+                model.ee = new EventEmitter;
             },
             dispatch(actionData, data, api) {
                const { value, model, name, args } = actionData;
