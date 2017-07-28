@@ -33,7 +33,7 @@ const systems = {
                const { value, model, name, args } = actionData;
                const events = api.component(api.root(model), 'events');
                if (name == '$undo') {
-                   const tmp = api.model(new model.constructor());
+                   const tmp = api.model(model.blueprint);
                    events.pop();
                    events.forEach(event => api.dispatch(tmp, event))
                    model.state = tmp.get();

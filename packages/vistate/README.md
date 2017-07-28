@@ -88,6 +88,7 @@ API is not stable yet so there can be breaking changes.
 
 Latest breaking changes:
 
+- 29/07/2017: $initialState is gone (use `data` param instead)
 - 28/07/2017: $afterChildAction is gone
 - no data() method in Transaction.
 - transaction methods return promise

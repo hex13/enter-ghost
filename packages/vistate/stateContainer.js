@@ -80,9 +80,6 @@ class Model {
         Object.assign(this.state, tempState); // TODO extract as action
         return callback(transaction, this);
     }
-    $initialState() {
-        return {};
-    }
 };
 
 function getProperty(state, prop) {
@@ -150,13 +147,6 @@ const vistate = {
             if (model._INITIALIZED) return model;
         } else {
             class AdHocModel extends Model {
-                $initialState() {
-                    const state = {};
-                    for (let k in description.data) {
-                        state[k] = description.data[k]
-                    };
-                    return state;
-                }
             }
             for (let k in description.actions) {
                 AdHocModel.prototype[k] = description.actions[k];
@@ -219,7 +209,15 @@ const vistate = {
             c.system.register && c.system.register(model, this);
         });
 
-        model.state = model.$initialState(...model._initialArgs);
+        model.state = (()=>{
+            const state = {};
+            for (let k in description.data) {
+                state[k] = description.data[k]
+            };
+            return state;
+        })();
+        model.blueprint = description;
+
         // create models from properties
         for (let p in model.state) {
             const value = model.state[p];
