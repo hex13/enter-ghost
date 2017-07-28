@@ -591,8 +591,6 @@ describe('model', () => {
                 expect(model.get('text')).equal('koteł');
                 expect(model.get('category')).equal('zwierzę')
             });
-            //const transaction = model.$transaction();
-
         });
         it('should call onCommit and onEnd handlers after commiting', () => {
             let c = 0;

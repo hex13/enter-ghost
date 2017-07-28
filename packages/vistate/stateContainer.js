@@ -82,23 +82,19 @@ class Model {
         Object.assign(this.state, tempState); // TODO extract as action
         return callback(transaction, this);
     }
-    get(prop) {
-        const state = this.state;
-
-        if (!prop)
-            return state;
-
-        if (state.hasOwnProperty(prop)) {
-            return state[prop];
-        }
-    }
-    set(state, k, v) {
-        state[k] = v;
-    }
     $initialState() {
         return {};
     }
 };
+
+function getProperty(state, prop) {
+    if (!prop)
+        return state;
+
+    if (state.hasOwnProperty(prop)) {
+        return state[prop];
+    }
+}
 
 const generateId = (last => () => ++last)(0);
 
@@ -188,8 +184,24 @@ const vistate = {
         ];
 
         const modelApi = {};
+
+        const queries = {
+            get: model.get || getProperty
+        };
+        for (let name in queries) {
+            model[name] = (...args) => {
+                return queries[name](model.state, ...args);
+            }
+        }
+
+        const standardActions = {
+            set(state, k, v) {
+                state[k] = v;
+            }
+        };
+        methods.push('set');
         methods.forEach(name => {
-            const original = model[name];
+            const original = model[name] || standardActions[name];
             if (params.use) {
                 componentRefs.push.apply(componentRefs, params.use.map(system => {
                         return {system: this.system(system)};
@@ -249,7 +261,7 @@ const vistate = {
 
                 },
                 get(state) {
-                    return this.state.list;
+                    return state.list;
                 }
             }
         });
