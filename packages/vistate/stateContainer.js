@@ -60,12 +60,6 @@ class Model {
         this._models = new Map;
         this._lastLocalId = this._localId;
     }
-    $afterChildAction(child, actionName) {
-
-    }
-    $subscribe(f, model = this) {
-        vistate.dispatchToSystems(model, {model, name: '$subscribe', payload: f});
-    }
     $localId() {
         return this._localId;
     }
@@ -185,7 +179,7 @@ const vistate = {
                 && n.charAt(0) != '$'
                 && n.charAt(0) != '_'
                 && n.indexOf('get') != 0
-            );
+            ).concat('$subscribe');
 
         const componentRefs = [
             {system: this.system('runHandlerAndNotify')},
@@ -193,6 +187,7 @@ const vistate = {
             {system: this.system('notifier')},
         ];
 
+        const modelApi = {};
         methods.forEach(name => {
             const original = model[name];
             if (params.use) {
@@ -201,12 +196,13 @@ const vistate = {
                 }));
             }
 
-            model[name] = (...args) => {
-                const actionData = { original, value: undefined, model, name, args };
+            modelApi[name ]= model[name] = (...args) => {
+                const actionData = { original, value: undefined, model, name, args, payload: args[0] };
                 this.dispatchToSystems(model, actionData)
                 return actionData.value;
             }
         });
+
         model._componentRefs = componentRefs;
 
         componentRefs.forEach(c => {
@@ -227,7 +223,7 @@ const vistate = {
         model._INITIALIZED = true;
         model._metadata = {type: description.type};
         // TODO remove it
-        //model.valueOf = () => model.constructor.name;
+        model.valueOf = () => model.constructor.name;
         return model;
     },
     metadata(model, md) {

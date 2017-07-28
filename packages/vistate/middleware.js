@@ -19,7 +19,6 @@ const systems = {
                     actionData.changed = true;
                 }
 
-                model._root.$afterChildAction(model, name);
                 actionData.value = res;
             }
         }
@@ -51,7 +50,9 @@ const systems = {
    notifier() {
        return {
            dispatch({ model, changed, name, payload: f }) {
+               //window.doAction();
                if (name == '$subscribe') {
+
                    const root = model._root;
                    root.ee.on('change', (changedModel) => {
                        if (model === root || model.$localId() === changedModel.$localId()) {

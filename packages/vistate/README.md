@@ -20,15 +20,15 @@ is conceptually the same as:
 object.increment(30);
 ```
 
-We just have some object (e.g. **model**, **store**, **entity** etc.) and we send messages to it (It is nothing new, it's just the old school OOP.). 
+We just have some object (e.g. **model**, **store**, **entity** etc.) and we send messages to it (It is nothing new, it's just the old school OOP.).
 
 But method calling requires less boilerplate so the approach `object.increment(30)` is preffered to the first one.
 
 2. Sometimes we just need intelligent **models** which encapsulate both **state** and **logic**
 
-3. Sometimes we need whole hierarchy of **models** 
+3. Sometimes we need whole hierarchy of **models**
 
-   ``` 
+   ```
    [  -------------------------- Todo application -------------------------- ]
       	[ TodoList ]           	[ TodoList ]              	[ TodoList ]
        |      |      |        |      |      |             |      |      |
@@ -40,7 +40,7 @@ But method calling requires less boilerplate so the approach `object.increment(3
 
    And it should be possible to send **action** to the specific **model** and work on **model level** (not **store** or **observable property** level). In Vistate the most important thing is a **model**.
 
-4. Logic of dispatching the action and updating the state should be hidden from user.  There is some kind of magic behind scene. When user calls 
+4. Logic of dispatching the action and updating the state should be hidden from user.  There is some kind of magic behind scene. When user calls
 
  ```javascript
    counter.increment(30)
@@ -58,7 +58,7 @@ this could be dispatched in anyway possible. Action could be automatically recor
 
    This means that although there could be some similarities with many other libraries and approaches but Vistate is not bound to one philosophy but it's inspired by many.
 
-8. Immutability / mutability is an implementation detail. 
+8. Immutability / mutability is an implementation detail.
 
    This framework started as being mutable. It promoted mutation of models directly in the action handlers:
 
@@ -88,6 +88,7 @@ API is not stable yet so there can be breaking changes.
 
 Latest breaking changes:
 
+- 28/07/2017: $afterChildAction is gone
 - no data() method in Transaction.
 - transaction methods return promise
 
