@@ -96,33 +96,23 @@ Examples of use:
 
 ```javascript
 
-const assert = require('assert');
-const { Model } = require('vistate');
+const { vistate } = require('vistate');
 
-
-class Example extends Model {
-    $initialState() {
-        return {value: 100};
+const model = vistate.model({
+    data: {value: 100},
+    actions: {
+        inc(state, amount) {
+            state.value += amount;
+        }
     }
-    inc(state, amount) {
-        state.value += amount;
-    }
-}
+});
 
-const model = new Example();
 model.$subscribe(() => {
     console.log("update your view here");
     console.log("current state:", model.state);
+    renderYourView();
 });
 
-// notice that each call will trigger handler passed in `subscribe`
-model.inc(100);
-model.inc(200);
-assert.equal(model.state.value, 400);
-console.log("UNDO!");
-
-// this uses event sourcing under the hood:
-model.$undo();
-assert.equal(model.state.value, 200);
+model.inc();
 
 ```
