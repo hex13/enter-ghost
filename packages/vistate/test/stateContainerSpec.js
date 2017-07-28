@@ -22,46 +22,49 @@ function $events(model) {
 function $model(...args) {
     return api.model(...args);
 }
+function $hierarchyModel() {
+    return $model(new Hierarchy);
+}
 function $exampleModel() {
-    return $model(new Example);
+    return $model({
+        data: {value: 100},
+        actions: {
+            foo(state, a) {
+                return a + 1;
+            },
+            doFoo(state, a) {
+                state.value = 'some mutation';
+            },
+            inc(state, amount) {
+                state.value += amount;
+            }
+        }
+    })
 }
 function $typeName(model) {
     const md = api.metadata(model);
     return md.type;
 }
-class Example extends Model {
-    $initialState() {
-        return {value: 100};
-    }
-    foo(state, a) {
-        return a + 1;
-    }
-    doFoo(state, a) {
-        state.value = a + 1;
-    }
-    inc(state, amount) {
-        state.value += amount;
-    }
-}
+
 
 class SubclassedModel extends Model {
 
 }
 
 
-class TransactionExampleModel extends Model {
-    $initialState() {
-        return {
-            status: 'normal',
-            text: '',
-            category: 'none',
-        };
-    }
-    setText(state, text) {
-        state.text = text;
-    }
-    setCategory(state, category) {
-        state.category = category;
+const TransactionExampleModel = {
+    data: {
+        status: 'normal',
+        text: '',
+        category: 'none',
+    },
+    actions: {
+        setText(state, text) {
+            state.text = text;
+        },
+        setCategory(state, category) {
+            state.category = category;
+        }
     }
 }
 
@@ -201,7 +204,7 @@ describe('model', () => {
             ]);
         });
         it('it should record events and expose them via $events (models in hierarchy). Root should gather all events', () => {
-            const model = $model(new Hierarchy);
+            const model = $hierarchyModel();
             const child = model.get('child');
             const grandChild = child.get('grandChild');
 
@@ -228,14 +231,14 @@ describe('model', () => {
 
     describe('hierarchy', () => {
         it('should assign local ids', () => {
-            const root = $model(new Hierarchy);
+            const root = $hierarchyModel();
             expect(root.$localId()).equal(ROOT_LOCAL_ID);
             expect(root.get('child').$localId()).equal(ROOT_LOCAL_ID + 1);
             expect(root.get('child').get('grandChild').$localId()).equal(ROOT_LOCAL_ID + 2);
         });
 
         it('should allow for undo whole hierarchy', () => {
-            const root = $model(new Hierarchy);
+            const root = $hierarchyModel();
             root.get('child').foo(200);
             expect(root.get('child').get('x')).equal(200);
             root.get('child').foo(300);
@@ -246,7 +249,7 @@ describe('model', () => {
         });
 
         it('should create children and children should notify parent about updates', () => {
-            const root = $model(new Hierarchy);
+            const root = $hierarchyModel();
             let c = 0;
             assert.deepEqual(root.get('child').get('x'), 10);
 
@@ -260,13 +263,13 @@ describe('model', () => {
             assert.equal(c, 1);
         });
         it('should create children and grand children connected to hierarchy. $root should return root model', () => {
-            const root = $model(new Hierarchy);
+            const root = $hierarchyModel();
             assert.strictEqual(api.root(root), root);
             assert.strictEqual(api.root(root.get('child')), root);
             assert.strictEqual(api.root(root.get('child').get('grandChild')), root);
         });
         it('should create grand children and grand children should notify root about updates', () => {
-            const root = $model(new Hierarchy);
+            const root = $hierarchyModel();
             let rootUpdates = 0;
             let childUpdates = 0;
             let grandChildUpdates = 0;
@@ -294,7 +297,7 @@ describe('model', () => {
         it('undo should generate one update', () => {
             // FIXME
             // commented asserts mean that they are needed but they are skipped
-            const root = $model(new Hierarchy);
+            const root = $hierarchyModel();
             let rootUpdates = 0;
             let childUpdates = 0;
             let grandChildUpdates = 0;
@@ -501,7 +504,7 @@ describe('model', () => {
     });
 
     it('should handle transactions', () => {
-        const model = $model(new TransactionExampleModel);
+        const model = $model(TransactionExampleModel);
 
         return model.$transaction((transaction, aModel) => {
             return pseudoAjax().then(text => {
@@ -548,7 +551,7 @@ describe('model', () => {
     describe('Transaction', () => {
         it('should allow for define tasks and commiting them', () => {
             const transaction = new Transaction();
-            const model = $model(new TransactionExampleModel);
+            const model = $model(TransactionExampleModel);
             transaction.task(() => {
                 model.setText('koteł');
             });
@@ -798,7 +801,7 @@ describe('model', () => {
 
 
     it('should assign ending state in transactions', () => {
-        const model = $model(new TransactionExampleModel);
+        const model = $model(TransactionExampleModel);
 
         model.$transaction((transaction, aModel) => {
             transaction.end({status: 'error'});
