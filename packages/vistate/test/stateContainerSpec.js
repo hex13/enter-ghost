@@ -229,6 +229,15 @@ describe('model', () => {
         });
     });
 
+    it('should run factories in data', () => {
+        const model = $model({
+            data: {
+                a: () => 'ooo'
+            }
+        });
+        expect(model.get('a')).equal('ooo');
+    });
+
     describe('hierarchy', () => {
         it('should assign local ids', () => {
             const root = $hierarchyModel();

@@ -220,14 +220,18 @@ const vistate = {
         });
 
         model.state = model.$initialState(...model._initialArgs);
-        model.stagedState = transmutable.fork(model.state);
-
         // create models from properties
         for (let p in model.state) {
+            const value = model.state[p];
+            if (typeof value == 'function') {
+                model.state[p] = value();
+            }
             if (model.state[p] instanceof Model) {
                 model.state[p] = vistate.model(model.state[p])
             }
         }
+
+        model.stagedState = transmutable.fork(model.state);
 
         _connectChildren(model._root, model, model.state);
         model._INITIALIZED = true;
