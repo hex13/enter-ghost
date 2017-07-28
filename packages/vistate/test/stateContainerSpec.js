@@ -23,7 +23,7 @@ function $model(...args) {
     return api.model(...args);
 }
 function $hierarchyModel() {
-    return $model(new Hierarchy);
+    return $model(Hierarchy);
 }
 function $exampleModel() {
     return $model({
@@ -86,12 +86,10 @@ class Example6 extends Model {
     }
 }
 
-class Hierarchy extends Model {
-    someAction() {
-
-    }
-    $initialState() {
-        const Child = {
+const Hierarchy = {
+    actions: {someAction() {} },
+    data: {
+        child: () => api.model({
             type: 'Child',
             data: {
                 x: 10,
@@ -122,12 +120,9 @@ class Hierarchy extends Model {
                     state.x = x;
                 },
             }
-        }
-        return {
-            child: api.model(Child)
-        };
+        })
     }
-}
+};
 
 
 class Example8 extends Model {
