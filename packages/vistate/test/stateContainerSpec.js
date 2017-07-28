@@ -22,6 +22,9 @@ function $events(model) {
 function $model(...args) {
     return api.model(...args);
 }
+function $exampleModel() {
+    return $model(new Example);
+}
 function $typeName(model) {
     const md = api.metadata(model);
     return md.type;
@@ -183,7 +186,7 @@ describe('example', () => {
 describe('model', () => {
     describe('events', () => {
         it(`it should record events and expose them via ${FRAMEWORK}.events()`, () => {
-            const model = $model(new Example);
+            const model = $exampleModel();
             model.inc(10);
             model.foo('a', {a: 4});
             const events = $events(model);
@@ -329,7 +332,7 @@ describe('model', () => {
     });
 
     it('should call wrapped method and return correct result', () => {
-        const model = $model(new Example);
+        const model = $exampleModel();
 
         assert.equal(model.foo(10), 11);
         assert.equal(model.foo(0), 1);
@@ -337,7 +340,7 @@ describe('model', () => {
     });
 
     it('should trigger change handler after each action which mutates state', () => {
-        const model = $model(new Example);
+        const model = $exampleModel();
         let updateCount = 0;
 
         model.$subscribe(() => {
@@ -352,7 +355,7 @@ describe('model', () => {
     });
 
     it('should not trigger change handler after actions that don\'t mutate state', () => {
-        const model = $model(new Example);
+        const model = $exampleModel();
         let updateCount = 0;
 
         model.$subscribe(() => {
@@ -396,7 +399,7 @@ describe('model', () => {
 
 
     it('should mutate state', () => {
-        const model = $model(new Example);
+        const model = $exampleModel();
         model.inc(10);
         model.inc(100);
         model.inc(1000);
@@ -404,7 +407,7 @@ describe('model', () => {
     });
 
     xit('should use processResult middleware', () => {
-        const model = $model(new Example);
+        const model = $exampleModel();
         let c = 0;
         model.$use({
             processResult: () => {c++}
@@ -453,7 +456,7 @@ describe('model', () => {
     });
 
     it('should undo state', () => {
-        const model = $model(new Example);
+        const model = $exampleModel();
         model.inc(10);
         model.inc(100);
         model.inc(1000);
@@ -466,7 +469,7 @@ describe('model', () => {
     });
 
     it('should dispatch via `dispatch` method', () => {
-        const model = $model(new Example);
+        const model = $exampleModel();
 
         api.dispatch(model, {type: 'inc', args:[1]});
 
@@ -476,7 +479,7 @@ describe('model', () => {
 
     xit('should not trigger change handler,when $subscribe(), $compatible(), $dbg() or get.*() are called', () => {
         [
-            $model(new Example), // class with #get inherited from model
+            $exampleModel(), // class with #get inherited from model
             $model(new Example3), // class which overrides #get
             $model(new Example8), // class with private method
         ].forEach(model => {
