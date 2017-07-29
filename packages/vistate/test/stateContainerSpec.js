@@ -47,10 +47,6 @@ function $typeName(model) {
 }
 
 
-class SubclassedModel extends Model {
-
-}
-
 
 const TransactionExampleModel = {
     data: {
@@ -68,20 +64,23 @@ const TransactionExampleModel = {
     }
 }
 
-class Example6 extends Model {
-    gummibear() {
+const Example6 = {
+    actions: {
+        gummibear() {
 
-    }
-    smurf() {
+        },
+        smurf() {
 
-    }
-    yogibear() {
+        },
+        yogibear() {
 
-    }
-    sylvester() {
+        },
+        sylvester() {
 
-    }
-    cinderella() {
+        },
+        cinderella() {
+
+        }
 
     }
 }
@@ -125,11 +124,11 @@ const Hierarchy = {
 };
 
 
-class Example8 extends Model {
-    _privateMethod() {
-
-    }
-}
+// class Example8 extends Model {
+//     _privateMethod() {
+//
+//     }
+// }
 
 
 function pseudoAjax() {
@@ -532,7 +531,7 @@ describe('model', () => {
     });
 
     it('it should be possible to set state properties via set()', () => {
-        [$model(new Model), $model(new SubclassedModel)].forEach(model => {
+        [$model({})].forEach(model => {
             model.set('a', 10);
             model.set('b', 20);
             model.set('c', 'kotek');
@@ -817,7 +816,7 @@ describe('model', () => {
 
     // TODO remove autocorrection logic out of this package
     it('should return autocorrect suggestion', () => {
-        const model = $model(new Example6);
+        const model = $model(Example6);
         assert.equal(api.autocorrect(model, 'gumbuear'), 'gummibear');
         assert.equal(api.autocorrect(model, 'cynDerela'), 'cinderella');
         assert.equal(api.autocorrect(model, 'Sylsveer'), 'sylvester');
