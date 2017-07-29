@@ -5,7 +5,7 @@ const assert = require('assert');
 
 const { expect } = require('chai');
 
-const { Model, ROOT_LOCAL_ID, Transaction } = require('..');
+const { Model, ROOT_LOCAL_ID, Transaction, isModel } = require('..');
 const createEvent = require('../createEvent');
 
 const sc = require('..');
@@ -851,8 +851,8 @@ describe(`${FRAMEWORK} API:`, () => {
                 }
             });
         });
-        it('that is instance of Model', () => {
-            expect(model).to.be.instanceof(Model);
+        it('that is a model, according to function isModel', () => {
+            assert(isModel(model));
         });
         it('that has correct initial state', () => {
             const state = model.get();
@@ -881,7 +881,7 @@ describe(`${FRAMEWORK} API:`, () => {
         });
 
         it('that is instance of Model', () => {
-            expect(collection).to.be.instanceof(Model);
+            assert(isModel(collection));
         });
         it('that is empty when created', () => {
             expect(collection.get()).deep.equal([]);
@@ -940,8 +940,8 @@ describe(`${FRAMEWORK} API:`, () => {
             });
         });
 
-        it('that is instance of Model', () => {
-            expect(model).to.be.instanceof(Model);
+        it('that is a model', () => {
+            assert(isModel(model));
         });
 
         it('that allow for delegating actions to child models', () => {

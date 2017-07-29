@@ -18,7 +18,7 @@ function correct(phrase, texts) {
 function _connectChildren(root, model, data) {
     for (let prop in data) {
         let child = data[prop];
-        if (child instanceof Model) {
+        if (isModel(child)) {
             child._root = root;
             child._localId = root.$register(child);
             _connectChildren(root, child, child.state);
@@ -31,6 +31,9 @@ const metadata = new WeakMap;
 const Transaction = require('./transaction');
 
 
+function isModel(obj) {
+    return obj instanceof Model;
+}
 const ROOT_LOCAL_ID = 1;
 // `constructor` is ES6 class constructor (inb4: thank you captain obvious XD).
 // methods beginning with `$`` are helpers
@@ -142,7 +145,7 @@ const vistate = {
     },
     model(description, params = {}) {
         let model;
-        if (description instanceof Model) {
+        if (isModel(description)) {
             model = description;
             if (model._INITIALIZED) return model;
         } else {
@@ -224,7 +227,7 @@ const vistate = {
             if (typeof value == 'function') {
                 model.state[p] = value();
             }
-            if (model.state[p] instanceof Model) {
+            if (isModel(model.state[p])) {
                 model.state[p] = vistate.model(model.state[p])
             }
         }
@@ -254,7 +257,7 @@ const vistate = {
                 add(state, item) {
                     state.list.push(item);
                     // TODO connect list item
-                    if (item instanceof Model) {
+                    if (isModel(item)) {
                         item._root = this;
                         item._localId = this.$register(item);
                     }
@@ -282,4 +285,5 @@ module.exports = {
     Transaction,
     ROOT_LOCAL_ID,
     vistate,
+    isModel,
 };
