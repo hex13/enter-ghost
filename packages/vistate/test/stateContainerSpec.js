@@ -509,7 +509,7 @@ describe('model', () => {
     it('should handle transactions', () => {
         const model = $model(TransactionExampleModel);
 
-        return model.$transaction((transaction, aModel) => {
+        return api.transaction(model, (transaction, aModel) => {
             return pseudoAjax().then(text => {
                 // API proposal (to encapsulate temp state in transaction handler):
                 //transaction.set({status: 'loading', a: 1})
@@ -806,7 +806,7 @@ describe('model', () => {
     it('should assign ending state in transactions', () => {
         const model = $model(TransactionExampleModel);
 
-        model.$transaction((transaction, aModel) => {
+        api.transaction(model, (transaction, aModel) => {
             transaction.end({status: 'error'});
         }, {status: 'loading', a:1});
 

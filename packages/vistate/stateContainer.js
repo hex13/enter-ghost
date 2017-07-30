@@ -69,20 +69,6 @@ class Model {
         this._models.set(localId, model);
         return localId;
     }
-    $transaction(callback, tempState) {
-        const transaction = new Transaction({
-            onEnd: resultState => {
-                Object.assign(this.state, savedState);
-                Object.assign(this.state, resultState);
-            }
-        });
-        let savedState = {};
-        Object.keys(tempState).forEach(k => {
-            savedState[k] = this.state[k];
-        });
-        Object.assign(this.state, tempState); // TODO extract as action
-        return callback(transaction, this);
-    }
 };
 
 function getProperty(state, prop) {
@@ -99,6 +85,20 @@ const generateId = (last => () => ++last)(0);
 
 
 const vistate = {
+    transaction(model, callback, tempState) {
+        const transaction = new Transaction({
+            onEnd: resultState => {
+                Object.assign(model.state, savedState);
+                Object.assign(model.state, resultState);
+            }
+        });
+        let savedState = {};
+        Object.keys(tempState).forEach(k => {
+            savedState[k] = model.state[k];
+        });
+        Object.assign(model.state, tempState); // TODO extract as action
+        return callback(transaction, model);
+    },
     systems: middleware,
     defaultSystems: [
         'runHandlerAndNotify',
