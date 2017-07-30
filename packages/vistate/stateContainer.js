@@ -100,6 +100,11 @@ const generateId = (last => () => ++last)(0);
 
 const vistate = {
     systems: middleware,
+    defaultSystems: [
+        'runHandlerAndNotify',
+        'record',
+        'notifier'
+    ],
     //systemInstances: Object.create(null),
     dbg(model) {
         return JSON.stringify(model.state);
@@ -153,15 +158,13 @@ const vistate = {
             model = new AdHocModel();
         }
 
+
         model._componentsById = Object.create(null);
 
         let methods = Object.keys(blueprint.actions||{}).concat('$subscribe');
 
-        const componentRefs = [
-            {system: this.system('runHandlerAndNotify')},
-            {system: this.system('record')},
-            {system: this.system('notifier')},
-        ];
+
+        const componentRefs = this.defaultSystems.map(name => ({system: this.system(name)}));
 
         const modelApi = {};
 
