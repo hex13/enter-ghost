@@ -55,11 +55,7 @@ function _getProps(obj) {
 
 class Model {
     constructor(...args) {
-        this._initialArgs = args;
-        this._root = this;
-        this._localId = ROOT_LOCAL_ID;
-        this._models = new Map;
-        this._lastLocalId = this._localId;
+
     }
 };
 
@@ -155,6 +151,13 @@ const vistate = {
             }
             model = new AdHocModel();
         }
+
+        //model._initialArgs = args;
+        model._root = model;
+        model._localId = ROOT_LOCAL_ID;
+        model._models = new Map;
+        model._lastLocalId = model._localId;
+
 
 
         model._componentsById = Object.create(null);
