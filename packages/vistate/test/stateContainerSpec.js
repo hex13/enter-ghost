@@ -332,11 +332,6 @@ describe('model', () => {
         });
     });
 
-    it('creating Model (without inheritance) should work', () => {
-        const model = $model(new Model);
-        assert.deepEqual(model.get(), {});
-    });
-
     it('should call wrapped method and return correct result', () => {
         const model = $exampleModel();
 

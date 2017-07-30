@@ -32,7 +32,7 @@ const Transaction = require('./transaction');
 
 
 function isModel(obj) {
-    return obj instanceof Model;
+    return obj._root;//obj instanceof Model;
 }
 const ROOT_LOCAL_ID = 1;
 // `constructor` is ES6 class constructor (inb4: thank you captain obvious XD).
@@ -52,12 +52,6 @@ function _getProps(obj) {
     }
     return Object.keys(props);
 }
-
-class Model {
-    constructor(...args) {
-
-    }
-};
 
 function getProperty(state, prop) {
     if (!prop)
@@ -140,19 +134,12 @@ const vistate = {
 
         const blueprint = description;
         let model;
-        if (isModel(description)) {
-            model = description;
+        if (isModel(blueprint)) {
+            model = blueprint;
             if (model._INITIALIZED) return model;
-        } else {
-            class AdHocModel extends Model {
-            }
-            for (let k in description.actions) {
-                AdHocModel.prototype[k] = description.actions[k];
-            }
-            model = new AdHocModel();
         }
+        model = Object.assign({}, blueprint.actions);
 
-        //model._initialArgs = args;
         model._root = model;
         model._localId = ROOT_LOCAL_ID;
         model._models = new Map;
@@ -292,7 +279,6 @@ const vistate = {
 };
 
 module.exports = {
-    Model,
     Transaction,
     ROOT_LOCAL_ID,
     vistate,
