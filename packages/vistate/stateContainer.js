@@ -107,7 +107,7 @@ const vistate = {
     },
     dispatch(model, {target, type, args}) {
         if (target && target != ROOT_LOCAL_ID ) {
-            model = model.getEntity()._models.get(target);
+            model = model.getEntity().find(target);
         }
         model[type](...args);
     },
@@ -160,6 +160,9 @@ const vistate = {
                 this._models = new Map;
                 this._lastLocalId = this._localId;
 
+            }
+            find(id) {
+                return this._models.get(id);
             }
             dispatch(action) {
                 this._componentRefs.forEach(c => {
