@@ -61,9 +61,6 @@ class Model {
         this._models = new Map;
         this._lastLocalId = this._localId;
     }
-    $localId() {
-        return this._localId;
-    }
 };
 
 function getProperty(state, prop) {
@@ -84,7 +81,7 @@ const vistate = {
         const localId = ++owner._lastLocalId;
         owner._models.set(localId, model);
         return localId;
-    },    
+    },
     transaction(model, callback, tempState) {
         const transaction = new Transaction({
             onEnd: resultState => {
@@ -144,6 +141,7 @@ const vistate = {
         model.getEntity().dispatch({model, name: '$undo'})
     },
     model(description, params = {}) {
+
         const blueprint = description;
         let model;
         if (isModel(description)) {
@@ -160,6 +158,7 @@ const vistate = {
 
 
         model._componentsById = Object.create(null);
+
 
         let methods = Object.keys(blueprint.actions||{}).concat('$subscribe');
 
@@ -228,6 +227,7 @@ const vistate = {
         });
 
         model.blueprint = description;
+        model.$localId = () => model._localId;
 
         // create models from properties
         for (let p in model.state) {
