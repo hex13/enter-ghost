@@ -35,23 +35,6 @@ function isModel(obj) {
     return obj._root;//obj instanceof Model;
 }
 const ROOT_LOCAL_ID = 1;
-// `constructor` is ES6 class constructor (inb4: thank you captain obvious XD).
-// methods beginning with `$`` are helpers
-// methods beginning with `get` are getters
-// methods beginning with `_` are private methods
-// rest of methods are actions
-// only actions are recorded.
-
-function _getProps(obj) {
-    const props = {};
-    let curr = obj;
-    for (let curr = obj; curr && curr !== Object.prototype; curr = curr.__proto__) {
-        Object.getOwnPropertyNames(curr).forEach(k => {
-            if (!props.hasOwnProperty(k)) props[k] = true;
-        });
-    }
-    return Object.keys(props);
-}
 
 function getProperty(state, prop) {
     if (!prop)
