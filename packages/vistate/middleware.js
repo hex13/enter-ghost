@@ -51,12 +51,12 @@ const systems = {
    notifier() {
        return {
            dispatch({ model, changed, name, payload: f }) {
-               //window.doAction();
+               //window.doAction && window.doAction();
                if (name == '$subscribe') {
 
                    const root = model._root;
                    root.ee.on('change', (changedModel) => {
-                       if (model === root || model.$localId() === changedModel.$localId()) {
+                       if (model === root || model.getId() === changedModel.getId()) {
                            f(changedModel)
                        }
                    });

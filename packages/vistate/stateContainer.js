@@ -155,6 +155,7 @@ const vistate = {
                 for (let k in data) {
                     this.state[k] = data[k]
                 };
+                this.stagedState = transmutable.fork(this.state);
 
                 this._localId = ROOT_LOCAL_ID;
                 this._models = new Map;
@@ -181,6 +182,20 @@ const vistate = {
 
         model._localId = entity._localId;
 
+        Object.defineProperty(model, 'stagedState', {
+            get: () => entity.stagedState,
+            set: (state) => {
+                entity.stagedState = state;
+            }
+        });
+        Object.defineProperty(model, 'state', {
+            get: () => entity.state,
+            set: (state) => {
+                entity.state = state;
+            }
+        })
+
+
         let methods = Object.keys(blueprint.actions||{}).concat('$subscribe', 'set');
 
         const actions = blueprint.actions || {};
@@ -200,7 +215,7 @@ const vistate = {
         });
 
         model.getEntity = () => entity;
-        model.state = entity.state;
+
 
         componentRefs.forEach(c => {
             c.system.register && c.system.register(model, this);
@@ -208,6 +223,7 @@ const vistate = {
 
         model.blueprint = description;
         model.$localId = () => model._localId;
+        model.getId = () => model._localId;
 
         // create models from properties
         for (let p in model.state) {
@@ -220,7 +236,7 @@ const vistate = {
             }
         }
 
-        model.stagedState = transmutable.fork(model.state);
+
 
         _connectChildren(model._root, model, model.state);
         model._INITIALIZED = true;
