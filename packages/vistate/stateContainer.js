@@ -135,15 +135,11 @@ const vistate = {
         }
         model[type](...args);
     },
-    dispatchToSystems(model, action) {
-        model._componentRefs.forEach(c => {
-            c.system.dispatch(action, c.data, vistate);
-        });
-    },
     undo(model) {
-        this.dispatchToSystems(model, {model, name: '$undo'});
+        model.getEntity().dispatch({model, name: '$undo'})
     },
     model(description, params = {}) {
+        const blueprint = description;
         let model;
         if (isModel(description)) {
             model = description;
@@ -159,14 +155,7 @@ const vistate = {
 
         model._componentsById = Object.create(null);
 
-
-
-        let methods = _getProps(model.__proto__)
-            .filter(n => n != 'constructor'
-                && n.charAt(0) != '$'
-                && n.charAt(0) != '_'
-                && n.indexOf('get') != 0
-            ).concat('$subscribe');
+        let methods = Object.keys(blueprint.actions||{}).concat('$subscribe');
 
         const componentRefs = [
             {system: this.system('runHandlerAndNotify')},
@@ -191,6 +180,25 @@ const vistate = {
             }
         };
         methods.push('set');
+
+        class Entity {
+            constructor(params) {
+                const entity = this;
+                entity._componentRefs = params.componentRefs;
+                const data = params.data;
+
+                this.state = {};
+                for (let k in data) {
+                    this.state[k] = data[k]
+                };
+            }
+            dispatch(action) {
+                this._componentRefs.forEach(c => {
+                    c.system.dispatch(action, c.data, vistate);
+                });
+            }
+        }
+
         methods.forEach(name => {
             const original = model[name] || standardActions[name];
             if (params.use) {
@@ -199,26 +207,23 @@ const vistate = {
                 }));
             }
 
-            modelApi[name ]= model[name] = (...args) => {
+            modelApi[name]= model[name] = (...args) => {
                 const actionData = { original, value: undefined, model, name, args, payload: args[0] };
-                this.dispatchToSystems(model, actionData)
+                entity.dispatch(actionData);
                 return actionData.value;
             }
         });
+        const entity = new Entity({
+            componentRefs, data: description.data
+        })
 
-        model._componentRefs = componentRefs;
+        model.getEntity = () => entity;
+        model.state = entity.state;
 
         componentRefs.forEach(c => {
             c.system.register && c.system.register(model, this);
         });
 
-        model.state = (()=>{
-            const state = {};
-            for (let k in description.data) {
-                state[k] = description.data[k]
-            };
-            return state;
-        })();
         model.blueprint = description;
 
         // create models from properties
