@@ -26,7 +26,7 @@ function _connectChildren(root, model, data) {
         let child = data[prop];
         if (isModel(child)) {
             child._root = root;
-            child._localId = vistate.$register(root, child);
+            child._localId = root.getEntity().register(child);
             _connectChildren(root, child, child.state);
         }
     }
@@ -56,11 +56,6 @@ const generateId = (last => () => ++last)(0);
 
 
 const vistate = {
-    $register(owner, model) {
-        const localId = ++owner._lastLocalId;
-        owner._models.set(localId, model);
-        return localId;
-    },
     transaction(model, callback, tempState) {
         const transaction = new Transaction({
             onEnd: resultState => {
@@ -112,7 +107,7 @@ const vistate = {
     },
     dispatch(model, {target, type, args}) {
         if (target && target != ROOT_LOCAL_ID ) {
-            model = model._models.get(target);
+            model = model.getEntity()._models.get(target);
         }
         model[type](...args);
     },
@@ -130,9 +125,7 @@ const vistate = {
         model = {};
 
         model._root = model;
-        model._localId = ROOT_LOCAL_ID;
-        model._models = new Map;
-        model._lastLocalId = model._localId;
+
 
 
         model._componentsById = Object.create(null);
@@ -162,16 +155,28 @@ const vistate = {
                 for (let k in data) {
                     this.state[k] = data[k]
                 };
+
+                this._localId = ROOT_LOCAL_ID;
+                this._models = new Map;
+                this._lastLocalId = this._localId;
+
             }
             dispatch(action) {
                 this._componentRefs.forEach(c => {
                     c.system.dispatch(action, c.data, vistate);
                 });
             }
+            register(model) {
+                const localId = ++this._lastLocalId;
+                this._models.set(localId, model);
+                return localId;
+            }
         }
         const entity = new Entity(blueprint, {
             componentRefs, data: description.data
-        })
+        });
+
+        model._localId = entity._localId;
 
         let methods = Object.keys(blueprint.actions||{}).concat('$subscribe', 'set');
 
@@ -239,7 +244,7 @@ const vistate = {
                     // TODO connect list item
                     if (isModel(item)) {
                         item._root = this;
-                        item._localId = vistate.$register(this, item);
+                        item._localId = this.getEntity().register(item);
                     }
 
                 },
