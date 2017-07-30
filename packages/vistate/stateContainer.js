@@ -8,6 +8,12 @@ const transmutable = require('transmutable').transmutable();
 
 const middleware = require('./middleware');
 
+const standardActions = {
+    set(state, k, v) {
+        state[k] = v;
+    }
+};
+
 function correct(phrase, texts) {
     phrase = phrase.toLowerCase();
     return texts
@@ -121,7 +127,7 @@ const vistate = {
             model = blueprint;
             if (model._INITIALIZED) return model;
         }
-        model = Object.assign({}, blueprint.actions);
+        model = {};
 
         model._root = model;
         model._localId = ROOT_LOCAL_ID;
@@ -129,11 +135,7 @@ const vistate = {
         model._lastLocalId = model._localId;
 
 
-
         model._componentsById = Object.create(null);
-
-
-        let methods = Object.keys(blueprint.actions||{}).concat('$subscribe');
 
 
         const componentRefs = this.defaultSystems.map(name => ({system: this.system(name)}));
@@ -149,15 +151,9 @@ const vistate = {
             }
         }
 
-        const standardActions = {
-            set(state, k, v) {
-                state[k] = v;
-            }
-        };
-        methods.push('set');
 
         class Entity {
-            constructor(params) {
+            constructor(blueprint, params) {
                 const entity = this;
                 entity._componentRefs = params.componentRefs;
                 const data = params.data;
@@ -173,24 +169,27 @@ const vistate = {
                 });
             }
         }
+        const entity = new Entity(blueprint, {
+            componentRefs, data: description.data
+        })
 
+        let methods = Object.keys(blueprint.actions||{}).concat('$subscribe', 'set');
+
+        const actions = blueprint.actions || {};
         methods.forEach(name => {
-            const original = model[name] || standardActions[name];
+            const original = actions[name] || standardActions[name];
             if (params.use) {
                 componentRefs.push.apply(componentRefs, params.use.map(system => {
                         return {system: this.system(system)};
                 }));
             }
 
-            modelApi[name]= model[name] = (...args) => {
+            model[name] = (...args) => {
                 const actionData = { original, value: undefined, model, name, args, payload: args[0] };
                 entity.dispatch(actionData);
                 return actionData.value;
             }
         });
-        const entity = new Entity({
-            componentRefs, data: description.data
-        })
 
         model.getEntity = () => entity;
         model.state = entity.state;
