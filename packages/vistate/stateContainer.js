@@ -20,7 +20,7 @@ function _connectChildren(root, model, data) {
         let child = data[prop];
         if (isModel(child)) {
             child._root = root;
-            child._localId = root.$register(child);
+            child._localId = vistate.$register(root, child);
             _connectChildren(root, child, child.state);
         }
     }
@@ -64,11 +64,6 @@ class Model {
     $localId() {
         return this._localId;
     }
-    $register(model) {
-        const localId = ++this._lastLocalId;
-        this._models.set(localId, model);
-        return localId;
-    }
 };
 
 function getProperty(state, prop) {
@@ -85,6 +80,11 @@ const generateId = (last => () => ++last)(0);
 
 
 const vistate = {
+    $register(owner, model) {
+        const localId = ++owner._lastLocalId;
+        owner._models.set(localId, model);
+        return localId;
+    },    
     transaction(model, callback, tempState) {
         const transaction = new Transaction({
             onEnd: resultState => {
@@ -267,7 +267,7 @@ const vistate = {
                     // TODO connect list item
                     if (isModel(item)) {
                         item._root = this;
-                        item._localId = this.$register(item);
+                        item._localId = vistate.$register(this, item);
                     }
 
                 },
