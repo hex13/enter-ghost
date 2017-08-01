@@ -838,6 +838,11 @@ describe(`${FRAMEWORK} API:`, () => {
         beforeEach(() => {
             model = api.model({
                 data: initialState,
+                queries: {
+                    getSomething(state, a, b) {
+                        return state.name + a + b;
+                    }
+                },
                 actions: {
                     inc(state) {
                         state.counter++;
@@ -855,6 +860,12 @@ describe(`${FRAMEWORK} API:`, () => {
             });
             expect(state).to.not.equal(initialState);
         });
+        it('that allows for running the query declared in blueprint', () => {
+            const result = model.getSomething('Abc', 'Def');
+
+            expect(result).to.equal('JohnAbcDef');
+        });
+
         it('that has declared action which change state correctly', (done) => {
             model.$subscribe(() => {
                 expect(model.get()).deep.equal({

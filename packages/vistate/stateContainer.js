@@ -158,8 +158,13 @@ const vistate = {
         const modelApi = {};
 
         const queries = {
-            get: model.get || getProperty
+            get: getProperty
         };
+
+        if (blueprint.queries) {
+            Object.assign(queries, blueprint.queries);
+        }
+
         for (let name in queries) {
             model[name] = (...args) => {
                 return queries[name](model.state, ...args);
@@ -279,6 +284,11 @@ const vistate = {
             data: {
                 list: []
             },
+            queries: {
+                get(state) {
+                    return state.list;
+                }
+            },
             actions: {
                 add(state, item) {
                     state.list.push(item);
@@ -289,9 +299,6 @@ const vistate = {
                     }
 
                 },
-                get(state) {
-                    return state.list;
-                }
             }
         });
     },
