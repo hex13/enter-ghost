@@ -1,6 +1,5 @@
 const createEvent = require('./createEvent');
 const transmutable = require('transmutable').transmutable();
-const EventEmitter = require('events');
 
 const systems = {
     runHandlerAndNotify() {
@@ -25,9 +24,8 @@ const systems = {
     },
     record() {
         return {
-            register(model, api) {
+            register(model, data, api) {
                 api.component(model, 'events', []);
-                model.ee = new EventEmitter;
             },
             dispatch(actionData, data, api) {
                const { value, model, name, args } = actionData;
@@ -48,22 +46,23 @@ const systems = {
             }
         }
    },
-   notifier() {
+   notifier(id) {
        return {
-           dispatch({ model, changed, name, payload: f }) {
+           register(model, data, api) {
+               data.observers = [];
+           },
+           dispatch({ model, changed, name, payload: f }, data, api) {
                //window.doAction && window.doAction();
-               if (name == '$subscribe') {
 
-                   const root = model._root;
-                   root.ee.on('change', (changedModel) => {
-                       if (model === root || model.getId() === changedModel.getId()) {
-                           f(changedModel)
-                       }
-                   });
+                if (name == '$subscribe') {
+                   data.observers.push(f);
                    return;
-               }
-               if (changed) {
-                   model._root.ee.emit('change', model);
+                }
+                if (changed) {
+                    data.observers.forEach(f => f(model));
+                    if (model._root != model) {
+                        data.of(model._root).observers.forEach(f => f(model));
+                    }
                }
            }
        }

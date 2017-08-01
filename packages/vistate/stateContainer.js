@@ -71,6 +71,9 @@ const vistate = {
         return callback(transaction, model);
     },
     systems: middleware,
+    runningSystems: {
+
+    },
     defaultSystems: [
         'runHandlerAndNotify',
         'record',
@@ -93,7 +96,18 @@ const vistate = {
         return componentsById[id];
     },
     system(name) {
-        if (this.systems.hasOwnProperty(name)) return this.systems[name]();
+        if (this.runningSystems.hasOwnProperty(name)) {
+            return this.runningSystems[name];
+        }
+        const id = Symbol(name);
+        if (this.systems.hasOwnProperty(name)) {
+            const system = {
+                system: this.systems[name](id),
+                id
+            };
+            this.runningSystems[name] = system;
+            return system;
+        }
     },
     root(model) {
         return model._root;
@@ -131,7 +145,15 @@ const vistate = {
         model._componentsById = Object.create(null);
 
 
-        const componentRefs = this.defaultSystems.map(name => ({system: this.system(name)}));
+        const componentRefs = this.defaultSystems.map(name => {
+            const { system, id } =  this.system(name);
+            return {
+                system,
+                data: this.component(model, id, {
+                    of: (model) => this.component(model, id)
+                })
+            };
+        });
 
         const modelApi = {};
 
@@ -203,7 +225,7 @@ const vistate = {
             const original = actions[name] || standardActions[name];
             if (params.use) {
                 componentRefs.push.apply(componentRefs, params.use.map(system => {
-                        return {system: this.system(system)};
+                        return {system: this.system(system).system};
                 }));
             }
 
@@ -218,7 +240,7 @@ const vistate = {
 
 
         componentRefs.forEach(c => {
-            c.system.register && c.system.register(model, this);
+            c.system.register && c.system.register(model, c.data, this);
         });
 
         model.blueprint = description;
