@@ -1,5 +1,39 @@
 "use strict";
 
+const ROOT_LOCAL_ID = 1;
+class Entity {
+    constructor(blueprint, params) {
+        const entity = this;
+        entity._componentRefs = params.componentRefs;
+        entity._api = params.api;
+
+        const data = params.data;
+        this.state = {};
+        for (let k in data) {
+            this.state[k] = data[k]
+        };
+        this.stagedState = transmutable.fork(this.state);
+
+        this._localId = ROOT_LOCAL_ID;
+        this._models = new Map;
+        this._lastLocalId = this._localId;
+
+    }
+    find(id) {
+        return this._models.get(id);
+    }
+    dispatch(action) {
+        this._componentRefs.forEach(c => {
+            c.system.dispatch(action, c.data, this._api);
+        });
+    }
+    register(model) {
+        const localId = ++this._lastLocalId;
+        this._models.set(localId, model);
+        return localId;
+    }
+}
+
 
 // for autocorrection
 const leven = require('leven');
@@ -40,7 +74,7 @@ const Transaction = require('./transaction');
 function isModel(obj) {
     return obj._root;//obj instanceof Model;
 }
-const ROOT_LOCAL_ID = 1;
+
 
 function getProperty(state, prop) {
     if (!prop)
@@ -172,38 +206,6 @@ const vistate = {
         }
 
 
-        class Entity {
-            constructor(blueprint, params) {
-                const entity = this;
-                entity._componentRefs = params.componentRefs;
-                entity._api = params.api;
-                const data = params.data;
-
-                this.state = {};
-                for (let k in data) {
-                    this.state[k] = data[k]
-                };
-                this.stagedState = transmutable.fork(this.state);
-
-                this._localId = ROOT_LOCAL_ID;
-                this._models = new Map;
-                this._lastLocalId = this._localId;
-
-            }
-            find(id) {
-                return this._models.get(id);
-            }
-            dispatch(action) {
-                this._componentRefs.forEach(c => {
-                    c.system.dispatch(action, c.data, this._api);
-                });
-            }
-            register(model) {
-                const localId = ++this._lastLocalId;
-                this._models.set(localId, model);
-                return localId;
-            }
-        }
         const entity = new Entity(blueprint, {
             componentRefs, data: description.data, api: this
         });
