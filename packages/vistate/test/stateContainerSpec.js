@@ -361,7 +361,23 @@ describe('model', () => {
         assert.equal(model.foo(3), 4);
     });
 
-    it('should trigger change handler after each action which mutates state', () => {
+    it('should trigger an update after action which mutates state', () => {
+        const model = $exampleModel();
+        let updateCount = 0;
+
+        model.$subscribe(() => {
+            updateCount++;
+        });
+
+        model.doFoo();
+
+        return $wait(() => {
+            assert.equal(updateCount, 1);
+        });
+
+    });
+
+    it('should trigger only one update after many consecutive actions which mutates state', () => {
         const model = $exampleModel();
         let updateCount = 0;
 
@@ -374,10 +390,11 @@ describe('model', () => {
         model.doFoo();
 
         return $wait(() => {
-            assert.equal(updateCount, 3);
+            assert.equal(updateCount, 1);
         });
 
     });
+
 
     it('should not trigger change handler after actions that don\'t mutate state', () => {
         const model = $exampleModel();

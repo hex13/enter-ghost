@@ -50,6 +50,7 @@ const systems = {
        return {
            register(model, data, api) {
                data.observers = [];
+               data.timeout = null;
            },
            dispatch({ model, changed, name, payload: f }, data, api) {
                if (typeof window != 'undefined') window.doAction && window.doAction();
@@ -59,14 +60,15 @@ const systems = {
                    data.observers = data.observers.concat(f);
                    return;
                 }
-                if (changed) {
+                if (changed && !data.timeout) {
                     const modelCurrentObservers = data.observers;
                     const rootCurrentObservers = data.of(model._root).observers;
-                    setTimeout(() => {
+                    data.timeout = setTimeout(() => {
                         modelCurrentObservers.forEach(f => f(model));
                         if (model._root != model) {
                             rootCurrentObservers.forEach(f => f(model));
                         }
+                        data.timeout = null;
                     }, 0);
                }
            }
