@@ -114,6 +114,7 @@ API is not stable yet so there can be breaking changes.
 
 Latest breaking changes:
 
+- 02/08/2017: subscriber is now called asynchronously
 - 30/07/2017: Model class is gone. Create model from blueprints instead.
 - 30/07/2017: model.$transaction and model.$register is gone
 - 29/07/2017: $initialState is gone (use `data` param instead)

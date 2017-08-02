@@ -55,14 +55,19 @@ const systems = {
                if (typeof window != 'undefined') window.doAction && window.doAction();
 
                 if (name == '$subscribe') {
-                   data.observers.push(f);
+                    // concat instead of push, to avoid mutation of observers array
+                   data.observers = data.observers.concat(f);
                    return;
                 }
                 if (changed) {
-                    data.observers.forEach(f => f(model));
-                    if (model._root != model) {
-                        data.of(model._root).observers.forEach(f => f(model));
-                    }
+                    const modelCurrentObservers = data.observers;
+                    const rootCurrentObservers = data.of(model._root).observers;
+                    setTimeout(() => {
+                        modelCurrentObservers.forEach(f => f(model));
+                        if (model._root != model) {
+                            rootCurrentObservers.forEach(f => f(model));
+                        }
+                    }, 0);
                }
            }
        }
