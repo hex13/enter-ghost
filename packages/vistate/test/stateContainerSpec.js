@@ -251,6 +251,13 @@ describe('model', () => {
             expect(root.get('child').get('x')).equal(200);
         });
 
+        it('should create children and grand children connected to hierarchy. $root should return root model', () => {
+            const root = $hierarchyModel();
+            assert.strictEqual(api.root(root), root);
+            assert.strictEqual(api.root(root.get('child')), root);
+            assert.strictEqual(api.root(root.get('child').get('grandChild')), root);
+        });
+
         it('should create children and children should notify parent about updates', () => {
             const root = $hierarchyModel();
             let c = 0;
@@ -264,12 +271,6 @@ describe('model', () => {
             root.get('child').foo(13);
             assert.equal(root.get('child').get('x'), 13);
             assert.equal(c, 1);
-        });
-        it('should create children and grand children connected to hierarchy. $root should return root model', () => {
-            const root = $hierarchyModel();
-            assert.strictEqual(api.root(root), root);
-            assert.strictEqual(api.root(root.get('child')), root);
-            assert.strictEqual(api.root(root.get('child').get('grandChild')), root);
         });
         it('should create grand children and grand children should notify root about updates', () => {
             const root = $hierarchyModel();
