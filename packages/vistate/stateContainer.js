@@ -168,7 +168,6 @@ const vistate = {
         let model;
         if (isModel(blueprint)) {
             model = blueprint;
-            if (model._INITIALIZED) return model;
         }
         model = {};
 
@@ -256,20 +255,14 @@ const vistate = {
         model.getId = () => model._localId;
 
         // create models from properties
-        for (let p in model.state) {
-            const value = model.state[p];
+        for (let p in entity.state) {
+            const value = entity.state[p];
             if (typeof value == 'function') {
-                model.state[p] = value();
-            }
-            if (isModel(model.state[p])) {
-                model.state[p] = vistate.model(model.state[p])
+                entity.state[p] = value();
             }
         }
 
-
-
         _connectChildren(model._root, model, model.state);
-        model._INITIALIZED = true;
         model._metadata = {type: description.type};
         // TODO remove it
         model.valueOf = () => model.constructor.name;
