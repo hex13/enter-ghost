@@ -101,7 +101,7 @@ this could be dispatched in any way possible through the **entity** object. Acti
    state.value += 1;
    ```
 
-   This mutation is only recorded (not yet applied). This is the **model** that really applies these mutations. This is inspired by [SAM pattern](http://sam.js.org/) and its "proposed values". But the difference is that in Vistate there is a little bit syntax sugar to it.  To achieve this a little library called [transmutable](npmjs.com/package/transmutable) was created. You can try it yourself.
+   This mutation is only recorded (not yet applied). This is the **model** that really applies these mutations. This is inspired by [SAM pattern](http://sam.js.org/) and its "proposed values". But the difference is that in Vistate there is a little bit syntax sugar to it.  To achieve this a little library called [transmutable](https://npmjs.com/package/transmutable) was created. You can try it yourself.
 
    ​
 
