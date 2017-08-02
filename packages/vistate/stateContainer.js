@@ -3,21 +3,6 @@
 const ROOT_LOCAL_ID = 1;
 class Entity {
     constructor(blueprint, params) {
-        const { data } = params;
-
-        const state = {};
-        for (let k in data) {
-            const value = data[k];
-            if (typeof value == 'function') {
-                state[k] = value();
-            } else {
-                state[k] = value;
-            }
-        };
-
-        this.state = state;
-        this.stagedState = transmutable.fork(state);
-
         this._componentRefs = params.componentRefs;
         this._api = params.api;
 
@@ -28,6 +13,7 @@ class Entity {
         this.blueprint = blueprint;
 
         this._registerComponents();
+        this._initState(params.data);
     }
     find(id) {
         return this._models.get(id);
@@ -41,6 +27,20 @@ class Entity {
         const localId = ++this._lastLocalId;
         this._models.set(localId, model);
         return localId;
+    }
+    _initState(data) {
+        const state = {};
+        for (let k in data) {
+            const value = data[k];
+            if (typeof value == 'function') {
+                state[k] = value();
+            } else {
+                state[k] = value;
+            }
+        };
+
+        this.state = state;
+        this.stagedState = transmutable.fork(state);
     }
     _registerComponents() {
         this._componentRefs.forEach(c => {
