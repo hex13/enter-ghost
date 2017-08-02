@@ -419,7 +419,7 @@ describe('model', () => {
         const model = $model({
             data: {a: 10, b: 20, c: 'kotek'}
         });
-        assert.deepEqual(model.state, {a: 10, b: 20, c: 'kotek'});
+        assert.deepEqual(model.get(), {a: 10, b: 20, c: 'kotek'});
 
         assert.deepEqual(model.get(), {a: 10, b: 20, c: 'kotek'});
 
@@ -431,7 +431,7 @@ describe('model', () => {
 
     xit('should have return correct initial state (when passing args into constructor)', () => {
         const model = $model(new Example4(10, 20, 'kotek'));
-        assert.deepEqual(model.state, {a: 10, b: 20, c: 'kotek'});
+        assert.deepEqual(model.get(), {a: 10, b: 20, c: 'kotek'});
 
         assert.deepEqual(model.get(), {a: 10, b: 20, c: 'kotek'});
 
@@ -447,7 +447,7 @@ describe('model', () => {
         model.inc(10);
         model.inc(100);
         model.inc(1000);
-        assert.deepEqual(model.state, {value: 1210});
+        assert.deepEqual(model.get(), {value: 1210});
     });
 
     xit('should use processResult middleware', () => {
@@ -476,7 +476,7 @@ describe('model', () => {
         model.inc(10);
         model.inc(100);
         model.inc(1000);
-        assert.deepEqual(model.state, {value: 1210});
+        assert.deepEqual(model.get(), {value: 1210});
     });
 
     xit('should reset state', () => {
@@ -485,7 +485,7 @@ describe('model', () => {
         model.inc(100);
         model.inc(1000);
         $reset(model);
-        assert.deepEqual(model.state, {value: 100});
+        assert.deepEqual(model.get(), {value: 100});
     });
 
     xit('should reset state, and also recorder actions', () => {
@@ -496,7 +496,7 @@ describe('model', () => {
         $reset(model);
         model.inc(1000);
         $undo(model);
-        assert.deepEqual(model.state, {value: 100});
+        assert.deepEqual(model.get(), {value: 100});
     });
 
     it('should undo state', () => {
@@ -505,11 +505,11 @@ describe('model', () => {
         model.inc(100);
         model.inc(1000);
         $undo(model);
-        assert.deepEqual(model.state, {value: 210});
+        assert.deepEqual(model.get(), {value: 210});
 
         // second undo for checking if calls are reset
         $undo(model);
-        assert.deepEqual(model.state, {value: 110});
+        assert.deepEqual(model.get(), {value: 110});
     });
 
     it('should dispatch via `dispatch` method', () => {
@@ -517,7 +517,7 @@ describe('model', () => {
 
         api.dispatch(model, {type: 'inc', args:[1]});
 
-        assert.deepEqual(model.state, {value: 101});
+        assert.deepEqual(model.get(), {value: 101});
     });
 
 
