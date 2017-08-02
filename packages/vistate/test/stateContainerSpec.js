@@ -171,7 +171,7 @@ describe('example', () => {
 
         model.$subscribe(() => {
             console.log("update your view here");
-            console.log("current state:", model.state);
+            console.log("current state:", model.get());
             renderYourView();
         });
 
