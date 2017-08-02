@@ -111,4 +111,18 @@ describe('Transmutable', () => {
         assert.deepStrictEqual(copied.arr, [1, 2, 3, 4])
     });
 
+    it('allows for reify current stage', () => {
+        t.stage.a = {n:2017};
+        expected.a = {n:2017};
+        const reified = t.reify();
+        const reified2 = t.reify();
+
+        assert.strictEqual(reified.a, reified2.a, 'and reified objects have structural sharing')
+        assert.deepStrictEqual(t.mutations, [[['a'], {n: 2017}]], 'it doesn\' reset mutations after reify');
+
+        assert.deepStrictEqual(original, createExample())
+        assert.deepStrictEqual(reified, expected);
+        assert.strictEqual(t.target, ex, 'target stays the same after reifying');
+    });
+
 });

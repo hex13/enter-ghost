@@ -23,7 +23,6 @@ function cloneDeepWithDirtyChecking(o, mutations) {
 
     const copy = (o, objPath = []) => {
         if (!isDirty(mutations, objPath)) return o;
-
         let o2;
         if (Array.isArray(o)) {
             o2 = o.slice();
@@ -88,7 +87,6 @@ Transmutable.prototype.pushTo = function pushTo(target) {
         const m = proposed.mutations[i];;
         if (!m) break;
         const [path, value] = m;
-
         let curr;
         for (let j = 0, curr = target; j < path.length; j++) {
             if (j < path.length - 1) {
@@ -98,16 +96,21 @@ Transmutable.prototype.pushTo = function pushTo(target) {
             }
         }
     }
-    this.mutations.length = 0;
 };
 
 
 Transmutable.prototype.commit = function commit() {
-    const copied = cloneDeepWithDirtyChecking(this.target, this.mutations);
+    const copied = this.reify();
     this.target = copied;
-    this.pushTo(copied);
+    this.mutations.length = 0;
     return copied;
 }
+
+Transmutable.prototype.reify = function reify(target) {
+    const copied = cloneDeepWithDirtyChecking(this.target, this.mutations);
+    this.pushTo(copied);
+    return copied;
+};
 
 exports.transmutable = () => {
     return {
