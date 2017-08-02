@@ -924,7 +924,7 @@ describe(`${FRAMEWORK} API:`, () => {
             expect(collection.get()).deep.equal([123, 456]);
         });
 
-        it('that triggers change handlers after element actions', () => {
+        it('that triggers change handler after element action', () => {
             const model = api.model({
                 data: {
                     v: 0,
@@ -943,11 +943,9 @@ describe(`${FRAMEWORK} API:`, () => {
             });
 
             model.foo();
-            model.foo();
-            model.foo();
 
             return $wait(() => {
-                expect(c).equal(3);
+                expect(c).equal(1);
             })
         });
 
