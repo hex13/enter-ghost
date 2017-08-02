@@ -83,6 +83,12 @@ describe('Transmutable', () => {
         assert(copied.arr === original.arr);
     });
 
+    it('reset mutations after commit', () => {
+        t.stage.a = 123456;
+        t.commit();
+        assert.strictEqual(t.mutations.length, 0);
+    });
+
     it('accumulates changes after commit (thus allows for commiting changes incrementally)', () => {
         expected.a = 200;
         expected.b = 20;
