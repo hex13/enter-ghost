@@ -113,3 +113,9 @@ Transmutable.prototype.reify = function reify(target) {
 };
 
 exports.Transmutable = Transmutable;
+
+exports.transform = (original, transformer) => {
+    const t = new Transmutable(original);
+    transformer(t.stage);
+    return t.reify();
+};

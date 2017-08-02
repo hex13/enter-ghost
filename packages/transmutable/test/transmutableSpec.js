@@ -1,6 +1,6 @@
 "use strict";
 
-const { Transmutable } = require('../transmutable.js');
+const { Transmutable, transform } = require('../transmutable.js');
 const assert = require('assert');
 
 const createExample = () => ({
@@ -125,4 +125,23 @@ describe('Transmutable', () => {
         assert.strictEqual(t.target, ex, 'target stays the same after reifying');
     });
 
+});
+
+describe('transform', () => {
+    it('allows for transforming', () => {
+        const original = createExample();
+        const expected = createExample();
+        const someObject = {ooo:1};
+        expected.b = 'małpy';
+        expected.dupa = someObject;
+        const copy = transform(original, state => {
+            state.b = 'małpy';
+            state.dupa = someObject;
+        });
+        assert.deepEqual(copy, expected);
+        assert.strictEqual(copy.dupa, expected.dupa);
+        assert.strictEqual(copy.c, original.c);
+
+        assert.deepEqual(original, createExample());
+    });
 });
