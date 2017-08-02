@@ -95,7 +95,7 @@ const generateId = (last => () => ++last)(0);
 
 
 
-const vistate = {
+const init = () => ({
     transaction(model, callback, tempState) {
         const transaction = new Transaction({
             onEnd: resultState => {
@@ -289,11 +289,11 @@ const vistate = {
 
         }
     }
-};
+});
 
 module.exports = {
     Transaction,
     ROOT_LOCAL_ID,
-    vistate,
+    init,
     isModel,
 };

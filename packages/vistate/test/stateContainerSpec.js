@@ -9,7 +9,7 @@ const { Model, ROOT_LOCAL_ID, Transaction, isModel } = require('..');
 const createEvent = require('../createEvent');
 
 const sc = require('..');
-const api = sc.vistate;
+const api = sc.init();
 
 function $wait(func) {
     return new Promise(done => {
@@ -167,7 +167,7 @@ describe('example', () => {
 
         //------ EXAMPLE
 
-        const { vistate } = require('vistate');
+        const vistate = require('vistate').init();
 
         const model = vistate.model({
             data: {value: 100},

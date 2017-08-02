@@ -8,7 +8,7 @@ Examples of use:
 
 ```javascript
 
-const { vistate } = require('vistate');
+const vistate = require('vistate').init();
 
 const model = vistate.model({
     data: {value: 100},
@@ -26,7 +26,6 @@ model.$subscribe(() => {
 });
 
 model.inc();
-
 ```
 
 
@@ -114,6 +113,7 @@ API is not stable yet so there can be breaking changes.
 
 Latest breaking changes:
 
+- 02/08/2017: now to access vistate api you must call `init` function
 - 02/08/2017: remove `model.state` (use `model.get()`)
 - 02/08/2017: subscriber is now called asynchronously
 - 30/07/2017: Model class is gone. Create model from blueprints instead.
