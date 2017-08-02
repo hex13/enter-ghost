@@ -176,6 +176,7 @@ const vistate = {
             constructor(blueprint, params) {
                 const entity = this;
                 entity._componentRefs = params.componentRefs;
+                entity._api = params.api;
                 const data = params.data;
 
                 this.state = {};
@@ -194,7 +195,7 @@ const vistate = {
             }
             dispatch(action) {
                 this._componentRefs.forEach(c => {
-                    c.system.dispatch(action, c.data, vistate);
+                    c.system.dispatch(action, c.data, this._api);
                 });
             }
             register(model) {
@@ -204,7 +205,7 @@ const vistate = {
             }
         }
         const entity = new Entity(blueprint, {
-            componentRefs, data: description.data
+            componentRefs, data: description.data, api: this
         });
 
         model._localId = entity._localId;
