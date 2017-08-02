@@ -186,7 +186,7 @@ const vistate = {
             return {
                 system,
                 data: this.component(model, id, {
-                    of: (model) => this.component(model, id)
+                    of: (model) => this.component(model, id),
                 })
             };
         });

@@ -6,15 +6,16 @@ const systems = {
         return {
             dispatch(actionData) {
                 const { original, value, model, name, args } = actionData;
+                const entity = model.getEntity();
                 if (name.charAt(0) == '$') return;
 
-                const res = original.apply(model, [model.stagedState.stage].concat(args));
-                const oldState = model.state;
+                const res = original.apply(model, [entity.stagedState.stage].concat(args));
+                const oldState = entity.state;
 
-                actionData.mutations = model.stagedState.mutations.slice();
-                model.state = model.stagedState.commit();
+                actionData.mutations = entity.stagedState.mutations.slice();
+                entity.state = entity.stagedState.commit();
 
-                if (oldState !== model.state) {
+                if (oldState !== entity.state) {
                     actionData.changed = true;
                 }
 
@@ -34,7 +35,7 @@ const systems = {
                    const tmp = api.model(model.blueprint);
                    events.pop();
                    events.forEach(event => api.dispatch(tmp, event))
-                   model.state = tmp.get();
+                   model.getEntity().state = tmp.get();
                    actionData.changed = true;
                    return;
                } else if (name.charAt(0) == '$') return;
@@ -76,10 +77,10 @@ const systems = {
    },
    reducers() {
        return {
-           dispatch(actionData) {
-               const { model } = actionData;
-               model.stagedState = transmutable.fork(actionData.value);
-               model.state = model.stagedState.commit();
+           dispatch({ model, value }) {
+               const entity = model.getEntity();
+               entity.stagedState = transmutable.fork(value);
+               entity.state = entity.stagedState.commit();
            }
        }
    }
