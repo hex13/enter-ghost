@@ -168,14 +168,9 @@ const init = () => ({
     undo(model) {
         model.getEntity().dispatch({model, name: '$undo'})
     },
-    model(description, params = {}) {
+    model(blueprint, params = {}) {
 
-        const blueprint = description;
-        let model;
-        if (isModel(blueprint)) {
-            model = blueprint;
-        }
-        model = {};
+        const model = {};
 
         model._root = model;
 
@@ -208,7 +203,7 @@ const init = () => ({
         }
 
         const entity = new Entity(blueprint, {
-            componentRefs, data: description.data, api: this
+            componentRefs, data: blueprint.data, api: this
         });
 
         model._localId = entity._localId;
@@ -238,14 +233,14 @@ const init = () => ({
             c.system.register && c.system.register(model, c.data, this);
         });
 
-        model.blueprint = description;
+        model.blueprint = blueprint;
         model.$localId = () => model._localId;
         model.getId = () => model._localId;
 
 
 
         _connectChildren(model._root, model, entity.state);
-        model._metadata = {type: description.type};
+        model._metadata = {type: blueprint.type};
         // TODO remove it
         model.valueOf = () => model.constructor.name;
         return model;
