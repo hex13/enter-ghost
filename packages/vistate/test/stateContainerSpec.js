@@ -10,6 +10,15 @@ const createEvent = require('../createEvent');
 
 const sc = require('..');
 const api = sc.vistate;
+
+function $wait(func) {
+    return new Promise(done => {
+        setTimeout(() => {
+            func();
+            done();
+        }, 50);
+    });
+}
 function $undo(model) {
     return api.undo(model);
 }
