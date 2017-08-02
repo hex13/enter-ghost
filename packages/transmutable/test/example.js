@@ -9,7 +9,7 @@ describe('example', () => {
 
         // COPY FROM HERE
 
-        const transmutable = require('transmutable').transmutable();
+        const { Transmutable } = require('transmutable');
         const log = console.log.bind(console);
 
         const original = {
@@ -19,13 +19,13 @@ describe('example', () => {
             }
         };
 
-        const forked = transmutable.fork(original);
-        forked.stage.cow = 456;
-        forked.stage.dogs.muchWow = 888888;
-            log(forked.reify()); // { cow: 456, dogs: { muchWow: 888888 } }
-            log(forked.stage.dogs); // { muchWow: 1 }
+        const t = new Transmutable(original);
+        t.stage.cow = 456;
+        t.stage.dogs.muchWow = 888888;
+            log(t.reify()); // { cow: 456, dogs: { muchWow: 888888 } }
+            log(t.stage.dogs); // { muchWow: 1 }
 
-        const copied = forked.commit();
+        const copied = t.commit();
 
             log(copied); // { cow: 456, dogs: { muchWow: 888888 } }
 

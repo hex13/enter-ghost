@@ -4,7 +4,7 @@ Example:
 
 ```javascript
 
-const transmutable = require('transmutable').transmutable();
+const { Transmutable } = require('transmutable');
 const log = console.log.bind(console);
 
 const original = {
@@ -14,19 +14,17 @@ const original = {
     }
 };
 
-const forked = transmutable.fork(original);
-forked.stage.cow = 456;
-forked.stage.dogs.muchWow = 888888;
-    log(forked.reify()); // { cow: 456, dogs: { muchWow: 888888 } }
-    log(forked.stage.dogs); // { muchWow: 1 }
+const t = new Transmutable(original);
+t.stage.cow = 456;
+t.stage.dogs.muchWow = 888888;
+    log(t.reify()); // { cow: 456, dogs: { muchWow: 888888 } }
+    log(t.stage.dogs); // { muchWow: 1 }
 
-const copied = forked.commit();
+const copied = t.commit();
 
     log(copied); // { cow: 456, dogs: { muchWow: 888888 } }
 
     log(original); // { cow: 123, dogs: { muchWow: 1 } }
-
-
 
 ```
 
@@ -40,6 +38,6 @@ properties of Transmutable object:
 **stage** enables for recording mutations, but it doesn't mutate neither original object neither stage object itself.
 It may be implemented by Proxy or by getters/setters (but this is technical detail, don't rely on it).
 
-**reify()** - materializes mutations without committing. 
+**reify()** - materializes mutations without committing. It returns smart copy of original object with applied mutations.
 
 **commit()** - materializes mutations with committing. So it's like reify, but with side-effects: mutations are reset and `stage` properties are updated to match next state.

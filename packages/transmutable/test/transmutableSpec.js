@@ -1,6 +1,6 @@
 "use strict";
 
-const { transmutable } = require('../transmutable.js')
+const { Transmutable } = require('../transmutable.js');
 const assert = require('assert');
 
 const createExample = () => ({
@@ -24,7 +24,7 @@ describe('Transmutable', () => {
     beforeEach(() => {
         ex = createExample();
         original = ex;
-        t = transmutable().fork(ex);
+        t = new Transmutable(ex);
         expected = createExample();
     });
 

@@ -1,5 +1,5 @@
 const createEvent = require('./createEvent');
-const transmutable = require('transmutable').transmutable();
+const { Transmutable } = require('transmutable');
 
 const systems = {
     runHandlerAndNotify() {
@@ -79,7 +79,7 @@ const systems = {
        return {
            dispatch({ model, value }) {
                const entity = model.getEntity();
-               entity.stagedState = transmutable.fork(value);
+               entity.stagedState = new Transmutable(value);
                entity.state = entity.stagedState.commit();
            }
        }

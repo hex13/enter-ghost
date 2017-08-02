@@ -40,7 +40,7 @@ class Entity {
         };
 
         this.state = state;
-        this.stagedState = transmutable.fork(state);
+        this.stagedState = new Transmutable(state);
     }
     _registerComponents() {
         this._componentRefs.forEach(c => {
@@ -53,7 +53,7 @@ class Entity {
 // for autocorrection
 const leven = require('leven');
 
-const transmutable = require('transmutable').transmutable();
+const { Transmutable } = require('transmutable');
 
 const middleware = require('./middleware');
 

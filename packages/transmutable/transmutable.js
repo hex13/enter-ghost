@@ -112,10 +112,4 @@ Transmutable.prototype.reify = function reify(target) {
     return copied;
 };
 
-exports.transmutable = () => {
-    return {
-        fork(original) {
-            return new Transmutable(original)
-        }
-    }
-};
+exports.Transmutable = Transmutable;
