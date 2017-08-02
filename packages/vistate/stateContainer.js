@@ -3,21 +3,27 @@
 const ROOT_LOCAL_ID = 1;
 class Entity {
     constructor(blueprint, params) {
-        const entity = this;
-        entity._componentRefs = params.componentRefs;
-        entity._api = params.api;
+        const { data } = params;
 
-        const data = params.data;
-        this.state = {};
+        const state = {};
         for (let k in data) {
-            this.state[k] = data[k]
+            const value = data[k];
+            if (typeof value == 'function') {
+                state[k] = value();
+            } else {
+                state[k] = value;
+            }
         };
-        this.stagedState = transmutable.fork(this.state);
+
+        this.state = state;
+        this.stagedState = transmutable.fork(state);
+
+        this._componentRefs = params.componentRefs;
+        this._api = params.api;
 
         this._localId = ROOT_LOCAL_ID;
         this._models = new Map;
         this._lastLocalId = this._localId;
-
     }
     find(id) {
         return this._models.get(id);
@@ -173,10 +179,7 @@ const vistate = {
 
         model._root = model;
 
-
-
         model._componentsById = Object.create(null);
-
 
         const componentRefs = this.defaultSystems.map(name => {
             const { system, id } =  this.system(name);
@@ -203,7 +206,6 @@ const vistate = {
                 return queries[name](model.state, ...args);
             }
         }
-
 
         const entity = new Entity(blueprint, {
             componentRefs, data: description.data, api: this
@@ -254,13 +256,7 @@ const vistate = {
         model.$localId = () => model._localId;
         model.getId = () => model._localId;
 
-        // create models from properties
-        for (let p in entity.state) {
-            const value = entity.state[p];
-            if (typeof value == 'function') {
-                entity.state[p] = value();
-            }
-        }
+
 
         _connectChildren(model._root, model, model.state);
         model._metadata = {type: description.type};
