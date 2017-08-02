@@ -52,7 +52,7 @@ const systems = {
                data.observers = [];
            },
            dispatch({ model, changed, name, payload: f }, data, api) {
-               //window.doAction && window.doAction();
+               if (typeof window != 'undefined') window.doAction && window.doAction();
 
                 if (name == '$subscribe') {
                    data.observers.push(f);
