@@ -24,6 +24,10 @@ class Entity {
         this._localId = ROOT_LOCAL_ID;
         this._models = new Map;
         this._lastLocalId = this._localId;
+        this._model = params.model;
+        this.blueprint = blueprint;
+
+        this._registerComponents();
     }
     find(id) {
         return this._models.get(id);
@@ -37,6 +41,11 @@ class Entity {
         const localId = ++this._lastLocalId;
         this._models.set(localId, model);
         return localId;
+    }
+    _registerComponents() {
+        this._componentRefs.forEach(c => {
+            c.system.register && c.system.register(this._model, c.data, this._api);
+        });
     }
 }
 
@@ -203,7 +212,7 @@ const init = () => ({
         }
 
         const entity = new Entity(blueprint, {
-            componentRefs, data: blueprint.data, api: this
+            componentRefs, data: blueprint.data, api: this, model
         });
 
         model._localId = entity._localId;
@@ -211,6 +220,7 @@ const init = () => ({
         let methods = Object.keys(blueprint.actions||{}).concat('$subscribe', 'set');
 
         const actions = blueprint.actions || {};
+
         methods.forEach(name => {
             const original = actions[name] || standardActions[name];
             if (params.use) {
@@ -228,16 +238,8 @@ const init = () => ({
 
         model.getEntity = () => entity;
 
-
-        componentRefs.forEach(c => {
-            c.system.register && c.system.register(model, c.data, this);
-        });
-
-        model.blueprint = blueprint;
         model.$localId = () => model._localId;
         model.getId = () => model._localId;
-
-
 
         _connectChildren(model._root, model, entity.state);
         model._metadata = {type: blueprint.type};

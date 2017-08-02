@@ -32,7 +32,7 @@ const systems = {
                const { value, model, name, args } = actionData;
                const events = api.component(api.root(model), 'events');
                if (name == '$undo') {
-                   const tmp = api.model(model.blueprint);
+                   const tmp = api.model(model.getEntity().blueprint);
                    events.pop();
                    events.forEach(event => api.dispatch(tmp, event))
                    model.getEntity().state = tmp.get();
