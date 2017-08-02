@@ -1,13 +1,13 @@
 {
   "name": "transmutable",
-  "version": "0.0.6",
+  "version": "0.0.9",
   "description": "immutable objects that pretend to be mutable",
   "main": "transmutable.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "immutable", "immutability", "copy-on-write", "cow", "deep", "clone", "mutations"
+    "immutable", "immutability", "copy-on-write", "cow", "deep", "clone", "mutations", "event sourcing"
   ],
   "author": "= <=>",
   "license": "MIT",
