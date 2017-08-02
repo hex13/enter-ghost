@@ -67,7 +67,7 @@ function _connectChildren(root, model, data) {
         if (isModel(child)) {
             child._root = root;
             child._localId = root.getEntity().register(child);
-            _connectChildren(root, child, child.state);
+            _connectChildren(root, child, child.getEntity().state);
         }
     }
 }
@@ -99,15 +99,15 @@ const vistate = {
     transaction(model, callback, tempState) {
         const transaction = new Transaction({
             onEnd: resultState => {
-                Object.assign(model.state, savedState);
-                Object.assign(model.state, resultState);
+                Object.assign(model.getEntity().state, savedState);
+                Object.assign(model.getEntity().state, resultState);
             }
         });
         let savedState = {};
         Object.keys(tempState).forEach(k => {
-            savedState[k] = model.state[k];
+            savedState[k] = model.getEntity().state[k];
         });
-        Object.assign(model.state, tempState); // TODO extract as action
+        Object.assign(model.getEntity().state, tempState); // TODO extract as action
         return callback(transaction, model);
     },
     systems: middleware,
@@ -121,7 +121,7 @@ const vistate = {
     ],
     //systemInstances: Object.create(null),
     dbg(model) {
-        return JSON.stringify(model.state);
+        return JSON.stringify(model.get());
     },
     events(model) {
         return this.component(this.root(model), 'events').filter(event => {
@@ -203,7 +203,7 @@ const vistate = {
 
         for (let name in queries) {
             model[name] = (...args) => {
-                return queries[name](model.state, ...args);
+                return queries[name](model.getEntity().state, ...args);
             }
         }
 
@@ -212,20 +212,6 @@ const vistate = {
         });
 
         model._localId = entity._localId;
-
-        Object.defineProperty(model, 'stagedState', {
-            get: () => entity.stagedState,
-            set: (state) => {
-                entity.stagedState = state;
-            }
-        });
-        Object.defineProperty(model, 'state', {
-            get: () => entity.state,
-            set: (state) => {
-                entity.state = state;
-            }
-        })
-
 
         let methods = Object.keys(blueprint.actions||{}).concat('$subscribe', 'set');
 
@@ -258,7 +244,7 @@ const vistate = {
 
 
 
-        _connectChildren(model._root, model, model.state);
+        _connectChildren(model._root, model, entity.state);
         model._metadata = {type: description.type};
         // TODO remove it
         model.valueOf = () => model.constructor.name;
