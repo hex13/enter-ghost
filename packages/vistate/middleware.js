@@ -78,6 +78,7 @@ const systems = {
    reducers() {
        return {
            dispatch({ model, value }) {
+               if (!value || typeof value !== 'object') return;
                const entity = model.getEntity();
                entity.stagedState = new Transmutable(value);
                entity.state = entity.stagedState.commit();

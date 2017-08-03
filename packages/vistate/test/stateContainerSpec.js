@@ -467,12 +467,14 @@ describe('model', () => {
         const model = $model({
             data: {value: 100},
             actions: {
-                inc: (state, amount) => ({value: state.value + amount})
+                inc: (state, amount) => ({value: state.value + amount}),
+                nop: () => { /*  this is no-op */ }
             }
         }, {
             use: ['reducers'],
         });
         let c = 0;
+        model.nop();
         model.inc(10);
         model.inc(100);
         model.inc(1000);
