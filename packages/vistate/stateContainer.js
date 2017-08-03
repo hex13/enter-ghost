@@ -186,7 +186,7 @@ const init = () => {
 
             model._componentsById = Object.create(null);
 
-            const componentRefs = this.defaultSystems.map(name => {
+            const componentRefs = this.defaultSystems.concat(params.use || []).map(name => {
                 const { system, id } =  this.system(name);
                 return {
                     system,
@@ -224,11 +224,6 @@ const init = () => {
 
             methods.forEach(name => {
                 const original = actions[name] || standardActions[name];
-                if (params.use) {
-                    componentRefs.push.apply(componentRefs, params.use.map(system => {
-                            return {system: this.system(system).system};
-                    }));
-                }
 
                 model[name] = (...args) => {
                     const actionData = { original, value: undefined, model, name, args, payload: args[0] };
