@@ -104,7 +104,7 @@ const generateId = (last => () => ++last)(0);
 
 
 
-const init = () => {
+const init = (config = {}) => {
     return {
         transaction(model, callback, tempState) {
             const transaction = new Transaction({
@@ -195,15 +195,18 @@ const init = () => {
 
             model._componentsById = Object.create(null);
 
-            const componentRefs = this.defaultSystems.concat(params.use || []).map(nameOrFactory => {
-                const { system, id } =  this.system(nameOrFactory);
-                return {
-                    system,
-                    data: this.component(model, id, {
-                        of: (model) => this.component(model, id),
-                    })
-                };
-            });
+            const componentRefs = this.defaultSystems
+                .concat(params.use || [])
+                .concat(config.use || [])
+                .map(nameOrFactory => {
+                    const { system, id } =  this.system(nameOrFactory);
+                    return {
+                        system,
+                        data: this.component(model, id, {
+                            of: (model) => this.component(model, id),
+                        })
+                    };
+                });
 
             const modelApi = {};
 

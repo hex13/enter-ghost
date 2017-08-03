@@ -8,8 +8,8 @@ const { expect } = require('chai');
 const { Model, ROOT_LOCAL_ID, Transaction, isModel } = require('..');
 const createEvent = require('../createEvent');
 
-const sc = require('..');
-const api = sc.init();
+const vistate = require('..');
+const api = vistate.init();
 
 function $wait(func) {
     return new Promise(done => {
@@ -499,6 +499,37 @@ describe('model', () => {
                     res = data.value;
                 }
             })],
+        });
+
+        model.foo(500);
+        model.foo(100);
+        model.foo(15);
+        model.foo(1);
+        return $wait(() => {
+            assert.equal(res, 1234);
+        })
+    });
+
+
+    it('should assign ad-hoc system to model during creation (when passing a factory to API)', () => {
+        const api = vistate.init({
+            use: [() => ({
+                register(m, data) {
+                    data.value = 2;
+                },
+                dispatch(ad, data) {
+                    data.value += ad.value;
+                    res = data.value;
+                }
+            })],
+        });
+
+        let res = 0;
+        const model = api.model({
+            data: {value: 100},
+            actions: {
+                foo: (state, amount) => amount * 2
+            }
         });
 
         model.foo(500);
