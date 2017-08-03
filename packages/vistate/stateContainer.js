@@ -145,18 +145,27 @@ const init = () => {
             }
             return componentsById[id];
         },
-        system(name) {
-            if (this.runningSystems.hasOwnProperty(name)) {
-                return this.runningSystems[name];
-            }
-            const id = Symbol(name);
-            if (this.systems.hasOwnProperty(name)) {
+        system(nameOrFactory) {
+            if (typeof nameOrFactory == 'function') {
                 const system = {
-                    system: this.systems[name](id),
-                    id
+                    system: nameOrFactory()
                 };
-                this.runningSystems[name] = system;
                 return system;
+
+            } else {
+                const name = nameOrFactory;
+                if (this.runningSystems.hasOwnProperty(name)) {
+                    return this.runningSystems[name];
+                }
+                const id = Symbol(name);
+                if (this.systems.hasOwnProperty(name)) {
+                    const system = {
+                        system: this.systems[name](id),
+                        id
+                    };
+                    this.runningSystems[name] = system;
+                    return system;
+                }
             }
         },
         root(model) {
@@ -186,8 +195,8 @@ const init = () => {
 
             model._componentsById = Object.create(null);
 
-            const componentRefs = this.defaultSystems.concat(params.use || []).map(name => {
-                const { system, id } =  this.system(name);
+            const componentRefs = this.defaultSystems.concat(params.use || []).map(nameOrFactory => {
+                const { system, id } =  this.system(nameOrFactory);
                 return {
                     system,
                     data: this.component(model, id, {

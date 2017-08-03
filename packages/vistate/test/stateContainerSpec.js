@@ -481,6 +481,35 @@ describe('model', () => {
         assert.deepEqual(model.get(), {value: 1210});
     });
 
+
+    it('should assign ad-hoc system to model during creation (when passing a factory)', () => {
+        let res = 0;
+        const model = $model({
+            data: {value: 100},
+            actions: {
+                foo: (state, amount) => amount * 2
+            }
+        }, {
+            use: [() => ({
+                register(m, data) {
+                    data.value = 2;
+                },
+                dispatch(ad, data) {
+                    data.value += ad.value;
+                    res = data.value;
+                }
+            })],
+        });
+
+        model.foo(500);
+        model.foo(100);
+        model.foo(15);
+        model.foo(1);
+        return $wait(() => {
+            assert.equal(res, 1234);
+        })
+    });
+
     xit('should reset state', () => {
         const model = new Example;
         model.inc(10);
