@@ -105,7 +105,32 @@ const generateId = (last => () => ++last)(0);
 
 
 const init = (config = {}) => {
+    function createSystemRef(system) {
+        return {
+            system,
+            id: Symbol()
+        }
+    }
+    function component(model, id, value) {
+        const componentsById = model._componentsById;
+        if (value !== undefined) {
+            componentsById[id] = value;
+        }
+        return componentsById[id];
+    }
+    function Component(model, {system, id}) {
+        this.system = system;
+        this.data = component(model, id, {
+            of: (model) => component(model, id),
+        });
+    }
+
+
+    const defaultSystemRefs = ['runHandlerAndNotify', 'record', 'notifier']
+        .map(name => createSystemRef(middleware[name]()));
+
     return {
+        component,
         transaction(model, callback, tempState) {
             const transaction = new Transaction({
                 onEnd: resultState => {
@@ -120,53 +145,13 @@ const init = (config = {}) => {
             Object.assign(model.getEntity().state, tempState); // TODO extract as action
             return callback(transaction, model);
         },
-        systems: middleware,
-        runningSystems: {
-
-        },
-        defaultSystems: [
-            'runHandlerAndNotify',
-            'record',
-            'notifier'
-        ],
-        //systemInstances: Object.create(null),
         dbg(model) {
             return JSON.stringify(model.get());
         },
         events(model) {
-            return this.component(this.root(model), 'events').filter(event => {
+            return component(this.root(model), 'events').filter(event => {
                 return this.root(model) == model || event.target == model.$localId();
             });
-        },
-        component(model, id, value) {
-            const componentsById = model._componentsById;
-            if (value !== undefined) {
-                componentsById[id] = value;
-            }
-            return componentsById[id];
-        },
-        system(nameOrFactory) {
-            if (typeof nameOrFactory == 'function') {
-                const system = {
-                    system: nameOrFactory()
-                };
-                return system;
-
-            } else {
-                const name = nameOrFactory;
-                if (this.runningSystems.hasOwnProperty(name)) {
-                    return this.runningSystems[name];
-                }
-                const id = Symbol(name);
-                if (this.systems.hasOwnProperty(name)) {
-                    const system = {
-                        system: this.systems[name](id),
-                        id
-                    };
-                    this.runningSystems[name] = system;
-                    return system;
-                }
-            }
         },
         root(model) {
             return model._root;
@@ -195,18 +180,12 @@ const init = (config = {}) => {
 
             model._componentsById = Object.create(null);
 
-            const componentRefs = this.defaultSystems
-                .concat(params.use || [])
+
+            const systemRefs = (params.use || [])
                 .concat(config.use || [])
-                .map(nameOrFactory => {
-                    const { system, id } =  this.system(nameOrFactory);
-                    return {
-                        system,
-                        data: this.component(model, id, {
-                            of: (model) => this.component(model, id),
-                        })
-                    };
-                });
+                .map(system => createSystemRef(system));
+
+            const componentRefs = defaultSystemRefs.concat(systemRefs).map(system => new Component(model, system))
 
             const modelApi = {};
 

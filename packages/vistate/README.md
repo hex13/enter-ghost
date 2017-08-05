@@ -113,6 +113,7 @@ API is not stable yet so there can be breaking changes.
 
 Latest breaking changes:
 
+- 05/08/2017: differences is using middleware systems
 - 02/08/2017: now to access vistate api you must call `init` function
 - 02/08/2017: remove `model.state` (use `model.get()`)
 - 02/08/2017: subscriber is now called asynchronously

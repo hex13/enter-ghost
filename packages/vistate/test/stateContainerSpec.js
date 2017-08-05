@@ -8,6 +8,7 @@ const { expect } = require('chai');
 const { Model, ROOT_LOCAL_ID, Transaction, isModel } = require('..');
 const createEvent = require('../createEvent');
 
+const middleware = require('../middleware')
 const vistate = require('..');
 const api = vistate.init();
 
@@ -471,7 +472,7 @@ describe('model', () => {
                 nop: () => { /*  this is no-op */ }
             }
         }, {
-            use: ['reducers'],
+            use: [middleware.reducers()],
         });
         let c = 0;
         model.nop();
@@ -482,7 +483,7 @@ describe('model', () => {
     });
 
 
-    it('should assign ad-hoc system to model during creation (when passing a factory)', () => {
+    it('should assign ad-hoc system to model during creation (when passing an instance of the system)', () => {
         let res = 0;
         const model = $model({
             data: {value: 100},
@@ -490,7 +491,7 @@ describe('model', () => {
                 foo: (state, amount) => amount * 2
             }
         }, {
-            use: [() => ({
+            use: [{
                 register(m, data) {
                     data.value = 2;
                 },
@@ -498,7 +499,7 @@ describe('model', () => {
                     data.value += ad.value;
                     res = data.value;
                 }
-            })],
+            }],
         });
 
         model.foo(500);
@@ -511,9 +512,9 @@ describe('model', () => {
     });
 
 
-    it('should assign ad-hoc system to model during creation (when passing a factory to API)', () => {
+    it('should assign ad-hoc system to model during creation (when passing an instance of the system to API)', () => {
         const api = vistate.init({
-            use: [() => ({
+            use: [{
                 register(m, data) {
                     data.value = 2;
                 },
@@ -521,7 +522,7 @@ describe('model', () => {
                     data.value += ad.value;
                     res = data.value;
                 }
-            })],
+            }],
         });
 
         let res = 0;
