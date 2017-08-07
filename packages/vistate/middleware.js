@@ -23,30 +23,6 @@ const systems = {
             }
         }
     },
-    record() {
-        return {
-            register(model, data, api) {
-                api.component(model, 'events', []);
-            },
-            dispatch(actionData, data, api) {
-               const { value, model, name, args } = actionData;
-               const events = api.component(api.root(model), 'events');
-               if (name == '$undo') {
-                   const tmp = api.model(model.getEntity().blueprint);
-                   events.pop();
-                   events.forEach(event => api.dispatch(tmp, event))
-                   model.getEntity().state = tmp.get();
-                   actionData.changed = true;
-                   return;
-               } else if (name.charAt(0) == '$') return;
-
-               const event = createEvent(model, name, args);
-               events.push(event);
-               api.metadata(event, actionData);
-
-            }
-        }
-   },
    notifier(id) {
        return {
            register(model, data, api) {
