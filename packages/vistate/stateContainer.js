@@ -3,7 +3,18 @@
 const ROOT_LOCAL_ID = 1;
 class Entity {
     constructor(blueprint, params) {
-        this._componentRefs = params.componentRefs;
+
+        this._componentsById = {};
+        this._componentRefs = params.systemRefs.map(({id, system}) => {
+            const componentRef = {
+                system,
+                data: {
+                    of: (model) => model.getEntity()._componentsById[id]
+                }
+            };
+            this._componentsById[id] = componentRef.data;
+            return componentRef;
+        });
         this._api = params.api;
 
         this._localId = ROOT_LOCAL_ID;
@@ -102,8 +113,6 @@ function getProperty(state, prop) {
 
 const generateId = (last => () => ++last)(0);
 
-
-
 const init = (config = {}) => {
     function createSystemRef(system) {
         return {
@@ -111,26 +120,11 @@ const init = (config = {}) => {
             id: Symbol()
         }
     }
-    function component(model, id, value) {
-        const componentsById = model._componentsById;
-        if (value !== undefined) {
-            componentsById[id] = value;
-        }
-        return componentsById[id];
-    }
-    function Component(model, {system, id}) {
-        this.system = system;
-        this.data = component(model, id, {
-            of: (model) => component(model, id),
-        });
-    }
 
-
-    const defaultSystemRefs = ['runHandlerAndNotify', 'record', 'notifier']
+    const defaultSystemRefs = ['runHandlerAndNotify', 'notifier']
         .map(name => createSystemRef(middleware[name]()));
 
     return {
-        component,
         transaction(model, callback, tempState) {
             const transaction = new Transaction({
                 onEnd: resultState => {
@@ -147,11 +141,6 @@ const init = (config = {}) => {
         },
         dbg(model) {
             return JSON.stringify(model.get());
-        },
-        events(model) {
-            return component(this.root(model), 'events').filter(event => {
-                return this.root(model) == model || event.target == model.$localId();
-            });
         },
         root(model) {
             return model._root;
@@ -178,17 +167,6 @@ const init = (config = {}) => {
 
             model._root = model;
 
-            model._componentsById = Object.create(null);
-
-
-            const systemRefs = (params.use || [])
-                .concat(config.use || [])
-                .map(system => createSystemRef(system));
-
-            const componentRefs = defaultSystemRefs.concat(systemRefs).map(system => new Component(model, system))
-
-            const modelApi = {};
-
             const queries = {
                 get: getProperty
             };
@@ -203,9 +181,16 @@ const init = (config = {}) => {
                 }
             }
 
+            const systemRefs = (params.use || [])
+                .concat(config.use || [])
+                .map(system => createSystemRef(system));
+
+            const allSystemRefs = defaultSystemRefs.concat(systemRefs);
+
             const entity = new Entity(blueprint, {
-                componentRefs, data: blueprint.data, api: this, model
+                systemRefs: allSystemRefs, data: blueprint.data, api: this, model
             });
+            model.getEntity = () => entity;
 
             model._localId = entity._localId;
 
@@ -223,25 +208,18 @@ const init = (config = {}) => {
                 }
             });
 
-            model.getEntity = () => entity;
+
 
             model.$localId = () => model._localId;
             model.getId = () => model._localId;
 
             _connectChildren(model._root, model, entity.state);
-            model._metadata = {type: blueprint.type};
+
             // TODO remove it
             model.valueOf = () => model.constructor.name;
             return model;
         },
-        metadata(model, md) {
-            if (md) {
-                metadata.set(model, md);
-                return
-            }
-            return model._metadata || metadata.get(model);
-        },
-        collection() {
+        collection(params) {
             return this.model({
                 data: {
                     list: []
@@ -262,7 +240,7 @@ const init = (config = {}) => {
 
                     },
                 }
-            });
+            }, params);
         },
         delegateTo(childName, methodName) {
             return (state) => {
