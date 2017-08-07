@@ -1063,3 +1063,11 @@ describe(`${FRAMEWORK} API:`, () => {
 
     });
 });
+
+
+describe('Dev tools', () => {
+    const devTools = require('../devtools');
+    it('should work', () => {
+        expect(devTools.inspect).to.exist;
+    });
+});
