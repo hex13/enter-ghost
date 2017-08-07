@@ -1065,9 +1065,30 @@ describe(`${FRAMEWORK} API:`, () => {
 });
 
 
-describe('Dev tools', () => {
-    const devTools = require('../devtools');
+describe.only('Dev tools', () => {
+    const reflection = require('../reflection')();
+    const api = vistate.init({
+        use: [reflection]
+    });
+    const model = api.model({
+        actions: {
+            foo() {
+
+            },
+            bar() {
+
+            }
+        }
+    });
+
+    model.foo();
+    model.bar();
     it('should work', () => {
-        expect(devTools.inspect).to.exist;
+        return $wait(() => {
+            const actions = reflection.devTools.get('actions')
+            expect(actions.length).to.equal(2);
+            expect(actions[0].name).to.equal('foo');
+            expect(actions[1].name).to.equal('bar');
+        });
     });
 });
