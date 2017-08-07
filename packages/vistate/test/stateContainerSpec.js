@@ -1065,7 +1065,7 @@ describe(`${FRAMEWORK} API:`, () => {
 });
 
 
-describe.only('Dev tools', () => {
+describe('Reflection', () => {
     const reflection = require('../reflection')();
     const api = vistate.init({
         use: [reflection]
