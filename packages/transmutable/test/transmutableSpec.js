@@ -128,6 +128,18 @@ describe('Transmutable', () => {
         assert.strictEqual(t.target, ex, 'target stays the same after reifying');
     });
 
+    it('returns original object if there are no mutations', () => {
+        const reified = t.reify();
+        assert.strictEqual(reified, ex);
+    });
+
+    xit('does not perform deep copy if mutations don\'t change value', () => {
+        t.stage.a = t.stage.a;
+        const reified = t.reify();
+        assert.strictEqual(reified, ex);
+    });
+
+
 });
 
 describe('transform', () => {
