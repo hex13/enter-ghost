@@ -29,6 +29,9 @@ describe('Transmutable', () => {
     });
 
 
+    // this is for spec only. Transmutable assumes that you do NOT mutate your objects.
+    // Mutating objects could affects on all objects (because of structural sharing)
+    // but this test is just for specification of library behavior (not for use case)
     it('is in sync with the original object (after mutating original object it returns changed values)', () => {
         ex.a = 4;
         assert.strictEqual(t.stage.a, 4);
