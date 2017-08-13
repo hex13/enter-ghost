@@ -133,7 +133,7 @@ describe('Transmutable', () => {
         assert.strictEqual(reified, ex);
     });
 
-    xit('does not perform deep copy if mutations don\'t change value', () => {
+    it('does not perform deep copy if a mutation doesn\'t really change value', () => {
         t.stage.a = t.stage.a;
         const reified = t.reify();
         assert.strictEqual(reified, ex);

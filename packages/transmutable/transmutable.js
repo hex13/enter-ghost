@@ -1,19 +1,35 @@
 "use strict";
 
-function isDirty(mutations, propPath) {
+
+function set(target, path, value) {
+  let curr = target, i;
+  for (i = 0; i < path.length - 1; curr = curr[path[i++]]) ;
+  curr[path[i]] = value
+}
+
+function get(target, path) {
+  let curr = target, i;
+  for (i = 0; i < path.length - 1; curr = curr[path[i++]]) ;
+  if (curr) return curr[path[i]];
+}
+
+function isDirty(mutations, propPath, target) {
     for (let i = 0; i < mutations.length; i++) {
         const mutPath = mutations[i][0];
+        const mutValue = mutations[i][1];
         const minLen = Math.min(mutPath.length, propPath.length);
-        let changed = true;
+        let affectedByMutation = true;
         for (let j = 0; j < minLen; j++) {
             const mutPropName = mutPath[j];
             const searchedPropName = propPath[j];
             if (mutPropName !== searchedPropName) {
-                changed = false;
+                affectedByMutation = false;
                 break;
             }
         }
-        if (changed) return true;
+        if (affectedByMutation) {
+            if (get(target, mutPath) !== mutValue) return true;
+        }
 
     }
     return false;
@@ -22,7 +38,7 @@ function isDirty(mutations, propPath) {
 function cloneDeepWithDirtyChecking(o, mutations) {
 
     const copy = (o, objPath = []) => {
-        if (!isDirty(mutations, objPath)) return o;
+        if (!isDirty(mutations, objPath, o)) return o;
         let o2;
         if (Array.isArray(o)) {
             o2 = o.slice();
@@ -87,14 +103,7 @@ Transmutable.prototype.pushTo = function pushTo(target) {
         const m = proposed.mutations[i];;
         if (!m) break;
         const [path, value] = m;
-        let curr;
-        for (let j = 0, curr = target; j < path.length; j++) {
-            if (j < path.length - 1) {
-                curr = curr[path[j]];
-            } else {
-                curr[path[j]] = value
-            }
-        }
+        set(target, path, value);
     }
 };
 
