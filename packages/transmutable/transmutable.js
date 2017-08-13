@@ -47,7 +47,7 @@ function cloneDeepWithDirtyChecking(o, mutations) {
         // NOTE currently we're doing for...in also for arrays (is this correct?)
 
         for (let k in o) {
-            if (typeof o[k] =='object') {
+            if (o[k] && typeof o[k] =='object') {
                 const propPath = new Array(objPath.length + 1);
                 for (let i = 0; i < objPath.length; i++) {
                     propPath[i] = objPath[i];
@@ -77,7 +77,7 @@ function Transmutable(o) {
                 // so we want to have always the current target
                 const target = getTarget();
 
-                if (typeof target[name] == 'object') {
+                if (target[name] && typeof target[name] == 'object') {
                     return createStage(target[name], path.concat(name));
                 }
                 return target[name];

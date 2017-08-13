@@ -15,6 +15,9 @@ const createExample = () => ({
     },
     mutated: {
         something: 123
+    },
+    nullable: {
+      value: null
     }
 });
 
@@ -139,6 +142,12 @@ describe('Transmutable', () => {
         assert.strictEqual(reified, ex);
     });
 
+    it('can work with property that equaled null (edge case)', () => {
+        t.stage.nullable.value = 25;
+        expected.nullable.value = 25;
+        const reified = t.reify();
+        assert.deepEqual(reified, expected);
+    });
 
 });
 
