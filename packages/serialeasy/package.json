@@ -1,0 +1,19 @@
+{
+  "name": "serialeasy",
+  "version": "0.0.1",
+  "description": "serialization library",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "serialization",
+    "deserialize",
+    "serialize"
+  ],
+  "author": "= <=>",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^3.4.2"
+  }
+}
