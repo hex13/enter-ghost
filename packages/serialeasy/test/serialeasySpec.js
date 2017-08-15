@@ -1,3 +1,5 @@
+'use strict';
+
 const { serialize, deserialize } = require('..');
 const assert = require('assert');
 
@@ -80,6 +82,24 @@ describe('Serialeasy', () => {
                     ],
                 ]);
             });
+        });
+        it('with predefined values', () => {
+            const foo = {};
+            const o = {a: 3, b: "hello", c: 20, d: "world", ref: foo};
+            const preset = {
+                values: {
+                    "H": "hello",
+                    "twenty": 20,
+                    "foo": foo
+                }
+            }
+            assert.deepStrictEqual(serialize(o, preset), [
+                ["a", 3],
+                ["b", ["val", "H"]],
+                ["c", ["val", "twenty"]],
+                ["d", "world"],
+                ["ref", ["val", "foo"]]
+            ])
         });
     });
 
