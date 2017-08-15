@@ -1,6 +1,6 @@
 {
   "name": "serialeasy",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "serialization library",
   "main": "index.js",
   "scripts": {

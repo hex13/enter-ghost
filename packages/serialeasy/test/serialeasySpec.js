@@ -1,6 +1,17 @@
 const { serialize, deserialize } = require('..');
 const assert = require('assert');
 
+const createComplexObject = () => ({
+    a: 90,
+    b: "a",
+    c: {
+        d: {
+            e: 120,
+            f: [10, 20, [1, {f: 2}]]
+        }
+    },
+});
+
 describe('Serialeasy', () => {
     describe('serialization', () => {
         it('of number', () => {
@@ -137,16 +148,13 @@ describe('Serialeasy', () => {
     });
 
     it('serializes and deserializes to the equal object', () => {
-        const o = {
-            a: 90,
-            b: "a",
-            c: {
-                d: {
-                    e: 120,
-                    f: [10, 20, [1, {f: 2}]]
-                }
-            }
-        };
+        const o = createComplexObject();
         assert.deepStrictEqual(deserialize(serialize(o)), o);
     });
+    it('serializes and deserializes to the equivalent object (after stringify/parse)', () => {
+        const o = createComplexObject();
+        const stringified = JSON.stringify(serialize(o));
+        assert.deepStrictEqual(deserialize(JSON.parse(stringified)), o);
+    });
+
 });
