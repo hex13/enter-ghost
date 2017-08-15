@@ -85,12 +85,14 @@ describe('Serialeasy', () => {
         });
         it('with predefined values', () => {
             const foo = {};
-            const o = {a: 3, b: "hello", c: 20, d: "world", ref: foo};
+            const someSymbol = Symbol();
+            const o = {a: 3, b: "hello", c: 20, d: "world", ref: foo, s: someSymbol};
             const preset = {
                 values: {
                     "H": "hello",
                     "twenty": 20,
-                    "foo": foo
+                    "foo": foo,
+                    "someSymbol": someSymbol
                 }
             }
             assert.deepStrictEqual(serialize(o, preset), [
@@ -98,7 +100,8 @@ describe('Serialeasy', () => {
                 ["b", ["val", "H"]],
                 ["c", ["val", "twenty"]],
                 ["d", "world"],
-                ["ref", ["val", "foo"]]
+                ["ref", ["val", "foo"]],
+                ["s", ["val", "someSymbol"]],
             ])
         });
     });
@@ -163,6 +166,19 @@ describe('Serialeasy', () => {
                         r: "abc"
                     }
                 });
+            });
+        });
+
+        it('with predefined values', () => {
+            const preset = {
+                values: {
+                    kot: 'cat'
+                }
+            }
+            assert.deepStrictEqual(deserialize([
+                ["a", 24], ["b", ["val", "kot"]]
+            ], preset), {
+                a: 24, b: 'cat'
             });
         });
     });

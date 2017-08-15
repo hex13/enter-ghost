@@ -27,25 +27,31 @@ function serialize(obj, preset = {}) {
     return _serialize(obj);
 };
 
-function deserialize(data) {
-    if (!Array.isArray(data)) return data;
+function deserialize(data, preset = {}) {
+    const values = preset.values || {};
 
-    if (Object.prototype.toString.call(data[0]) == '[object String]') {
-        const t = data[0];
-        if (t == 'arr') return data[1].map(deserialize);
-        // if (t == 'val') {
-        //
-        // }
-    }
+    const _deserialize = data => {
+        if (!Array.isArray(data)) return data;
 
-    if (data && typeof data == 'object') {
-        const obj = {};
-        data.forEach(([k, v, t]) => {
-            if (Array.isArray(v)) v = deserialize(v);
-            obj[k] = v;
-        });
-        return obj;
+        if (Object.prototype.toString.call(data[0]) == '[object String]') {
+            const t = data[0];
+            if (t == 'arr') return data[1].map(deserialize);
+            if (t == 'val') {
+                return values[data[1]];
+            }
+        }
+
+        if (data && typeof data == 'object') {
+            const obj = {};
+            data.forEach(([k, v, t]) => {
+                if (Array.isArray(v)) v = _deserialize(v);
+                obj[k] = v;
+            });
+            return obj;
+        }
     }
+    return _deserialize(data);
+
 
 }
 
