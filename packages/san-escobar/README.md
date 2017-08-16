@@ -1,37 +1,26 @@
-# powerful HTML logging for NodeJS applications
+# dynamic code analysis with pretty visualisation
 
 
-Debugging NodeJS code doesn't have to be boring. You aren't limited to dull terminal emulator. The idea is very simple: to log HTML instead of plain text and dump output to the HTML file.
-https://twitter.com/hex13code/status/780018739391631360
+It allows for spying JS object (via ES6 Proxies) and intercepts what is happening in given object (e.g. function calls). It output traces to the standard output in nice HTML format.
 
-the simplest yet naïve form of such debugging is putting HTML tags into console.logs:
+It was written as a proof of concept, but if you're interested (and have some feature request) you can create an issue here:
+https://github.com/hex13/enter-ghost/issues/new
 
-```javascript
-console.log("<ul>");
-someArray.forEach(item => {
-    console.log('<li style="color:red">', item.value, "</li>");
-});
-console.log("</li>");
-```
+![screenshot](https://raw.githubusercontent.com/hex13/enter-ghost/master/packages/san-escobar/san-escobar.gif)
 
-but it demands too much boilerplate and is prone to errors.
+### Usage:
 
-But if we only we had tool which automagically output nice formatted logs!
+It works best when calling from NodeJS.
 
-That's what this library is supposed to do.
-
-- It formats logs into HTML format. You can redirect process output to *.html file and open it in a browser as interactive visualisation.
-- It allows for create spies on objects and functions (it uses trace-machine library under hood). ![screenshot](https://raw.githubusercontent.com/hex13/enter-ghost/master/packages/san-escobar/san-escobar.gif)
-
-Example of use:
-
-installation:
+Just redirect process output to *.html file:
 
 ```
-npm install --save-dev san-escobar
+node example.js > output.html
 ```
+ and open it in a browser as interactive visualisation:
 
-code:
+
+#### code example:
 ```javascript
 const SE = require('san-escobar');
 const { log, spy } = SE(SE.htmlLogger);
@@ -78,9 +67,3 @@ const proxied = spy({
 proxied.fact(7);
 
 ```
-
-Then run:
-```
-node example.js > output.html
-```
-and open `output.html` file.
