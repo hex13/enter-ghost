@@ -1,5 +1,6 @@
 "use strict";
 
+
 const FRAMEWORK = 'vistate';
 const assert = require('assert');
 
@@ -11,6 +12,7 @@ const createEvent = require('../createEvent');
 const middleware = require('../middleware')
 const vistate = require('..');
 const api = vistate.init();
+const helpers = require('../helpers');
 
 function $wait(func) {
     return new Promise(done => {
@@ -263,9 +265,9 @@ describe('model', () => {
 
         it('should create children and grand children connected to hierarchy. $root should return root model', () => {
             const root = $hierarchyModel();
-            assert.strictEqual(api.root(root), root);
-            assert.strictEqual(api.root(root.get('child')), root);
-            assert.strictEqual(api.root(root.get('child').get('grandChild')), root);
+            assert.strictEqual(helpers.root(root), root);
+            assert.strictEqual(helpers.root(root.get('child')), root);
+            assert.strictEqual(helpers.root(root.get('child').get('grandChild')), root);
         });
 
         it('should create children and children should notify parent about updates', () => {
@@ -575,12 +577,21 @@ describe('model', () => {
         assert.deepEqual(model.get(), {value: 110});
     });
 
-    it('should dispatch via `dispatch` method', () => {
-        const model = $exampleModel();
+    xit('should dispatch via `dispatch` method', () => {
+        const model = $model({
+            data: {value: 100},
+            actions: {
+                inc(state, payload) { state.value += payload; }
+            }
+        });
 
-        api.dispatch(model, {type: 'inc', args:[1]});
+        helpers.dispatch(model, {type: 'inc', payload: 2});
 
-        assert.deepEqual(model.get(), {value: 101});
+        assert.deepEqual(model.get(), {value: 102});
+
+        //helpers.dispatch(model, {type: 'nonExisting', args:[1]});
+
+        //assert.deepEqual(model.get(), {value: 102});
     });
 
 
@@ -610,7 +621,7 @@ describe('model', () => {
     it('should handle transactions', () => {
         const model = $model(TransactionExampleModel);
 
-        return api.transaction(model, (transaction, aModel) => {
+        return helpers.transaction(model, (transaction, aModel) => {
             return pseudoAjax().then(text => {
                 // API proposal (to encapsulate temp state in transaction handler):
                 //transaction.set({status: 'loading', a: 1})
@@ -907,7 +918,7 @@ describe('model', () => {
     it('should assign ending state in transactions', () => {
         const model = $model(TransactionExampleModel);
 
-        api.transaction(model, (transaction, aModel) => {
+        helpers.transaction(model, (transaction, aModel) => {
             transaction.end({status: 'error'});
         }, {status: 'loading', a:1});
 
@@ -918,17 +929,18 @@ describe('model', () => {
     // TODO remove autocorrection logic out of this package
     it('should return autocorrect suggestion', () => {
         const model = $model(Example6);
-        assert.equal(api.autocorrect(model, 'gumbuear'), 'gummibear');
-        assert.equal(api.autocorrect(model, 'cynDerela'), 'cinderella');
-        assert.equal(api.autocorrect(model, 'Sylsveer'), 'sylvester');
-        assert.equal(api.autocorrect(model, 'yobuear'), 'yogibear');
-        assert.equal(api.autocorrect(model, 'smrf'), 'smurf');
+        const { autocorrect } = helpers;
+        assert.equal(autocorrect(model, 'gumbuear'), 'gummibear');
+        assert.equal(autocorrect(model, 'cynDerela'), 'cinderella');
+        assert.equal(autocorrect(model, 'Sylsveer'), 'sylvester');
+        assert.equal(autocorrect(model, 'yobuear'), 'yogibear');
+        assert.equal(autocorrect(model, 'smrf'), 'smurf');
 
-        assert.equal(api.autocorrect(model, 'mmbear'), 'gummibear');
-        assert.equal(api.autocorrect(model, 'ynDerelax'), 'cinderella');
-        assert.equal(api.autocorrect(model, 'ylsveers'), 'sylvester');
-        assert.equal(api.autocorrect(model, 'obuear'), 'yogibear');
-        assert.equal(api.autocorrect(model, 'mrf'), 'smurf');
+        assert.equal(autocorrect(model, 'mmbear'), 'gummibear');
+        assert.equal(autocorrect(model, 'ynDerelax'), 'cinderella');
+        assert.equal(autocorrect(model, 'ylsveers'), 'sylvester');
+        assert.equal(autocorrect(model, 'obuear'), 'yogibear');
+        assert.equal(autocorrect(model, 'mrf'), 'smurf');
     });
 
 });
@@ -988,7 +1000,7 @@ describe(`${FRAMEWORK} API:`, () => {
         let collection;
 
         beforeEach(() => {
-            collection = api.collection();
+            collection = api.createCollection();
         });
 
         it('that is instance of Model', () => {

@@ -61,8 +61,6 @@ class Entity {
 }
 
 
-// for autocorrection
-const leven = require('leven');
 
 const { Transmutable } = require('transmutable');
 
@@ -73,13 +71,6 @@ const standardActions = {
         state[k] = v;
     }
 };
-
-function correct(phrase, texts) {
-    phrase = phrase.toLowerCase();
-    return texts
-        .map(t => [t,leven(t.toLowerCase(), phrase)])
-        .sort((a,b)=>{return a[1]-b[1]})[0][0];
-}
 
 function _connectChildren(root, model, data) {
     for (let prop in data) {
@@ -125,42 +116,6 @@ const init = (config = {}) => {
         .map(name => createSystemRef(middleware[name]()));
 
     return {
-        transaction(model, callback, tempState) {
-            const transaction = new Transaction({
-                onEnd: resultState => {
-                    Object.assign(model.getEntity().state, savedState);
-                    Object.assign(model.getEntity().state, resultState);
-                }
-            });
-            let savedState = {};
-            Object.keys(tempState).forEach(k => {
-                savedState[k] = model.getEntity().state[k];
-            });
-            Object.assign(model.getEntity().state, tempState); // TODO extract as action
-            return callback(transaction, model);
-        },
-        dbg(model) {
-            return JSON.stringify(model.get());
-        },
-        root(model) {
-            return model._root;
-        },
-        reset(model) {
-            model.$reset();
-        },
-        autocorrect(model, methodName) {
-            const props = Object.keys(model);
-            return correct(methodName, props);
-        },
-        dispatch(model, {target, type, args}) {
-            if (target && target != ROOT_LOCAL_ID ) {
-                model = model.getEntity().find(target);
-            }
-            model[type](...args);
-        },
-        undo(model) {
-            model.getEntity().dispatch({model, name: '$undo'})
-        },
         model(blueprint, params = {}) {
 
             const model = {};
@@ -219,7 +174,7 @@ const init = (config = {}) => {
             model.valueOf = () => model.constructor.name;
             return model;
         },
-        collection(params) {
+        createCollection(params) {
             return this.model({
                 data: {
                     list: []

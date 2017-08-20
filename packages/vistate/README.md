@@ -113,7 +113,9 @@ API is not stable yet so there can be breaking changes.
 
 Latest breaking changes:
 
-- 07/08/2017: no recording actions 
+- 21/08/2017: rename collection -> createCollection
+- 21/08/2017: moving helpers from the main api to separate module. remove vistate.init().dispatch
+- 07/08/2017: no recording actions
 - 05/08/2017: differences is using middleware systems
 - 02/08/2017: now to access vistate api you must call `init` function
 - 02/08/2017: remove `model.state` (use `model.get()`)
