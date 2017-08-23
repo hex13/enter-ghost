@@ -1,8 +1,8 @@
 {
   "name": "transmutable",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "immutable objects that pretend to be mutable",
-  "main": "transmutable.js",
+  "main": "dist/transmutable.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

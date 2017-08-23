@@ -1,6 +1,6 @@
 "use strict";
 
-const { Transmutable, transform } = require('../transmutable.js');
+const { Transmutable, transform } = require('..');
 const assert = require('assert');
 
 const createExample = () => ({
