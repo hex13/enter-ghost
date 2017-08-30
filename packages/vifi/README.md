@@ -40,9 +40,9 @@ someFunction();
 
 ## Classes 
 
-####File 
+#### File 
 
-#####methods 
+##### methods 
 
 constructor(path, contents = '') 
 
@@ -57,9 +57,9 @@ snapshot(opts = {})
 proxy(resolveTarget) 
 
 #### MainFileSystem is not accessible directly but you have to call vifi()
-####MainFileSystem 
+#### MainFileSystem 
 
-#####methods 
+##### methods 
 
 constructor() 
 
