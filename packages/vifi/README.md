@@ -37,3 +37,25 @@ async function someFunction() {
 someFunction();
 
 ```
+## classes:
+
+
+####File
+#####methods
+constructor(path, contents = '')
+read()
+write(data)
+connect(vfs)
+snapshot(opts = {})
+proxy(resolveTarget)
+#### MainFileSystem is not accessible directly but you have to call vifi()
+####MainFileSystem
+#####methods
+constructor()
+getMountPoint(file)
+open(path)
+read(file)
+write(file, data)
+mount(root, vfs)
+loader(loader)
+load(file, opts)
