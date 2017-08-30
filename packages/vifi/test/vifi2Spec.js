@@ -191,6 +191,45 @@ describe('having main virtual file system', () => {
         });
     });
 
+    it('it should be possible to mount two virtual file systems at different paths', () => {
+        const vfs = vifi();
+        const createVfs = (propName) => {
+            return {
+                read(file) {
+                    return Promise.resolve(file[propName]);
+                },
+                write(file, data) {
+                    return new Promise(resolve => {
+                        file[propName] = data;
+                        resolve();
+                    });
+                }
+            }
+        };
+        vfs.mount('/foo', createVfs('foo'));
+        vfs.mount('/bar', createVfs('bar'));
+
+        const file = vfs.open('/foo/whatever');
+        file.foo = 'foo123';
+
+        const file2 = vfs.open('/bar/whatever');
+        file2.bar = 'bar123';
+
+        const readWrite = (file, propName) => {
+            return file.read().then(contents => {
+                assert.strictEqual(contents, propName + '123', 'files open in main system should delegate "read" action to the mounted file system');
+                return file.write(propName + '456').then(() => {
+                    assert.strictEqual(file[propName], propName + '456', 'files open in main system should delegate "write" action to the mounted file system');
+                });
+            })
+        }
+        return Promise.all([
+            readWrite(file, 'foo'),
+            readWrite(file2, 'bar'),
+        ]);
+    });
+
+
     it('it should be possible to register loader and load file as object', () => {
         const vfs = vifi();
         vfs.loader(file => {

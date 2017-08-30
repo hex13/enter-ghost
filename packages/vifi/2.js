@@ -85,6 +85,10 @@ class NodeFsWrapper {
 class MainFileSystem {
     constructor() {
         this._loaders = [];
+        this._mountingPoints = [];
+    }
+    getMountPoint(file) {
+        return this._mountingPoints.find(mp => file.path.indexOf(mp.root) == 0);
     }
     open(path) {
         const file = new File(path);
@@ -92,16 +96,20 @@ class MainFileSystem {
         return file;
     }
     read(file) {
-        return this._vfs.read(file);
+        const mp = this.getMountPoint(file);
+        return mp.vfs.read(file);
     }
     write(file, data) {
-        return this._vfs.write(file, data);
+        const mp = this.getMountPoint(file);
+        return mp.vfs.write(file, data);
     }
     mount(root, vfs) {
         if (vfs.readFile) {
             vfs = new NodeFsWrapper(vfs);
         }
-        this._vfs = vfs;
+        this._mountingPoints.push({
+            root, vfs
+        });
     }
     loader(loader) {
         this._loaders.push(loader);
