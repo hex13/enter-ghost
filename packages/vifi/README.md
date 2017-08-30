@@ -44,36 +44,36 @@ someFunction();
 
 ##### methods 
 
-constructor(path, contents = '') 
+constructor(path, contents = '') : ??? 
 
-read() 
+read() : promise 
 
-write(data) 
+write(data) : promise 
 
-connect(vfs) 
+connect(vfs) : undefined 
 
-snapshot(opts = {}) 
+snapshot(opts = {}) : promise 
 
-proxy(resolveTarget) 
+proxy(resolveTarget) : undefined 
 
 #### MainFileSystem is not accessible directly but you have to call vifi()
 #### MainFileSystem 
 
 ##### methods 
 
-constructor() 
+constructor() : ??? 
 
-getMountPoint(file) 
+getMountPoint(file) : undefined 
 
-open(path) 
+open(path) : File 
 
-read(file) 
+read(file) : ??? 
 
-write(file, data) 
+write(file, data) : ??? 
 
-mount(root, vfs) 
+mount(root, vfs) : ??? 
 
-loader(loader) 
+loader(loader) : undefined 
 
-load(file, opts) 
+load(file, opts) : ??? 
 
