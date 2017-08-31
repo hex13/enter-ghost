@@ -210,16 +210,18 @@ describe('having main virtual file system', () => {
         vfs.mount('/bar', createVfs('bar'));
 
         const file = vfs.open('/foo/whatever');
+        assert.strictEqual(file.path, '/whatever', `file should have path relative to the mount point and it has ${file.path}`)
         file.foo = 'foo123';
 
-        const file2 = vfs.open('/bar/whatever');
+        const file2 = vfs.open('/bar/whatever2');
+        assert.strictEqual(file2.path, '/whatever2', `file should have path relative to the mount point and it has ${file.path}`)
         file2.bar = 'bar123';
 
         const readWrite = (file, propName) => {
             return file.read().then(contents => {
-                assert.strictEqual(contents, propName + '123', 'files open in main system should delegate "read" action to the mounted file system');
+                assert.strictEqual(contents, propName + '123');
                 return file.write(propName + '456').then(() => {
-                    assert.strictEqual(file[propName], propName + '456', 'files open in main system should delegate "write" action to the mounted file system');
+                    assert.strictEqual(file[propName], propName + '456');
                 });
             })
         }

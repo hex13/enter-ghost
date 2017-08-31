@@ -57,7 +57,7 @@ class File {
     }
 }
 
-wrapClass(File);
+//wrapClass(File);
 
 class NodeFsWrapper {
     constructor(fs) {
@@ -88,10 +88,15 @@ class MainFileSystem {
         this._mountingPoints = [];
     }
     getMountPoint(file) {
-        return this._mountingPoints.find(mp => file.path.indexOf(mp.root) == 0);
+        return this._mountingPoints.find(mp => file.originalPath.indexOf(mp.root) == 0);
     }
     open(path) {
         const file = new File(path);
+        file.originalPath = path;
+        const mp = this.getMountPoint(file);
+        if (mp && mp.root != '/') {
+            file.path = file.path.slice(mp.root.length);
+        }
         file.connect(this);
         return file;
     }
