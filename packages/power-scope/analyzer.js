@@ -6,6 +6,9 @@ const estraverse = require('estraverse');
 const Analysis = require('./analysis');
 const State = require('./state')(require('./analysisBuilder'));
 
+const SE = require('../san-escobar');
+const { log, spy } = SE(SE.htmlLogger);
+
 const { isScope, isScope6 } = require('./helpers');
 
 function invokeVisitor(visitor, node, type, phase, state) {
