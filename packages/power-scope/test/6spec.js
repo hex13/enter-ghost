@@ -48,6 +48,22 @@ describe('objects', () => {
     let analysis;
     let scopes;
     before(() => {
+        ast = parse(__dirname + '/../mocks/6/refs.js', {sourceType: 'module'});
+        analyzer = createAnalyzer();
+        analysis = analyzer.analyze(ast);
+        require('fs').writeFileSync('analysis.json', JSON.stringify(analysis,0,2));
+
+    });
+});
+
+
+describe('objects', () => {
+
+    let analyzer;
+    let ast;
+    let analysis;
+    let scopes;
+    before(() => {
         ast = parse(mocks.objects, {sourceType: 'module'});
         analyzer = createAnalyzer();
         analysis = analyzer.analyze(ast);

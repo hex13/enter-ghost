@@ -83,33 +83,46 @@ module.exports = () => {
             }
         },
         ObjectProperty: {
-            enter: (node, state) => state.expectValue(),
+            enter: (node, state) => {
+                state.expectValue();
+            },
             // TODO api proposal:
             //expectValue: true,
             exit(node, state) {
                 if (state.parent.type == 'ObjectExpression')
                     state.bindProperty(state.lastOf('objects'), new Binding(node.key, state.receiveValue()));
+                else if (state.parent.type == 'ObjectPattern') {
+                    state.passValue('kotek')
+                }
             }
         },
         //declarators
         VariableDeclarator: {
             enter(node, state) {
-                const decl = {
-                    kind: state.parent.kind,
-                    name: node.id.name,
-                    //loc: node.id.loc,
-                    range: loc2range(node.id.loc)
-                };
-                // TODO check maybe push/pop can be replaced with mapping AST node id to value(s)
-                state.analysis.declarators.push(decl);
-                state.decl.push(decl);
-                state.expectValue();
+                if (node.id.type == 'ObjectPattern') {
+                    state.expectValues();
+                } else {
+                    const decl = {
+                        kind: state.parent.kind,
+                        name: node.id.name,
+                        //loc: node.id.loc,
+                        range: loc2range(node.id.loc)
+                    };
+                    // TODO check maybe push/pop can be replaced with mapping AST node id to value(s)
+                    state.analysis.declarators.push(decl);
+                    state.decl.push(decl);
+                    state.expectValue();
+                }
             },
             exit(node, state) {
-                const decl = state.decl.pop();
-                decl.init = state.receiveValue();
-                state.last('blockScopedDecl').values.push(decl);
-                state.last('blockScopes').declarations.push(decl);
+                if (node.id.type == 'ObjectPattern') {
+                    const vals = state.receiveValues();
+                } else {
+                    const decl = state.decl.pop();
+                    decl.init = state.receiveValue();
+                    state.last('blockScopedDecl').values.push(decl);
+                    state.last('blockScopes').declarations.push(decl);
+                }
             },
         },
         NumericLiteral: {
