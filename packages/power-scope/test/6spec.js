@@ -30,7 +30,7 @@ const mocks =
     objects: fs.readFileSync(__dirname + '/../mocks/6/objects.js', 'utf8'),
     vars: fs.readFileSync(__dirname + '/../mocks/6/variables.js', 'utf8'),
     //arrays: fs.readFileSync(__dirname + '/../mocks/6/arrays.js', 'utf8'),
-    benchmark: fs.readFileSync(__dirname + '/../x.js', 'utf8'),
+    //benchmark: fs.readFileSync(__dirname + '/../x.js', 'utf8'),
     refs: fs.readFileSync(__dirname + '/../mocks/6/refs.js', 'utf8'),
 };
 
