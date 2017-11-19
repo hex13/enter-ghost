@@ -6,8 +6,8 @@ const estraverse = require('estraverse');
 const Analysis = require('./analysis');
 const State = require('./state')(require('./analysisBuilder'));
 
-const SE = require('../san-escobar');
-const { log, spy } = SE(SE.htmlLogger);
+//const SE = require('../san-escobar');
+//const { log, spy } = SE(SE.htmlLogger);
 
 const { isScope, isScope6 } = require('./helpers');
 
@@ -110,6 +110,7 @@ Analyzer.prototype.analyze = function analyze(ast, opts) {
     estraverse.traverse(ast, mainVisitor);
 
     if (this.postprocess) analysis.postprocess(state);
+    analysis.finalState = state;
     return analysis;
 }
 
