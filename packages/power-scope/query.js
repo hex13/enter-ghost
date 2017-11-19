@@ -32,7 +32,7 @@ module.exports = function Query(services) {
                 return query(services.getProperty(structure, path));
             },
             refAt(pos) {
-                return query(structure.refAt(pos));
+                return query(services.refAt(structure, pos));
             },
             text() {
                 return services.textOf(structure);
@@ -42,6 +42,9 @@ module.exports = function Query(services) {
                     return query(structure[0].scope);
                 }
                 throw new Error('This has no scope');
+            },
+            scopeAt(pos) {
+                return services.scopeAt(structure, pos)
             }
         };
     }

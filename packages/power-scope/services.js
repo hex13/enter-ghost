@@ -36,6 +36,7 @@ module.exports = (getters) => {
     }
 
     function refAt(refs, pos) {
+        if (refs.refs) refs = refs.refs;
         for (let ri = 0; ri < refs.length; ri++) {
             const item = refs[ri];
 
