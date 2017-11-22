@@ -11,6 +11,9 @@ const State = require('./state')(require('./analysisBuilder'));
 
 const { isScope, isScope6 } = require('./helpers');
 
+const getters = require('./getters');
+const services = require('./services')(getters);
+
 function invokeVisitor(visitor, node, type, phase, state) {
     if (visitor.hasOwnProperty(type)) {
         const handler = visitor[type][phase];
@@ -109,13 +112,13 @@ Analyzer.prototype.analyze = function analyze(ast, opts) {
 
     estraverse.traverse(ast, mainVisitor);
 
-    if (this.postprocess) analysis.postprocess(state, {
+    if (this.postprocess) analysis.postprocess(state, Object.assign({}, services, getters, {
         forEachRef(state, handler) {
             state.analysis.refs.forEach(ref => {
                 handler(ref);
-            })
+            });
         }
-    });
+    }));
     analysis.finalState = state;
     return analysis;
 }

@@ -48,27 +48,28 @@ Analysis.prototype = {
     rangeOf,
     getEntries,
     postprocess(state, services) {
+        const analysis = state.analysis;
         services.forEachRef(state, ref_ => {
             const ref = ref_.slice();
-            let baseVariable = this.resolveRef([ref[0]]);
+            let baseVariable = services.resolveRef([ref[0]]);
             if (!baseVariable) {
                 // declare implicit global variable
                 state.declareVariable({
                     name: ref[0].key,
-                    scope: this.scopes[0],
+                    scope: analysis.scopes[0],
                     loc: {start:{column:0,line:1}, end:{line:1, column:0}},
                     isImplicit: true,
                     refs: [ref.slice()],
                 });
             }
             while (ref.length) {
-                const entity = this.resolveRef(ref);
+                const entity = services.resolveRef(ref);
                 if (entity) {
                     entity.refs = entity.refs || [];
                     entity.refs.push(ref.slice());
                 } else if(baseVariable) {
                     // declare implicit entry
-                    baseVariable.scope.entries[this.textOf(ref)] = {
+                    baseVariable.scope.entries[services.textOf(ref)] = {
                         name: ref[ref.length - 1].name,
                         scope: baseVariable.scope,
                         loc: {start:{column:0,line:1}, end:{line:1, column:0}},
@@ -84,12 +85,12 @@ Analysis.prototype = {
         });
 
         // set components for module.exports
-        if (this.scopes[0]) {
-            Object.keys(this.scopes[0].entries)
+        if (analysis.scopes[0]) {
+            Object.keys(analysis.scopes[0].entries)
                 .filter(k => k.indexOf('module.exports.') == 0)
-                .map(k => this.scopes[0].entries[k])
+                .map(k => analysis.scopes[0].entries[k])
                 .forEach((entry) => {
-                    this.setComponent('file', 'exports.' + entry.name, entry);
+                    analysis.setComponent('file', 'exports.' + entry.name, entry);
                 });
         }
     }
