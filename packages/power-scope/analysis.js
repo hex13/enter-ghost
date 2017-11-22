@@ -47,9 +47,6 @@ Analysis.prototype = {
     refsFor,
     rangeOf,
     getEntries,
-    postprocess(state, services) {
-        return services.postprocess(state, services);
-    }
 };
 
 module.exports = Analysis;
