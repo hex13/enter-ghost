@@ -109,7 +109,13 @@ Analyzer.prototype.analyze = function analyze(ast, opts) {
 
     estraverse.traverse(ast, mainVisitor);
 
-    if (this.postprocess) analysis.postprocess(state);
+    if (this.postprocess) analysis.postprocess(state, {
+        forEachRef(state, handler) {
+            state.analysis.refs.forEach(ref => {
+                handler(ref);
+            })
+        }
+    });
     analysis.finalState = state;
     return analysis;
 }

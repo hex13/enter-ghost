@@ -47,8 +47,8 @@ Analysis.prototype = {
     refsFor,
     rangeOf,
     getEntries,
-    postprocess(state) {
-        this.refs.forEach(ref_ => {
+    postprocess(state, services) {
+        services.forEachRef(state, ref_ => {
             const ref = ref_.slice();
             let baseVariable = this.resolveRef([ref[0]]);
             if (!baseVariable) {
