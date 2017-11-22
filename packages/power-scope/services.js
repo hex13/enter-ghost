@@ -79,14 +79,14 @@ module.exports = (getters) => {
 
 
     function postprocess(state, services) {
-
         const analysis = state.analysis;
         services.forEachRef(state, ref_ => {
             const ref = ref_.slice();
             let baseVariable = services.resolveRef([ref[0]]);
             if (!baseVariable) {
                 // declare implicit global variable
-                state.declareVariable({
+                // TODO, clean this up.
+                state.declareVariable && state.declareVariable({
                     name: ref[0].key,
                     scope: analysis.scopes[0],
                     loc: {start:{column:0,line:1}, end:{line:1, column:0}},
@@ -97,8 +97,7 @@ module.exports = (getters) => {
             while (ref.length) {
                 const entity = services.resolveRef(ref);
                 if (entity) {
-                    entity.refs = entity.refs || [];
-                    entity.refs.push(ref.slice());
+                    services.addBackRef(entity, ref.slice());
                 } else if(baseVariable) {
                     // declare implicit entry
                     baseVariable.scope.entries[services.textOf(ref)] = {
@@ -126,7 +125,12 @@ module.exports = (getters) => {
 
     }
 
+    function addBackRef(entity, ref) {
+        entity.refs = entity.refs || [];
+        entity.refs.push(ref);
+    }
+
     return {
-        lookupEntry, resolveRef, refAt, scopeAt, entryAt, postprocess
+        lookupEntry, resolveRef, refAt, scopeAt, entryAt, postprocess, addBackRef
     };
 };

@@ -83,6 +83,8 @@ function Analyzer(opts = {}) {
     this.visitors = opts.visitors;
     this.State = opts.State || State;
     this.postprocess = 'postprocess' in opts? opts.postprocess : true;
+
+    this.services = opts.services || services;
 }
 
 
@@ -111,13 +113,13 @@ Analyzer.prototype.analyze = function analyze(ast, opts) {
     };
 
     estraverse.traverse(ast, mainVisitor);
-    if (this.postprocess) services.postprocess(state, Object.assign({}, services, getters, {
+    if (this.postprocess) this.services.postprocess(state, Object.assign({}, getters, {
         forEachRef(state, handler) {
             state.analysis.refs.forEach(ref => {
                 handler(ref);
             });
         }
-    }));
+    }, this.services));
     analysis.finalState = state;
     return analysis;
 }
