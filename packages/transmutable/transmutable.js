@@ -128,3 +128,5 @@ exports.transform = (original, transformer) => {
     transformer(t.stage);
     return t.reify();
 };
+
+//exports.clone = cloneDeepWithDirtyChecking;
