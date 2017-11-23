@@ -7,7 +7,14 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "immutable", "immutability", "copy-on-write", "cow", "deep", "clone", "mutations", "event sourcing"
+    "immutable",
+    "immutability",
+    "copy-on-write",
+    "cow",
+    "deep",
+    "clone",
+    "mutations",
+    "event sourcing"
   ],
   "author": "= <=>",
   "license": "MIT",
