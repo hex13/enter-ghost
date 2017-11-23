@@ -42,6 +42,7 @@ function isFunctionScope(node, parent) {
     return (
         node.type == 'Program'
         || parent.type == 'ClassMethod'
+        || parent.type == 'ObjectMethod'
         || parent.type.includes('Function')
     );
 }

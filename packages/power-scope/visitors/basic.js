@@ -47,19 +47,9 @@ const basicVisitor = {
                 return;
             }
 
-            const scope = new Scope({
-                loc: node.loc,
-                isFunctionScope: true,
-                parent: state.blockScopes[state.blockScopes.length - 1],
-            });
-            state.declareScope(scope);
-            state.pushBlockScope(scope); // blockScopes are for setting parent in child scope
-            state.pushFunctionScope(scope);
         },
         exit(node, state) {
             state.declareParamsFrom(node);
-            state.popBlockScope();
-            state.popFunctionScope();
             state.exitProperty(node);
         }
     },
