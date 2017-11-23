@@ -18,6 +18,9 @@ const createExample = () => ({
     },
     nullable: {
       value: null
+    },
+    deep: {
+        arr: [1, 2, 4, 8, 16]
     }
 });
 
@@ -116,6 +119,21 @@ describe('Transmutable', () => {
         assert.deepStrictEqual(original.arr, createExample().arr)
         assert.deepStrictEqual(copied.arr, [1, 2, 3, 4])
     });
+
+    // TODO consider implementing this (maybe):
+    xit('allows for adding deep objects', () => {
+        t.stage.allows.for.adding.deep.objects = 2;
+        const copied = t.commit();
+    });
+
+    it('allows for use arrays (deep)', () => {
+        t.stage.deep.arr.push(32);
+        const copied = t.commit();
+
+        assert.deepStrictEqual(original.deep.arr, createExample().deep.arr)
+        assert.deepStrictEqual(copied.deep.arr, [1, 2, 4, 8, 16, 32])
+    });
+
 
     it('allows for reify current stage', () => {
         t.stage.a = {n:2017};

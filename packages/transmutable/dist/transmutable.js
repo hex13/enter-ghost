@@ -2,6 +2,8 @@
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 function set(target, path, value) {
     var curr = target,
         i = void 0;
@@ -12,7 +14,7 @@ function set(target, path, value) {
 function get(target, path) {
     var curr = target,
         i = void 0;
-    for (i = 0; i < path.length - 1; curr = curr[path[i++]]) {}
+    for (i = 0; curr && i < path.length - 1; curr = curr[path[i++]]) {}
     if (curr) return curr[path[i]];
 }
 
@@ -39,7 +41,7 @@ function isDirty(mutations, propPath, target) {
 
 function cloneDeepWithDirtyChecking(o, mutations) {
 
-    var copy = function (o) {
+    var copy = function copy(o) {
         var objPath = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
         if (!isDirty(mutations, objPath, o)) return o;
@@ -51,7 +53,7 @@ function cloneDeepWithDirtyChecking(o, mutations) {
         // NOTE currently we're doing for...in also for arrays (is this correct?)
 
         for (var k in o) {
-            if (o[k] && typeof o[k] == 'object') {
+            if (o[k] && _typeof(o[k]) == 'object') {
                 var propPath = new Array(objPath.length + 1);
                 for (var i = 0; i < objPath.length; i++) {
                     propPath[i] = objPath[i];
@@ -74,24 +76,24 @@ function Transmutable(o) {
     this.mutations = [];
     this.target = o;
 
-    var createStage = function (o) {
+    var createStage = function createStage(o) {
         var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-        var getTarget = function () {
+        var getTarget = function getTarget() {
             return typeof o == 'function' ? o() : o;
         };
         var proxy = new Proxy(getTarget(), {
-            get: function (nonUsedProxyTarget, name) {
+            get: function get(nonUsedProxyTarget, name) {
                 // transmutable.target can change
                 // so we want to have always the current target
                 var target = getTarget();
 
-                if (target[name] && typeof target[name] == 'object') {
+                if (target[name] && _typeof(target[name]) == 'object') {
                     return createStage(target[name], path.concat(name));
                 }
                 return target[name];
             },
-            set: function (nonUsedProxyTarget, k, v) {
+            set: function set(nonUsedProxyTarget, k, v) {
                 var mutPath = [];
                 for (var i = 0; i < path.length + 1; i++) {
                     mutPath.push(path[i] || k);
@@ -143,3 +145,4 @@ exports.transform = function (original, transformer) {
     return t.reify();
 };
 
+//exports.clone = cloneDeepWithDirtyChecking;
