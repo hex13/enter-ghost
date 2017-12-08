@@ -57,6 +57,7 @@ function cloneDeepWithDirtyChecking(o, mutations) {
 function Transmutable(o) {
     this.mutations = [];
     this.target = o;
+    this.observers = [];
 
     const createStage = (o, path = []) => {
         const getTarget = () => typeof o == 'function'? o(): o;
@@ -96,10 +97,33 @@ Transmutable.prototype.pushTo = function pushTo(target) {
     }
 };
 
+function samePaths(a, b) {
+    if (a.length != b.length) return false;
+    const minLen = Math.min(a.length, b.length);
+    for (let i = 0; i < minLen; i++) {
+        if (a[i] != b[i]) return false;
+    }
+    return true;
+}
 
 Transmutable.prototype.commit = function commit() {
     const copied = this.reify();
     this.target = copied;
+    const called = [];
+    this.observers.forEach(observer => {
+        if (observer.path) {
+            for (let i = 0; i < this.mutations.length; i++) {
+                const [mutPath, mutValue] = this.mutations[i];
+                if (samePaths(mutPath, observer.path)) {
+                    observer.handler();
+                    return; // to ensure that given observer will be called no more than once
+                }
+            }
+        } else {
+            observer.handler();
+        }
+    });
+
     this.mutations.length = 0;
     return copied;
 }
@@ -109,6 +133,16 @@ Transmutable.prototype.reify = function reify(target) {
     this.pushTo(copied);
     return copied;
 };
+
+Transmutable.prototype.observe = function observe(...args) {
+    const handler = typeof args[0] == 'function'? args[0] : args[1];
+    const path = typeof args[0] == 'function'? null : args[0];
+    this.observers.push({
+        path,
+        handler
+    });
+}
+
 
 exports.Transmutable = Transmutable;
 

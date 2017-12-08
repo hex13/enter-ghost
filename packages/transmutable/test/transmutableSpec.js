@@ -1,6 +1,6 @@
 "use strict";
 
-const { Transmutable, transform } = require('..');
+const { Transmutable, transform } = require('../transmutable');
 const assert = require('assert');
 
 const createExample = () => ({
@@ -21,6 +21,12 @@ const createExample = () => ({
     },
     deep: {
         arr: [1, 2, 4, 8, 16]
+    },
+    observable: {
+        foo: {
+            cat: {},
+            dog: {},
+        }
     }
 });
 
@@ -166,6 +172,66 @@ describe('Transmutable', () => {
         const reified = t.reify();
         assert.deepEqual(reified, expected);
     });
+
+    describe('observability', () => {
+        it('allows for observing changes after commit (in whole object)', () => {
+            let c = 0;
+            t.observe(() => {
+                c++;
+            });
+            assert.strictEqual(c, 0);
+            t.commit();
+            assert.strictEqual(c, 1);
+            t.commit();
+            assert.strictEqual(c, 2);
+        });
+
+        it('allows for attaching few observers at once', () => {
+            let c1 = 0, c2 = 0;
+            t.observe(() => {
+                c1++;
+            });
+            t.observe(() => {
+                c2++;
+            });
+            t.commit();
+            assert.strictEqual(c1, 1);
+            assert.strictEqual(c2, 1);
+        });
+
+        it('allows for observing changes after commit (specific property)', () => {
+            let c = 0;
+            t.observe(['observable', 'foo', 'cat'], () => {
+                c++;
+            });
+            assert.strictEqual(c, 0);
+            t.stage.observable.foo.cat = 981198;
+            t.commit();
+            assert.strictEqual(c, 1);
+        });
+
+        it('it triggers handler at most one after one commit (even if there are many mutations)', () => {
+            let c = 0;
+            t.observe(['observable', 'foo', 'cat'], () => {
+                c++;
+            });
+            t.stage.observable.foo.cat = 981198;
+            t.stage.observable.foo.cat = 282272;
+            t.commit();
+            assert.strictEqual(c, 1);
+        });
+
+
+        it('doesn\'t trigger observer if there is no matching mutation', () => {
+            let c = 0;
+            t.observe(['observable', 'foo', 'cat'], () => {
+                c++;
+            });
+            t.stage.observable.foo.dog = 1234;
+            t.commit();
+            assert.strictEqual(c, 0);
+        });
+    })
 
 });
 
