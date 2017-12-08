@@ -231,6 +231,34 @@ describe('Transmutable', () => {
             t.commit();
             assert.strictEqual(c, 0);
         });
+    });
+
+    describe('(forking and merging)', () => {
+        it('.fork() creates new transmutable object with same target', () => {
+            const forked = t.fork();
+            assert(forked instanceof Transmutable);
+            assert.notStrictEqual(t, forked);
+            assert.strictEqual(forked.target, t.target);
+        });
+        it('it\'s possible:\n1. to fork\n2. to commit changes in fork\n3. to merge changes into original object)', () => {
+            const forked = t.fork();
+            forked.stage.c.d = 7654;
+            expected.c.d = 7654;
+
+            forked.commit();
+
+            assert.deepStrictEqual(expected, forked.reify());
+            assert.strictEqual(forked.stage.c.d, 7654);
+
+            assert.deepStrictEqual(ex, t.reify(), 'changes in fork should not be present in original object');
+            assert.strictEqual(t.stage.c.d, 100, 'changes in fork should not be present in original object');
+
+            t.merge(forked);
+
+            assert.deepStrictEqual(expected, t.reify(), 'changes in fork should be present in original object after merging');
+            assert.strictEqual(t.stage.c.d, 7654, 'changes in fork should be present in original object after merging');
+
+        })
     })
 
 });

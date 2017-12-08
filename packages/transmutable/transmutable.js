@@ -123,8 +123,8 @@ Transmutable.prototype.commit = function commit() {
             observer.handler();
         }
     });
-
-    this.mutations.length = 0;
+    this.lastCommit = this.mutations;
+    this.mutations = [];
     return copied;
 }
 
@@ -143,6 +143,14 @@ Transmutable.prototype.observe = function observe(...args) {
     });
 }
 
+Transmutable.prototype.fork = function fork() {
+    return new Transmutable(this.target);
+}
+
+Transmutable.prototype.merge = function merge(transmutable) {
+    this.mutations = transmutable.lastCommit;
+    this.commit();
+}
 
 exports.Transmutable = Transmutable;
 
