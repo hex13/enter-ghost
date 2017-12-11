@@ -106,6 +106,11 @@ function samePaths(a, b) {
     return true;
 }
 
+// TODO
+function containsPath(a, b) {
+
+}
+
 Transmutable.prototype.commit = function commit() {
     const copied = this.reify();
     this.target = copied;
