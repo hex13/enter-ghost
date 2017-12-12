@@ -239,8 +239,26 @@ describe('Transmutable', () => {
             assert(forked instanceof Transmutable);
             assert.notStrictEqual(t, forked);
             assert.strictEqual(forked.target, t.target);
+            assert.notStrictEqual(forked.commits, t.commits, 'fork and master mustn\'t have same commits object');
+            assert.deepStrictEqual(forked.commits, t.commits, 'fork and master should have equivalent commits objects');
         });
-        it('it\'s possible:\n1. to fork\n2. to commit changes in fork\n3. to merge changes into original object)', () => {
+        it('forked should have the same commits', () => {
+            t.stage.a = 1234;
+            t.commit();
+            t.stage.a = 666;
+            t.commit();
+            const forked = t.fork();
+            assert.notStrictEqual(forked.commits, t.commits);
+            assert.deepStrictEqual(forked.commits, t.commits);
+        });
+        const testDesc = (
+            'it\'s possible:\n' +
+            '1. to fork\n' +
+            '2. to commit changes in fork\n' +
+            '3. to merge changes into original object)' +
+            ''
+        );
+        it(testDesc, () => {
             const forked = t.fork();
             forked.stage.c.d = 7654;
             expected.c.d = 7654;
@@ -257,8 +275,80 @@ describe('Transmutable', () => {
 
             assert.deepStrictEqual(expected, t.reify(), 'changes in fork should be present in original object after merging');
             assert.strictEqual(t.stage.c.d, 7654, 'changes in fork should be present in original object after merging');
+        });
+        it('many commits in fork (fast forward)', () => {
+            const forked = t.fork();
+            const oldA = createExample().a;
 
-        })
+            forked.stage.a = 'aaaa';
+            forked.stage.c.d = 7654;
+            expected.a = 'aaaa';
+            expected.c.d = 7654;
+
+            forked.commit();
+
+            expected.a = oldA;
+            forked.stage.a = oldA;
+
+            forked.commit();
+
+            assert.deepStrictEqual(expected, forked.reify());
+            assert.strictEqual(forked.stage.c.d, 7654);
+
+            assert.deepStrictEqual(ex, t.reify(), 'changes in fork should not be present in original object');
+            assert.strictEqual(t.stage.c.d, createExample().c.d, 'changes in fork should not be present in original object');
+
+            t.merge(forked);
+
+            assert.deepStrictEqual(expected, t.reify(), 'changes in fork should be present in original object after merging');
+            assert.strictEqual(t.stage.c.d, 7654, 'changes in fork should be present in original object after merging');
+        });
+        it('merge with branching', () => {
+            const forked = t.fork();
+            forked.stage.c.d = 7654;
+            expected.c.d = 7654;
+
+            forked.commit();
+
+            t.stage.a = 333;
+            expected.a = 333;
+            t.commit();
+            t.merge(forked);
+
+            assert.deepStrictEqual(expected, t.reify(), 'changes in fork should be present in original object after merging');
+            assert.strictEqual(t.stage.c.d, 7654, 'changes in fork should be present in original object after merging');
+        });
+
+        it('commit count should be appropriate in master and fork when fast forwarding', () => {
+            const forked = t.fork();
+
+            forked.stage.c.d = 7654;
+            forked.commit();
+
+            t.stage.a = 333;
+            t.commit();
+
+            t.merge(forked);
+
+            assert.strictEqual(t.commits.length,2);
+            assert.strictEqual(forked.commits.length, 1);
+        });
+        it('commit count should be appropriate in master and fork when branching', () => {
+            t.stage.a = 2222;
+            t.commit();
+
+            const forked = t.fork();
+
+            forked.stage.c.d = 7654;
+            forked.commit();
+
+            t.stage.a = 333;
+            t.commit();
+
+            t.merge(forked);
+            assert.strictEqual(t.commits.length, 3);
+            assert.strictEqual(forked.commits.length, 2);
+        });
     })
 
 });

@@ -58,6 +58,7 @@ function Transmutable(o) {
     this.mutations = [];
     this.target = o;
     this.observers = [];
+    this.commits = [];
 
     const createStage = (o, path = []) => {
         const getTarget = () => typeof o == 'function'? o(): o;
@@ -136,6 +137,7 @@ Transmutable.prototype.commit = function commit() {
         }
     });
     this.lastCommit = this.mutations;
+    this.commits.push(this.lastCommit);
     this.mutations = [];
     return copied;
 }
@@ -156,12 +158,21 @@ Transmutable.prototype.observe = function observe(...args) {
 }
 
 Transmutable.prototype.fork = function fork() {
-    return new Transmutable(this.target);
+    const t = new Transmutable(this.target);
+    t.commits = this.commits.slice();
+    return t;
 }
 
 Transmutable.prototype.merge = function merge(transmutable) {
-    this.mutations = transmutable.lastCommit;
-    this.commit();
+    // TODO proposal:
+    // const track = new Track();
+    for (let i = 0; i < transmutable.commits.length; i++) {
+        this.mutations = transmutable.commits[i];
+        if (this.commits.includes(transmutable.commits[i])) continue;
+        // TODO proposal:
+        // track.commit(transmutable.commits[i]);
+        this.commit();
+    }
 }
 
 exports.Transmutable = Transmutable;
