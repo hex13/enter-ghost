@@ -78,6 +78,8 @@ function Transmutable(o) {
                     mutPath.push(path[i] || k)
                 }
                 this.mutations.push([mutPath, v])
+                // TODO something like that (decouple recording logic)
+                // onSet(target, mutpath, v);
                 return true;
             }
         });
@@ -85,6 +87,11 @@ function Transmutable(o) {
     }
 
     this.stage = createStage(() => this.target);
+}
+
+// TODO
+function applyCommit(commit, target) {
+
 }
 
 Transmutable.prototype.pushTo = function pushTo(target) {
