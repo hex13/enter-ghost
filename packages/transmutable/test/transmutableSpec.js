@@ -199,13 +199,35 @@ describe('Transmutable', () => {
             assert.strictEqual(c2, 1);
         });
 
-        it('allows for observing changes after commit (specific property)', () => {
+        it('allows for observing changes (specific property)', () => {
             let c = 0;
             t.observe(['observable', 'foo', 'cat'], () => {
                 c++;
             });
             assert.strictEqual(c, 0);
             t.stage.observable.foo.cat = 981198;
+            t.commit();
+            assert.strictEqual(c, 1);
+        });
+
+        it('allows for observing changes (parent observed, child changed)', () => {
+            let c = 0;
+            t.observe(['observable'], () => {
+                c++;
+            });
+            assert.strictEqual(c, 0);
+            t.stage.observable.foo.cat = 981198;
+            t.commit();
+            assert.strictEqual(c, 1);
+        });
+
+        it('allows for observing changes (child observed, parent changed)', () => {
+            let c = 0;
+            t.observe(['observable', 'foo', 'cat'], () => {
+                c++;
+            });
+            assert.strictEqual(c, 0);
+            t.stage.observable.foo = 981198;
             t.commit();
             assert.strictEqual(c, 1);
         });

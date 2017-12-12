@@ -105,18 +105,12 @@ Transmutable.prototype.pushTo = function pushTo(target) {
     }
 };
 
-function samePaths(a, b) {
-    if (a.length != b.length) return false;
+function containsPath(a, b) {
     const minLen = Math.min(a.length, b.length);
     for (let i = 0; i < minLen; i++) {
         if (a[i] != b[i]) return false;
     }
     return true;
-}
-
-// TODO
-function containsPath(a, b) {
-
 }
 
 Transmutable.prototype.commit = function commit() {
@@ -127,7 +121,7 @@ Transmutable.prototype.commit = function commit() {
         if (observer.path) {
             for (let i = 0; i < this.mutations.length; i++) {
                 const [mutPath, mutValue] = this.mutations[i];
-                if (samePaths(mutPath, observer.path)) {
+                if (containsPath(mutPath, observer.path)) {
                     observer.handler();
                     return; // to ensure that given observer will be called no more than once
                 }
