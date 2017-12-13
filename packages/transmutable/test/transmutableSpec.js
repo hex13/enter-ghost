@@ -372,7 +372,25 @@ describe('Transmutable', () => {
             assert.strictEqual(forked.commits.length, 2);
         });
     })
-
+    describe('(events)', () => {
+        it('`lastCommit` has correct number of mutations', () => {
+            assert.strictEqual(t.lastCommit.mutations.length, 0);
+            t.stage.a = 9182;
+            assert.strictEqual(t.lastCommit.mutations.length, 0);
+            t.stage.b = 9182;
+            assert.strictEqual(t.lastCommit.mutations.length, 0);
+            t.stage.c = 9182;
+            assert.strictEqual(t.lastCommit.mutations.length, 0);
+            t.commit();
+            assert.strictEqual(t.lastCommit.mutations.length, 3);
+        });
+        xit('put allows for putting events', () => {
+            const e = {type: 'foo124'};
+            t.put(e);
+            t.commit();
+            assert.strictEqual(t.lastCommit.length, 1);
+        })
+    });
 });
 
 describe('transform', () => {
