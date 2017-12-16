@@ -147,6 +147,17 @@ describe('Transmutable', () => {
         assert.deepEqual(reified, expected);
     });
 
+    describe('actions', () => {
+        it('performs mutations', () => {
+            const handler = (state) => {
+                state.a = 13;
+            };
+
+            expected.a = 13;
+            assert.deepStrictEqual(t.unstable_runAction(handler), expected);
+        });
+    });
+
     describe('observability', () => {
         it('allows for observing changes after commit (in whole object)', () => {
             let c = 0;

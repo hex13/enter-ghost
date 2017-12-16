@@ -115,19 +115,32 @@ function callObservers(commit, observers) {
     });
 }
 
-Transmutable.prototype.commit = function commit() {
-    const copied = this.reify();
-    this.target = copied;
-    const called = [];
+// TODO think about:
+// 1. when running action: to fork or not to fork?
+// 2.runAction vs. commit? (do we need 2 functions or just one?)
+// 3. naming: runAction? run? dispatch? etc.
 
-    this.lastCommit = this.nextCommit;
+Transmutable.prototype.unstable_runAction = function (handler) {
+    const commit = new Commit();
+    const stage = createStage(() => this.target, {
+        set: (path, v) => {
+            commit.mutations.push([path, v]);
+        }
+    });
+    handler(stage);
+    return this.commit(commit);
+}
 
-    callObservers(this.lastCommit, this.observers);
+Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
+    this.target = cloneAndApplyMutations(this.target, commit.mutations);
 
-    this.commits.push(this.lastCommit);
+    callObservers(commit, this.observers);
 
+    this.commits.push(commit);
+    this.lastCommit = commit;
     this.nextCommit = new Commit();
-    return copied;
+
+    return this.target;
 }
 
 function cloneAndApplyMutations(sourceObject, mutations) {
