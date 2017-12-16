@@ -79,7 +79,7 @@ function applyCommit(commit, target) {
 
 }
 
-Transmutable.prototype.pushTo = function pushTo(target) {
+Transmutable.prototype.applyMutations = function applyMutations(target) {
     const proposed = this;
     for (let i = 0; i < proposed.mutations.length; i++) {
         const m = proposed.mutations[i];;
@@ -130,7 +130,7 @@ Transmutable.prototype.commit = function commit() {
 
 Transmutable.prototype.reify = function reify(target) {
     const copied = cloneDeepWithDirtyChecking(this.target, this.mutations);
-    this.pushTo(copied);
+    this.applyMutations(copied);
     return copied;
 };
 

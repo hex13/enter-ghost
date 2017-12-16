@@ -71,12 +71,12 @@ describe('Transmutable', () => {
         assert.deepStrictEqual(ex, createExample());
     });
 
-    it('pushes data to the object', () => {
+    it('apply mutations to the object', () => {
         expected.a = 81;
 
         const output = createExample();
         t.stage.a = 81;
-        t.pushTo(output);
+        t.applyMutations(output);
 
         assert.deepStrictEqual(ex, createExample());
         assert.deepStrictEqual(output, expected);
