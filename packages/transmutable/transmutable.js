@@ -57,6 +57,9 @@ function cloneDeepWithDirtyChecking(o, mutations) {
 function Commit(mutations = [], events = []) {
     this.mutations = mutations;
     this.events = events;
+    this.put = (event) => {
+        this.events.push(event);
+    };
 }
 
 function Transmutable(o) {
@@ -161,9 +164,6 @@ Transmutable.prototype.merge = function merge(transmutable) {
     }
 }
 
-Transmutable.prototype.put = function put(event) {
-    this.nextCommit.events.push(event);
-}
 
 exports.Transmutable = Transmutable;
 exports.applyMutations = applyMutations;

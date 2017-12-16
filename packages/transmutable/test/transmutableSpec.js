@@ -386,16 +386,16 @@ describe('Transmutable', () => {
         });
         it('`put` allows for putting events', () => {
             const e = {type: 'foo124'};
-            t.put(e);
+            t.nextCommit.put(e);
             t.commit();
             assert.deepStrictEqual(t.lastCommit.events, [{
                 type: 'foo124'
             }]);
         });
         it('events are reset after commit', () => {
-            t.put({type: 'bar124'});
+            t.nextCommit.put({type: 'bar124'});
             t.commit();
-            t.put({type: 'bar123'});
+            t.nextCommit.put({type: 'bar123'});
             t.commit();
             assert.deepStrictEqual(t.lastCommit.events, [{
                 type: 'bar123'
