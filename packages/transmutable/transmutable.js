@@ -53,8 +53,9 @@ function cloneDeepWithDirtyChecking(o, mutations) {
     return copy(o);
 }
 
-function Commit(mutations = []) {
+function Commit(mutations = [], events = []) {
     this.mutations = mutations;
+    this.events = events;
 }
 
 function Transmutable(o) {
@@ -135,9 +136,10 @@ Transmutable.prototype.commit = function commit() {
             observer.handler();
         }
     });
-    this.lastCommit = new Commit(this.mutations);
+    this.lastCommit = new Commit(this.mutations, this.events);
     this.commits.push(this.lastCommit);
     this.mutations = [];
+    this.events = [];
     return copied;
 }
 
@@ -175,7 +177,7 @@ Transmutable.prototype.merge = function merge(transmutable) {
 }
 
 Transmutable.prototype.put = function put(event) {
-    this.events.push(1);
+    this.events.push(event);
 }
 
 exports.Transmutable = Transmutable;

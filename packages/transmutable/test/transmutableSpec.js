@@ -384,12 +384,23 @@ describe('Transmutable', () => {
             t.commit();
             assert.strictEqual(t.lastCommit.mutations.length, 3);
         });
-        xit('put allows for putting events', () => {
+        it('`put` allows for putting events', () => {
             const e = {type: 'foo124'};
             t.put(e);
             t.commit();
-            assert.strictEqual(t.lastCommit.length, 1);
-        })
+            assert.deepStrictEqual(t.lastCommit.events, [{
+                type: 'foo124'
+            }]);
+        });
+        it('events are reset after commit', () => {
+            t.put({type: 'bar124'});
+            t.commit();
+            t.put({type: 'bar123'});
+            t.commit();
+            assert.deepStrictEqual(t.lastCommit.events, [{
+                type: 'bar123'
+            }]);
+        });
     });
 });
 
