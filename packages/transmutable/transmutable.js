@@ -130,11 +130,14 @@ Transmutable.prototype.commit = function commit() {
     return copied;
 }
 
+function cloneAndApplyMutations(sourceObject, mutations) {
+    const nextValue = cloneDeepWithDirtyChecking(sourceObject, mutations);
+    applyMutations(nextValue, mutations);
+    return nextValue;
+}
+
 Transmutable.prototype.reify = function reify(target) {
-    const mutations = this.nextCommit.mutations;
-    const copied = cloneDeepWithDirtyChecking(this.target, mutations);
-    applyMutations(copied, mutations);
-    return copied;
+    return cloneAndApplyMutations(this.target, this.nextCommit.mutations);
 };
 
 Transmutable.prototype.observe = function observe(...args) {
