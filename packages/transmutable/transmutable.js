@@ -60,7 +60,6 @@ function Commit(mutations = [], events = []) {
 }
 
 function Transmutable(o) {
-    this.events = [];
     this.target = o;
     this.observers = [];
     this.commits = [];
@@ -118,13 +117,12 @@ Transmutable.prototype.commit = function commit() {
     this.target = copied;
     const called = [];
 
-    this.lastCommit = new Commit(this.nextCommit.mutations, this.events);
+    this.lastCommit = this.nextCommit;
 
     callObservers(this.lastCommit, this.observers);
 
     this.commits.push(this.lastCommit);
 
-    this.events = [];
     this.nextCommit = new Commit();
     return copied;
 }
@@ -164,7 +162,7 @@ Transmutable.prototype.merge = function merge(transmutable) {
 }
 
 Transmutable.prototype.put = function put(event) {
-    this.events.push(event);
+    this.nextCommit.events.push(event);
 }
 
 exports.Transmutable = Transmutable;
