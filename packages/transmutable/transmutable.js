@@ -3,6 +3,14 @@
 const { set, get } = require('./get-set');
 const createStage = require('./createStage');
 
+const errorChecks = {
+    Transmutable: {
+        commit(commit) {
+            if (!(commit instanceof Commit)) throw new Error('Wrong argument passed to method Transmutable::commit()')
+        }
+    }
+}
+
 function isDirty(mutations, propPath, target) {
     for (let i = 0; i < mutations.length; i++) {
         const mutPath = mutations[i][0];
@@ -132,6 +140,8 @@ Transmutable.prototype.unstable_runAction = function (handler) {
 }
 
 Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
+    errorChecks.Transmutable.commit(commit);
+
     this.target = cloneAndApplyMutations(this.target, commit.mutations);
 
     callObservers(commit, this.observers);
