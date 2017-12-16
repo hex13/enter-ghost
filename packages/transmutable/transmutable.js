@@ -119,14 +119,11 @@ function containsPath(a, b) {
     return true;
 }
 
-Transmutable.prototype.commit = function commit() {
-    const copied = this.reify();
-    this.target = copied;
-    const called = [];
-    this.observers.forEach(observer => {
+function callObservers(commit, observers) {
+    observers.forEach(observer => {
         if (observer.path) {
-            for (let i = 0; i < this.mutations.length; i++) {
-                const [mutPath, mutValue] = this.mutations[i];
+            for (let i = 0; i < commit.mutations.length; i++) {
+                const [mutPath, mutValue] = commit.mutations[i];
                 if (containsPath(mutPath, observer.path)) {
                     observer.handler();
                     return; // to ensure that given observer will be called no more than once
@@ -136,7 +133,17 @@ Transmutable.prototype.commit = function commit() {
             observer.handler();
         }
     });
+}
+
+Transmutable.prototype.commit = function commit() {
+    const copied = this.reify();
+    this.target = copied;
+    const called = [];
+
     this.lastCommit = new Commit(this.mutations, this.events);
+
+    callObservers(this.lastCommit, this.observers);
+
     this.commits.push(this.lastCommit);
     this.mutations = [];
     this.events = [];
