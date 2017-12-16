@@ -79,10 +79,10 @@ function applyCommit(commit, target) {
 
 }
 
-Transmutable.prototype.applyMutations = function applyMutations(target) {
-    const proposed = this;
-    for (let i = 0; i < proposed.mutations.length; i++) {
-        const m = proposed.mutations[i];;
+
+function applyMutations(target, mutations) {
+    for (let i = 0; i < mutations.length; i++) {
+        const m = mutations[i];;
         if (!m) break;
         const [path, value] = m;
         set(target, path, value);
@@ -130,7 +130,7 @@ Transmutable.prototype.commit = function commit() {
 
 Transmutable.prototype.reify = function reify(target) {
     const copied = cloneDeepWithDirtyChecking(this.target, this.mutations);
-    this.applyMutations(copied);
+    applyMutations(copied, this.mutations);
     return copied;
 };
 
@@ -166,7 +166,7 @@ Transmutable.prototype.put = function put(event) {
 }
 
 exports.Transmutable = Transmutable;
-
+exports.applyMutations = applyMutations;
 exports.transform = (original, transformer) => {
     const t = new Transmutable(original);
     transformer(t.stage);

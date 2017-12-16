@@ -1,6 +1,6 @@
 "use strict";
 
-const { Transmutable, transform } = require('../transmutable');
+const { Transmutable, transform, applyMutations } = require('../transmutable');
 const assert = require('assert');
 
 const createExample = () => ({
@@ -76,7 +76,7 @@ describe('Transmutable', () => {
 
         const output = createExample();
         t.stage.a = 81;
-        t.applyMutations(output);
+        applyMutations(output, t.mutations);
 
         assert.deepStrictEqual(ex, createExample());
         assert.deepStrictEqual(output, expected);
