@@ -1,5 +1,9 @@
 ### immutable objects that pretend to be mutable
 
+Event-sourced state library.
+
+There are ongoing changes. Read issues: https://github.com/hex13/enter-ghost/issues
+
 it enables for writing this:
 
 ```javascript
