@@ -60,16 +60,16 @@ function Commit(mutations = [], events = []) {
 }
 
 function Transmutable(o) {
-    this.mutations = [];
     this.events = [];
     this.target = o;
     this.observers = [];
     this.commits = [];
     this.lastCommit = new Commit();
+    this.nextCommit = new Commit();
 
     this.stage = createStage(() => this.target, {
         set: (path, v) => {
-            this.mutations.push([path, v])
+            this.nextCommit.mutations.push([path, v]);
         }
     });
 }
@@ -118,19 +118,21 @@ Transmutable.prototype.commit = function commit() {
     this.target = copied;
     const called = [];
 
-    this.lastCommit = new Commit(this.mutations, this.events);
+    this.lastCommit = new Commit(this.nextCommit.mutations, this.events);
 
     callObservers(this.lastCommit, this.observers);
 
     this.commits.push(this.lastCommit);
-    this.mutations = [];
+
     this.events = [];
+    this.nextCommit = new Commit();
     return copied;
 }
 
 Transmutable.prototype.reify = function reify(target) {
-    const copied = cloneDeepWithDirtyChecking(this.target, this.mutations);
-    applyMutations(copied, this.mutations);
+    const mutations = this.nextCommit.mutations;
+    const copied = cloneDeepWithDirtyChecking(this.target, mutations);
+    applyMutations(copied, mutations);
     return copied;
 };
 
@@ -153,7 +155,7 @@ Transmutable.prototype.merge = function merge(transmutable) {
     // TODO proposal:
     // const track = new Track();
     for (let i = 0; i < transmutable.commits.length; i++) {
-        this.mutations = transmutable.commits[i].mutations;
+        this.nextCommit.mutations = transmutable.commits[i].mutations;
         if (this.commits.includes(transmutable.commits[i])) continue;
         // TODO proposal:
         // track.commit(transmutable.commits[i]);

@@ -76,7 +76,7 @@ describe('Transmutable', () => {
 
         const output = createExample();
         t.stage.a = 81;
-        applyMutations(output, t.mutations);
+        applyMutations(output, t.nextCommit.mutations);
 
         assert.deepStrictEqual(ex, createExample());
         assert.deepStrictEqual(output, expected);
@@ -101,7 +101,7 @@ describe('Transmutable', () => {
     it('reset mutations after commit', () => {
         t.stage.a = 123456;
         t.commit();
-        assert.strictEqual(t.mutations.length, 0);
+        assert.strictEqual(t.nextCommit.mutations.length, 0);
     });
 
     it('accumulates changes after commit (thus allows for commiting changes incrementally)', () => {
@@ -148,7 +148,7 @@ describe('Transmutable', () => {
         const reified2 = t.reify();
 
         assert.strictEqual(reified.a, reified2.a, 'and reified objects have structural sharing')
-        assert.deepStrictEqual(t.mutations, [[['a'], {n: 2017}]], 'it doesn\' reset mutations after reify');
+        assert.deepStrictEqual(t.nextCommit.mutations, [[['a'], {n: 2017}]], 'it doesn\' reset mutations after reify');
 
         assert.deepStrictEqual(original, createExample())
         assert.deepStrictEqual(reified, expected);
