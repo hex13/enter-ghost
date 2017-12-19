@@ -1,3 +1,5 @@
+'use strict';
+
 const { get, set } = require('./get-set');
 
 function isDirty(mutations, propPath, target) {
