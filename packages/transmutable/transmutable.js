@@ -193,10 +193,16 @@ Transmutable.prototype.merge = function merge(transmutable) {
 
 exports.Transmutable = Transmutable;
 exports.applyMutations = applyMutations;
+
 exports.transform = (original, transformer) => {
-    const t = new Transmutable(original);
-    transformer(t.stage);
-    return t.reify();
+    const mutations = [];
+    const stage = createStage(() => original, {
+        set: (path, v) => {
+            mutations.push([path, v]);
+        }
+    });
+    transformer(stage);
+    return cloneAndApplyMutations(original, mutations);
 };
 
 //exports.clone = cloneDeepWithDirtyChecking;
