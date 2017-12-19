@@ -2,6 +2,7 @@
 
 const { set, get } = require('./get-set');
 const createStage = require('./createStage');
+const { cloneAndApplyMutations } = require('./cloning');
 
 const errorChecks = {
     Transmutable: {
@@ -11,56 +12,7 @@ const errorChecks = {
     }
 }
 
-function isDirty(mutations, propPath, target) {
-    for (let i = 0; i < mutations.length; i++) {
-        const mutPath = mutations[i][0];
-        const mutValue = mutations[i][1];
-        const minLen = Math.min(mutPath.length, propPath.length);
-        let affectedByMutation = true;
-        for (let j = 0; j < minLen; j++) {
-            const mutPropName = mutPath[j];
-            const searchedPropName = propPath[j];
-            if (mutPropName !== searchedPropName) {
-                affectedByMutation = false;
-                break;
-            }
-        }
-        if (affectedByMutation) {
-            if (get(target, mutPath) !== mutValue) return true;
-        }
 
-    }
-    return false;
-}
-
-function cloneDeepWithDirtyChecking(o, mutations) {
-
-    const copy = (o, objPath = []) => {
-        if (!isDirty(mutations, objPath, o)) return o;
-        let o2;
-        if (Array.isArray(o)) {
-            o2 = o.slice();
-        } else o2 = {};
-
-        // NOTE currently we're doing for...in also for arrays (is this correct?)
-
-        for (let k in o) {
-            if (o[k] && typeof o[k] =='object') {
-                const propPath = new Array(objPath.length + 1);
-                for (let i = 0; i < objPath.length; i++) {
-                    propPath[i] = objPath[i];
-                }
-                propPath[objPath.length] = k;
-
-                o2[k] = copy(o[k], propPath);
-            } else {
-                o2[k] = o[k];
-            }
-        }
-        return o2;
-    }
-    return copy(o);
-}
 
 function Commit(mutations = [], events = []) {
     this.mutations = mutations;
@@ -90,14 +42,6 @@ function applyCommit(commit, target) {
 }
 
 
-function applyMutations(target, mutations) {
-    for (let i = 0; i < mutations.length; i++) {
-        const m = mutations[i];;
-        if (!m) break;
-        const [path, value] = m;
-        set(target, path, value);
-    }
-};
 
 function containsPath(a, b) {
     const minLen = Math.min(a.length, b.length);
@@ -153,11 +97,6 @@ Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
     return this.target;
 }
 
-function cloneAndApplyMutations(sourceObject, mutations) {
-    const nextValue = cloneDeepWithDirtyChecking(sourceObject, mutations);
-    applyMutations(nextValue, mutations);
-    return nextValue;
-}
 
 Transmutable.prototype.reify = function reify(target) {
     return cloneAndApplyMutations(this.target, this.nextCommit.mutations);
@@ -192,7 +131,6 @@ Transmutable.prototype.merge = function merge(transmutable) {
 
 
 exports.Transmutable = Transmutable;
-exports.applyMutations = applyMutations;
 
 exports.transform = (original, transformer) => {
     const mutations = [];
@@ -204,5 +142,3 @@ exports.transform = (original, transformer) => {
     transformer(stage);
     return cloneAndApplyMutations(original, mutations);
 };
-
-//exports.clone = cloneDeepWithDirtyChecking;

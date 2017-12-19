@@ -1,6 +1,7 @@
 "use strict";
 
-const { Transmutable, transform, applyMutations } = require('../transmutable');
+const { Transmutable, transform } = require('../transmutable');
+const { applyMutations } = require('../cloning');
 const { createExample } = require('../testUtils');
 const assert = require('assert');
 
