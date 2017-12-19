@@ -132,13 +132,4 @@ Transmutable.prototype.merge = function merge(transmutable) {
 
 exports.Transmutable = Transmutable;
 
-exports.transform = (original, transformer) => {
-    const mutations = [];
-    const stage = createStage(() => original, {
-        set: (path, v) => {
-            mutations.push([path, v]);
-        }
-    });
-    transformer(stage);
-    return cloneAndApplyMutations(original, mutations);
-};
+exports.transform = require('./transform');

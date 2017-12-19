@@ -1,4 +1,6 @@
-module.exports = createStage = (target, handlers) => {
+'use strict';
+
+module.exports = function createStage(target, handlers) {
     const _createStage = (o, path = []) => {
         const getTarget = () => typeof o == 'function'? o(): o;
         const proxy = new Proxy(getTarget(), {
