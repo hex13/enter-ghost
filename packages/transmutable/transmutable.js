@@ -13,10 +13,11 @@ const errorChecks = {
     }
 }
 
-function Transmutable(o) {
+function Transmutable(o, hooks = {}) {
     this.target = o;
     this.observers = [];
     this.commits = [];
+    this.hooks = hooks;
     this.lastCommit = new Commit();
     this.nextCommit = new Commit();
 
@@ -84,7 +85,7 @@ Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
     this.commits.push(commit);
     this.lastCommit = commit;
     this.nextCommit = new Commit();
-
+    this.hooks.onCommit && this.hooks.onCommit(this, commit);
     return this.target;
 }
 

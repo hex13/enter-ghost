@@ -3,6 +3,7 @@
 const { Transmutable, transform } = require('../transmutable');
 const { applyMutations } = require('../cloning');
 const { createExample } = require('../testUtils');
+const Commit = require('../commit');
 const assert = require('assert');
 
 describe('Transmutable', () => {
@@ -386,6 +387,26 @@ describe('Transmutable', () => {
             assert.deepStrictEqual(t.lastCommit.events, [{
                 type: 'bar123'
             }]);
+        });
+    });
+
+    describe('(hooks)', () => {
+        it('calls onCommit after commit', () => {
+            const calls = [];
+            const store = new Transmutable({}, {
+                onCommit(store, commit) {
+                    calls.push({
+                        store, commit
+                    });
+                }
+            });
+            assert.strictEqual(calls.length, 0);
+            store.commit();
+            assert.strictEqual(calls.length, 1);
+
+            const call = calls[0];
+            assert.deepStrictEqual(call.store, store);
+            assert(call.commit instanceof Commit);
         });
     });
 });
