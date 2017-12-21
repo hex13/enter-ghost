@@ -3,6 +3,7 @@
 const { set, get } = require('./get-set');
 const createStage = require('./createStage');
 const { cloneAndApplyMutations } = require('./cloning');
+const Commit = require('./commit');
 
 const errorChecks = {
     Transmutable: {
@@ -10,16 +11,6 @@ const errorChecks = {
             if (!(commit instanceof Commit)) throw new Error('Wrong argument passed to method Transmutable::commit()')
         }
     }
-}
-
-
-
-function Commit(mutations = [], events = []) {
-    this.mutations = mutations;
-    this.events = events;
-    this.put = (event) => {
-        this.events.push(event);
-    };
 }
 
 function Transmutable(o) {
