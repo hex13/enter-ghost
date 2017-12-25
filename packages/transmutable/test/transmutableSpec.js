@@ -1,7 +1,7 @@
 "use strict";
 
 const { Transmutable, transform } = require('../transmutable');
-const { applyMutations } = require('../cloning');
+const { applyChanges } = require('../cloning');
 const { createExample } = require('../testUtils');
 const Commit = require('../commit');
 const assert = require('assert');
@@ -47,12 +47,13 @@ describe('Transmutable', () => {
         assert.deepStrictEqual(ex, createExample());
     });
 
+    // TODO review this case (mutations vs changes)
     it('apply mutations to the object', () => {
         expected.a = 81;
 
         const output = createExample();
         t.stage.a = 81;
-        applyMutations(output, t.nextCommit.mutations);
+        applyChanges(output, t.nextCommit.mutations);
 
         assert.deepStrictEqual(ex, createExample());
         assert.deepStrictEqual(output, expected);

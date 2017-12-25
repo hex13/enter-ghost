@@ -17,14 +17,14 @@ function isDirty(mutations, propPath, target) {
             }
         }
         if (affectedByMutation) {
-            if (get(target, mutPath) !== mutValue) return true;
+            return true;
         }
 
     }
     return false;
 }
 
-function applyMutations(target, mutations) {
+function applyChanges(target, mutations) {
     for (let i = 0; i < mutations.length; i++) {
         const m = mutations[i];;
         if (!m) break;
@@ -63,10 +63,18 @@ function cloneDeepWithDirtyChecking(o, mutations) {
 }
 
 
-exports.cloneAndApplyMutations = function cloneAndApplyMutations(sourceObject, mutations) {
-    const nextValue = cloneDeepWithDirtyChecking(sourceObject, mutations);
-    applyMutations(nextValue, mutations);
-    return nextValue;
+function computeChanges(sourceObject, mutations) {
+    return mutations.filter(([mutPath, mutValue]) => {
+        return get(sourceObject, mutPath) !== mutValue;
+    });
 }
 
-exports.applyMutations = applyMutations;
+function cloneAndApplyMutations(sourceObject, mutations) {
+    const changes = computeChanges(sourceObject, mutations);
+    const nextValue = cloneDeepWithDirtyChecking(sourceObject, changes);
+    applyChanges(nextValue, changes);
+    return nextValue;
+}
+exports.cloneAndApplyMutations = cloneAndApplyMutations;
+
+exports.applyChanges = applyChanges;
