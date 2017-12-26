@@ -34,26 +34,17 @@ function applyCommit(commit, target) {
 }
 
 
-
-function containsPath(a, b) {
-    const minLen = Math.min(a.length, b.length);
-    for (let i = 0; i < minLen; i++) {
-        if (a[i] != b[i]) return false;
-    }
-    return true;
-}
-
-function callObservers(changes, observers) {
+function callObservers(observers, lastState, nextState) {
     observers.forEach(observer => {
         if (observer.path) {
-            for (let i = 0; i < changes.length; i++) {
-                const [mutPath, mutValue] = changes[i];
-                if (containsPath(mutPath, observer.path)) {
-                    observer.handler();
-                }
+            if (
+                get(lastState, observer.path) !==
+                get(nextState, observer.path)
+            ) {
+                observer.handler();
             }
         } else {
-            if (changes.length)
+            if (lastState !== nextState)
                 observer.handler();
         }
     });
@@ -78,14 +69,10 @@ Transmutable.prototype.unstable_runAction = function (handler) {
 Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
     errorChecks.Transmutable.commit(commit);
 
-    let changes;
-    this.target = cloneAndApplyMutations(this.target, commit.mutations, {
-        onComputeChanges(data) {
-            changes = data;
-        }
-    });
+    const prevTarget = this.target;
+    this.target = cloneAndApplyMutations(this.target, commit.mutations);
 
-    callObservers(changes, this.observers);
+    callObservers(this.observers, prevTarget, this.target);
 
     this.commits.push(commit);
     this.lastCommit = commit;
