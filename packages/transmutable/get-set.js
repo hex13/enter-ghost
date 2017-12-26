@@ -7,6 +7,8 @@ exports.get = function get(target, path) {
 }
 exports.set = function set(target, path, value) {
   let curr = target, i;
-  for (i = 0; i < path.length - 1; curr = curr[path[i++]]) ;
+  for (i = 0; i < path.length - 1; i++) {
+      curr = curr[path[i]] || (curr[path[i]] = {});
+  };
   curr[path[i]] = value
 }
