@@ -43,18 +43,18 @@ function containsPath(a, b) {
     return true;
 }
 
-function callObservers(commit, observers) {
+function callObservers(changes, observers) {
     observers.forEach(observer => {
         if (observer.path) {
-            for (let i = 0; i < commit.mutations.length; i++) {
-                const [mutPath, mutValue] = commit.mutations[i];
+            for (let i = 0; i < changes.length; i++) {
+                const [mutPath, mutValue] = changes[i];
                 if (containsPath(mutPath, observer.path)) {
                     observer.handler();
-                    return; // to ensure that given observer will be called no more than once
                 }
             }
         } else {
-            observer.handler();
+            if (changes.length)
+                observer.handler();
         }
     });
 }
@@ -78,9 +78,14 @@ Transmutable.prototype.unstable_runAction = function (handler) {
 Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
     errorChecks.Transmutable.commit(commit);
 
-    this.target = cloneAndApplyMutations(this.target, commit.mutations);
+    let changes;
+    this.target = cloneAndApplyMutations(this.target, commit.mutations, {
+        onComputeChanges(data) {
+            changes = data;
+        }
+    });
 
-    callObservers(commit, this.observers);
+    callObservers(changes, this.observers);
 
     this.commits.push(commit);
     this.lastCommit = commit;

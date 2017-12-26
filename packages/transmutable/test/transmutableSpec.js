@@ -162,14 +162,26 @@ describe('Transmutable', () => {
     });
 
     describe('observability', () => {
-        it('allows for observing changes after commit (in whole object)', () => {
+        it('doesn\'t trigger observers if there are no mutations', () => {
             let c = 0;
             t.observe(() => {
                 c++;
             });
             assert.strictEqual(c, 0);
             t.commit();
+            assert.strictEqual(c, 0);
+        });
+
+        it('allows for observing changes after commit (in whole object)', () => {
+            let c = 0;
+            t.observe(() => {
+                c++;
+            });
+            t.stage.a = 292828;
+            assert.strictEqual(c, 0);
+            t.commit();
             assert.strictEqual(c, 1);
+            t.stage.a = 74342;
             t.commit();
             assert.strictEqual(c, 2);
         });
@@ -182,6 +194,7 @@ describe('Transmutable', () => {
             t.observe(() => {
                 c2++;
             });
+            t.stage.a = 381211;
             t.commit();
             assert.strictEqual(c1, 1);
             assert.strictEqual(c2, 1);

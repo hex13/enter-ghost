@@ -2,6 +2,8 @@
 
 const { get, set } = require('./get-set');
 
+const WAS_WRITTEN = Symbol();
+
 function isDirty(mutations, propPath, target) {
     for (let i = 0; i < mutations.length; i++) {
         const mutPath = mutations[i][0];
@@ -64,13 +66,26 @@ function cloneDeepWithDirtyChecking(o, mutations) {
 
 
 function computeChanges(sourceObject, mutations) {
-    return mutations.filter(([mutPath, mutValue]) => {
-        return get(sourceObject, mutPath) !== mutValue;
-    });
+    const changes = [];
+    const treeOfChanges = {};
+
+    for (let i = mutations.length - 1; i >= 0; i--) {
+        const [mutPath, mutValue] = mutations[i];
+        const wasWrittenRef = mutPath.concat(WAS_WRITTEN);
+        if (
+            get(sourceObject, mutPath) !== mutValue
+            && get(treeOfChanges, wasWrittenRef) !== true
+        ) {
+            changes.push(mutations[i]);
+            set(treeOfChanges, wasWrittenRef, true);
+        }
+    }
+    return changes;
 }
 
-function cloneAndApplyMutations(sourceObject, mutations) {
+function cloneAndApplyMutations(sourceObject, mutations, handlers = {}) {
     const changes = computeChanges(sourceObject, mutations);
+    if (handlers.onComputeChanges) handlers.onComputeChanges(changes);
     const nextValue = cloneDeepWithDirtyChecking(sourceObject, changes);
     applyChanges(nextValue, changes);
     return nextValue;
