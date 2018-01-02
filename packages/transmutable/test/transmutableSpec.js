@@ -200,6 +200,35 @@ describe('Transmutable', () => {
             assert.strictEqual(c2, 1);
         });
 
+        it('passes state to observer (when subscribing to full state)', () => {
+            let c = 0;
+            expected.observable.foo.cat = 981198;
+
+            t.observe((state) => {
+                assert.deepStrictEqual(state, expected);
+                c++;
+            });
+
+            t.stage.observable.foo.cat = 981198;
+            t.commit();
+            assert.strictEqual(c, 1);
+        });
+
+        it('passes state to observer (when subscribing to path)', () => {
+            let c = 0;
+            expected.observable.foo.cat = 981198;
+
+            t.observe(['observable'], (state) => {
+                assert.deepStrictEqual(state, expected.observable);
+                c++;
+            });
+
+            t.stage.observable.foo.cat = 981198;
+            t.commit();
+            assert.strictEqual(c, 1);
+        });
+
+
         it('allows for observing changes (specific property)', () => {
             let c = 0;
             t.observe(['observable', 'foo', 'cat'], () => {
