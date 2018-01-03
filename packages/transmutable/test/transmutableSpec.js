@@ -157,7 +157,7 @@ describe('Transmutable', () => {
             };
 
             expected.a = 13;
-            assert.deepStrictEqual(t.unstable_runAction(handler), expected);
+            assert.deepStrictEqual(t.run(handler), expected);
         });
     });
 

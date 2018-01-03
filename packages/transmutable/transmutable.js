@@ -29,7 +29,7 @@ function Transmutable(o, hooks = {}) {
     });
 }
 
-Transmutable.prototype.unstable_runAction = function (handler) {
+Transmutable.prototype.run = function (handler) {
     return this.commit(
         new Commit(evaluateMutations(this.target, handler))
     );
