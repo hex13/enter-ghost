@@ -2,6 +2,7 @@
 
 const { set, get } = require('./get-set');
 const createStage = require('./createStage');
+const evaluateMutations = require('./evaluateMutations');
 const { cloneAndApplyMutations } = require('./cloning');
 const Commit = require('./commit');
 
@@ -50,14 +51,9 @@ function callObservers(observers, lastState, nextState) {
 // 3. naming: runAction? run? dispatch? etc.
 
 Transmutable.prototype.unstable_runAction = function (handler) {
-    const commit = new Commit();
-    const stage = createStage(() => this.target, {
-        set: (path, v) => {
-            commit.mutations.push([path, v]);
-        }
-    });
-    handler(stage);
-    return this.commit(commit);
+    return this.commit(
+        new Commit(evaluateMutations(this.target, handler))
+    );
 }
 
 Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
