@@ -20,4 +20,13 @@ describe('set', () => {
             }
         })
     });
+    it('get with [] as path should return original object', () => {
+        const o = {};
+        assert.strictEqual(get(o, []), o);
+    });
+    it('get without path should return original object', () => {
+        const o = {};
+        assert.strictEqual(get(o), o);
+    });
+
 });

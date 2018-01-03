@@ -37,11 +37,8 @@ function applyCommit(commit, target) {
 
 function callObservers(observers, lastState, nextState) {
     observers.forEach(({path, handler}) => {
-        if (
-            path ?
-            get(lastState, path) !== get(nextState, path) :
-            lastState !== nextState
-        ) handler(path? get(nextState, path) : nextState);
+        if (get(lastState, path) !== get(nextState, path))
+            handler(get(nextState, path));
     });
 }
 
