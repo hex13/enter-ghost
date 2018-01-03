@@ -80,13 +80,21 @@ Transmutable.prototype.reify = function reify(target) {
     return cloneAndApplyMutations(this.target, this.nextCommit.mutations);
 };
 
+Transmutable.prototype.select = function (path) {
+    return {
+        subscribe: (handler) => {
+            this.observers.push({
+                path,
+                handler
+            });
+        }
+    }
+}
+
 Transmutable.prototype.observe = function observe(...args) {
     const handler = typeof args[0] == 'function'? args[0] : args[1];
     const path = typeof args[0] == 'function'? null : args[0];
-    this.observers.push({
-        path,
-        handler
-    });
+    this.select(path).subscribe(handler);
 }
 
 Transmutable.prototype.fork = function fork() {
