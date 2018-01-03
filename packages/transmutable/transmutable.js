@@ -5,6 +5,7 @@ const createStage = require('./createStage');
 const evaluateMutations = require('./evaluateMutations');
 const { cloneAndApplyMutations } = require('./cloning');
 const Commit = require('./commit');
+const { Stream } = require('./stream');
 
 const errorChecks = {
     Transmutable: {
@@ -15,8 +16,8 @@ const errorChecks = {
 }
 
 function Transmutable(o, hooks = {}) {
+    this.state$ = Stream();
     this.target = o;
-    this.observers = [];
     this.commits = [];
     this.hooks = hooks;
     this.lastCommit = new Commit();
@@ -32,14 +33,6 @@ function Transmutable(o, hooks = {}) {
 // TODO
 function applyCommit(commit, target) {
 
-}
-
-
-function callObservers(observers, lastState, nextState) {
-    observers.forEach(({path, handler}) => {
-        if (get(lastState, path) !== get(nextState, path))
-            handler(get(nextState, path));
-    });
 }
 
 // TODO think about:
@@ -59,7 +52,7 @@ Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
     const prevTarget = this.target;
     this.target = cloneAndApplyMutations(this.target, commit.mutations);
 
-    callObservers(this.observers, prevTarget, this.target);
+    this.state$.publish(this.target, prevTarget);
 
     this.commits.push(commit);
     this.lastCommit = commit;
@@ -73,21 +66,10 @@ Transmutable.prototype.reify = function reify(target) {
     return cloneAndApplyMutations(this.target, this.nextCommit.mutations);
 };
 
-Transmutable.prototype.select = function (path) {
-    return {
-        subscribe: (handler) => {
-            this.observers.push({
-                path,
-                handler
-            });
-        }
-    }
-}
-
 Transmutable.prototype.observe = function observe(...args) {
     const handler = typeof args[0] == 'function'? args[0] : args[1];
     const path = typeof args[0] == 'function'? null : args[0];
-    this.select(path).subscribe(handler);
+    return this.state$.subscribe(handler, path);
 }
 
 Transmutable.prototype.fork = function fork() {
