@@ -1,6 +1,5 @@
 "use strict";
 
-const { set, get } = require('./get-set');
 const createStage = require('./createStage');
 const evaluateMutations = require('./evaluateMutations');
 const { cloneAndApplyMutations } = require('./cloning');
@@ -29,16 +28,6 @@ function Transmutable(o, hooks = {}) {
         }
     });
 }
-
-// TODO
-function applyCommit(commit, target) {
-
-}
-
-// TODO think about:
-// 1. when running action: to fork or not to fork?
-// 2.runAction vs. commit? (do we need 2 functions or just one?)
-// 3. naming: runAction? run? dispatch? etc.
 
 Transmutable.prototype.unstable_runAction = function (handler) {
     return this.commit(
