@@ -8,11 +8,11 @@ module.exports = function createStage(target, handlers) {
                 // transmutable.target can change
                 // so we want to have always the current target
                 const target = getTarget();
-
-                if (target[name] && typeof target[name] == 'object') {
-                    return _createStage(target[name], path.concat(name));
+                const value = target[name];
+                if (value && typeof value == 'object') {
+                    return _createStage(value, path.concat(name));
                 }
-                return target[name];
+                return value;
             },
             set: (nonUsedProxyTarget, k, v) => {
                 const mutPath = [];
