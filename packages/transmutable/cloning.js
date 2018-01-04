@@ -4,7 +4,7 @@ const { get, set } = require('./get-set');
 
 const WAS_WRITTEN = Symbol();
 
-const { getMutationPath, getMutationValue, getMutationType } = require('./mutations');
+const { getMutationPath, getMutationValue, getMutationType, getMutationArgs } = require('./mutations');
 
 
 function isDirty(mutations, propPath, target) {
@@ -32,9 +32,18 @@ function applyChanges(target, mutations) {
     for (let i = 0; i < mutations.length; i++) {
         const m = mutations[i];;
         if (!m) break;
-        switch (getMutationType(m)) {
+        const type = getMutationType(m);
+        switch (type) {
             case 'set':
                 set(target, getMutationPath(m), getMutationValue(m));
+                break;
+            default:
+                get(target, getMutationPath(m))[type](...getMutationArgs(m));
+            // case 'push':
+            //     get(target, getMutationPath(m)).push(...getMutationArgs(m));
+            //     break;
+            // case 'shift':
+            //     get(target, getMutationPath(m)).shift(...getMutationArgs(m));
         }
     }
 };
@@ -78,10 +87,11 @@ function computeChanges(sourceObject, mutations) {
         const mutValue = getMutationValue(mutations[i]);
         const wasWrittenRef = mutPath.concat(WAS_WRITTEN);
         if (
-            get(sourceObject, mutPath) !== mutValue
+            getMutationType(mutations[i]) != 'set'
+            || get(sourceObject, mutPath) !== mutValue
             && get(treeOfChanges, wasWrittenRef) !== true
         ) {
-            changes.push(mutations[i]);
+            changes.unshift(mutations[i]);
             set(treeOfChanges, wasWrittenRef, true);
         }
     }

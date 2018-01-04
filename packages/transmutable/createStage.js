@@ -14,6 +14,11 @@ module.exports = function createStage(target, handlers) {
                 if (value && typeof value == 'object') {
                     return _createStage(value, path.concat(name));
                 }
+                if (typeof value == 'function') {
+                    return function (...args) {
+                        handlers.set(createMutation(path, undefined, name, args));
+                    };
+                }
                 return value;
             },
             set: (nonUsedProxyTarget, k, v) => {

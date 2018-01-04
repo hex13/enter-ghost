@@ -350,4 +350,31 @@ describe('transform', () => {
 
         assert.deepEqual(original, createExample());
     });
+
+    const evaluateMutations = require('../evaluateMutations');
+
+    it('creates proper mutations when double pushing arrays', () => {
+        const o = {arr: [1, 2, 4]};
+        const mutations = evaluateMutations(o, state => {
+            state.arr.push(8);
+            state.arr.push(16);
+        });
+
+        assert.deepStrictEqual(mutations, [
+            createMutation(['arr'], undefined, 'push', [8]),
+            createMutation(['arr'], undefined, 'push', [16]),
+        ])
+    });
+
+
+    it('allows for double pushing array and then shift', () => {
+        const o = {arr: [1, 2, 4]};
+        const copy = transform(o, state => {
+            state.arr.push(8);
+            state.arr.push(16);
+            state.arr.shift();
+        });
+        assert.deepStrictEqual(copy, {arr: [2, 4, 8, 16]})
+    });
+
 });
