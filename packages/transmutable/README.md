@@ -1,14 +1,11 @@
 ### immutable objects that pretend to be mutable
 
-Event-sourced state library.
-
-There are ongoing changes. Read issues: https://github.com/hex13/enter-ghost/issues
 
 it enables for writing this:
 
 ```javascript
 copy = transform(foo, stage => {
-	stage.bar.baz = 123; 
+	stage.bar.baz = 123;
 });
 ```
 
@@ -16,11 +13,11 @@ instead of this (spread operator helps only a little - notice repetitions, manua
 
 ```javascript
 copy = {
-  ...foo, 
+  ...foo,
     bar: {
-      ...foo.bar, 
+      ...foo.bar,
       baz: 123
-    } 
+    }
 }
 ```
 
@@ -28,12 +25,12 @@ or even this (even more verbose with `Object.assign`):
 
 ```javascript
 copy = Object.assign(
-  {}, 
-  foo, 
+  {},
+  foo,
   {
     bar: Object.assign(
-      {}, 
-      foo.bar, 
+      {},
+      foo.bar,
       {baz: 123}
     )
   }
@@ -54,6 +51,10 @@ There are two modes of using:
 - reusable (low level)
 
 Easy mode is just one function: `transform`
+
+
+NOTE: full Transmutable objects are deprecated and will be probable be moved to another package / changed / or removed completely. If you want to have immutability helper, just use `transform`.
+====
 
 Reusable mode involves creating a `Transmutable` object which stores `target` (original object), `stage` (proxied object) and `mutations` (array which contains data about mutations). It also has methods `reify` (it materializes mutations and returns a new changed object) and `commit` (like `reify` but it resets mutations and advances `target` property to the next state).
 

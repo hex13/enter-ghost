@@ -1,6 +1,6 @@
 {
   "name": "transmutable",
-  "version": "0.2.1",
+  "version": "0.3",
   "description": "immutable objects that pretend to be mutable",
   "main": "dist/transmutable.js",
   "scripts": {
@@ -14,7 +14,8 @@
     "deep",
     "clone",
     "mutations",
-    "event sourcing"
+    "event sourcing",
+    "state"
   ],
   "author": "= <=>",
   "license": "MIT",
