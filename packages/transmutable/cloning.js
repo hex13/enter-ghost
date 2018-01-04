@@ -4,7 +4,7 @@ const { get, set } = require('./get-set');
 
 const WAS_WRITTEN = Symbol();
 
-const { getMutationPath, getMutationValue } = require('./mutations');
+const { getMutationPath, getMutationValue, getMutationType } = require('./mutations');
 
 
 function isDirty(mutations, propPath, target) {
@@ -32,7 +32,10 @@ function applyChanges(target, mutations) {
     for (let i = 0; i < mutations.length; i++) {
         const m = mutations[i];;
         if (!m) break;
-        set(target, getMutationPath(m), getMutationValue(m));
+        switch (getMutationType(m)) {
+            case 'set':
+                set(target, getMutationPath(m), getMutationValue(m));
+        }
     }
 };
 

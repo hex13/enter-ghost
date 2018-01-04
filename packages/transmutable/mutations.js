@@ -12,6 +12,10 @@ function createMutation(path, value, type, ...args) {
     return {type: 'set', path, value};
 }
 
+function getMutationType(mutation) {
+    return mutation.type;
+}
+
 module.exports = {
-    getMutationPath, getMutationValue, createMutation
+    getMutationPath, getMutationValue, createMutation, getMutationType
 }
