@@ -1,5 +1,7 @@
 'use strict';
 
+const { createMutation } = require('./mutations');
+
 module.exports = function createStage(target, handlers) {
     const _createStage = (o, path = []) => {
         const getTarget = () => typeof o == 'function'? o(): o;
@@ -19,7 +21,7 @@ module.exports = function createStage(target, handlers) {
                 for (let i = 0; i < path.length + 1; i++) {
                     mutPath.push(path[i] || k)
                 }
-                handlers.set(mutPath, v);
+                handlers.set(createMutation(mutPath, v));
                 return true;
             }
         });

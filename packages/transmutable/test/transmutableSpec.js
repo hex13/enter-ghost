@@ -3,6 +3,8 @@
 const { Transmutable, transform } = require('../transmutable');
 const { applyChanges } = require('../cloning');
 const { createExample } = require('../testUtils');
+const { createMutation } = require('../mutations');
+
 const Commit = require('../commit');
 const assert = require('assert');
 
@@ -125,7 +127,8 @@ describe('Transmutable', () => {
         const reified2 = t.reify();
 
         assert.strictEqual(reified.a, reified2.a, 'and reified objects have structural sharing')
-        assert.deepStrictEqual(t.nextCommit.mutations, [[['a'], {n: 2017}]], 'it doesn\' reset mutations after reify');
+
+        assert.deepStrictEqual(t.nextCommit.mutations, [createMutation(['a'], {n: 2017})], 'it doesn\' reset mutations after reify');
 
         assert.deepStrictEqual(original, createExample())
         assert.deepStrictEqual(reified, expected);

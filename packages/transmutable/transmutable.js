@@ -23,8 +23,8 @@ function Transmutable(o, hooks = {}) {
     this.nextCommit = new Commit();
 
     this.stage = createStage(() => this.target, {
-        set: (path, v) => {
-            this.nextCommit.mutations.push([path, v]);
+        set: (mutation) => {
+            this.nextCommit.mutations.push(mutation);
         }
     });
 }

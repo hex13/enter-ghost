@@ -4,10 +4,12 @@ const { get, set } = require('./get-set');
 
 const WAS_WRITTEN = Symbol();
 
+const { getMutationPath, getMutationValue } = require('./mutations');
+
+
 function isDirty(mutations, propPath, target) {
     for (let i = 0; i < mutations.length; i++) {
-        const mutPath = mutations[i][0];
-        const mutValue = mutations[i][1];
+        const mutPath = getMutationPath(mutations[i]);
         const minLen = Math.min(mutPath.length, propPath.length);
         let affectedByMutation = true;
         for (let j = 0; j < minLen; j++) {
@@ -30,8 +32,7 @@ function applyChanges(target, mutations) {
     for (let i = 0; i < mutations.length; i++) {
         const m = mutations[i];;
         if (!m) break;
-        const [path, value] = m;
-        set(target, path, value);
+        set(target, getMutationPath(m), getMutationValue(m));
     }
 };
 
@@ -70,7 +71,8 @@ function computeChanges(sourceObject, mutations) {
     const treeOfChanges = {};
 
     for (let i = mutations.length - 1; i >= 0; i--) {
-        const [mutPath, mutValue] = mutations[i];
+        const mutPath = getMutationPath(mutations[i]);
+        const mutValue = getMutationValue(mutations[i]);
         const wasWrittenRef = mutPath.concat(WAS_WRITTEN);
         if (
             get(sourceObject, mutPath) !== mutValue
