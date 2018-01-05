@@ -22,9 +22,9 @@ describe('example', () => {
 
         // easy way:
 
-        const copy = transform(original, stage => {
+        const copy = transform(stage => {
             stage.cow = 'doge';
-        });
+        }, original);
 
                 log(copy); // { cow: 'doge', dogs: { muchWow: 1 } }
                 log(original); // still the same: { cow: 123, dogs: { muchWow: 1 } }
