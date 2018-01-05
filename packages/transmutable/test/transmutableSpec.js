@@ -32,13 +32,6 @@ describe('Transmutable', () => {
     });
 
 
-    it('allows for accessing properties', () => {
-        assert.strictEqual(t.stage.a, 2);
-        assert.deepStrictEqual(t.stage.c, {d: 100});
-        assert.deepStrictEqual(t.stage.c.d, 100);
-    });
-
-
     // TODO review this case (mutations vs changes)
     it('apply mutations to the object', () => {
         expected.a = 81;
@@ -66,28 +59,11 @@ describe('Transmutable', () => {
         assert.deepStrictEqual(copied, expected)
     });
 
-    it('allows for use arrays', () => {
-        t.stage.arr.push(4);
-        const copied = t.commit();
-
-        assert.deepStrictEqual(original.arr, createExample().arr)
-        assert.deepStrictEqual(copied.arr, [1, 2, 3, 4])
-    });
-
     // TODO consider implementing this (maybe):
     xit('allows for adding deep objects', () => {
         t.stage.allows.for.adding.deep.objects = 2;
         const copied = t.commit();
     });
-
-    it('allows for use arrays (deep)', () => {
-        t.stage.deep.arr.push(32);
-        const copied = t.commit();
-
-        assert.deepStrictEqual(original.deep.arr, createExample().deep.arr)
-        assert.deepStrictEqual(copied.deep.arr, [1, 2, 4, 8, 16, 32])
-    });
-
 
     it('allows for reify current stage', () => {
         t.stage.a = {n:2017};
@@ -107,19 +83,6 @@ describe('Transmutable', () => {
     it('returns original object if there are no mutations', () => {
         const reified = t.reify();
         assert.strictEqual(reified, ex);
-    });
-
-    it('does not perform deep copy if a mutation doesn\'t really change value', () => {
-        t.stage.a = t.stage.a;
-        const reified = t.reify();
-        assert.strictEqual(reified, ex);
-    });
-
-    it('can work with property that equaled null (edge case)', () => {
-        t.stage.nullable.value = 25;
-        expected.nullable.value = 25;
-        const reified = t.reify();
-        assert.deepEqual(reified, expected);
     });
 
     describe('actions', () => {
@@ -401,6 +364,56 @@ describe('transform', () => {
         assert(copied.arr === original.arr);
     });
 
+    it('allows for accessing properties', () => {
+        let passed = false;
+        transform(state => {
+            assert.strictEqual(state.a, 2);
+            assert.deepStrictEqual(state.c, {d: 100});
+            assert.deepStrictEqual(state.c.d, 100);
+            passed = true;
+        }, createExample());
+        assert(passed);
+    });
 
+
+    it('can work with property that equaled null (edge case)', () => {
+        const expected = createExample();
+        expected.nullable.value = 25;
+
+        const copy = transform(state => {
+            state.nullable.value = 25;
+        }, createExample());
+
+        assert.deepEqual(copy, expected);
+    });
+
+    it('allows for use arrays', () => {
+        const original = createExample();
+        const copy = transform(state => {
+            state.arr.push(4);
+        }, original)
+
+        assert.deepStrictEqual(original.arr, createExample().arr)
+        assert.deepStrictEqual(copy.arr, [1, 2, 3, 4])
+    });
+
+    it('does not perform deep copy if a mutation doesn\'t really change value', () => {
+        const original = createExample();
+
+        const copy = transform(state => {
+            state.a = state.a;
+        }, original)
+        assert.strictEqual(original, copy);
+    });
+
+    it('allows for use arrays (deep)', () => {
+        const original = createExample();
+        const copy = transform((state) => {
+            state.deep.arr.push(32);
+        }, original)
+
+        assert.deepStrictEqual(original.deep.arr, createExample().deep.arr)
+        assert.deepStrictEqual(copy.deep.arr, [1, 2, 4, 8, 16, 32])
+    });
 
 });
