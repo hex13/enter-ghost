@@ -4,7 +4,7 @@ const evaluateMutations = require('./evaluateMutations');
 
 const Transform = (transformer) => {
     const run = (state, ...args) => {
-        const mutations = evaluateMutations(state, transformer, ...args);
+        const mutations = evaluateMutations(transformer, state, ...args);
         return {
             reify: () => cloneAndApplyMutations(
                 state,

@@ -289,10 +289,10 @@ describe('transform', () => {
 
     xit('creates proper mutations when double pushing arrays', () => {
         const o = {arr: [1, 2, 4]};
-        const mutations = evaluateMutations(o, state => {
+        const mutations = evaluateMutations(state => {
             state.arr.push(8);
             state.arr.push(16);
-        });
+        }, o);
 
         assert.deepStrictEqual(mutations, [
             createMutation(['arr'], undefined, 'push', [8]),
@@ -302,9 +302,9 @@ describe('transform', () => {
 
     xit('creates proper mutations when mapping', () => {
         const o = {arr: [1, 2, 4]};
-        const mutations = evaluateMutations(o, state => {
+        const mutations = evaluateMutations(state => {
             state.arr.map(x => x * 2);
-        });
+        }, o);
 
         assert.deepStrictEqual(mutations,)
     });

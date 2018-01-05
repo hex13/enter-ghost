@@ -1,7 +1,7 @@
 'use strict';
 const createStage = require('./createStage');
 
-module.exports = (lastState, transformer, ...args) => {
+module.exports = (transformer, lastState, ...args) => {
     const mutations = [];
     const stage = createStage(() => lastState, {
         set: (mutation) => {
