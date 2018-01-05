@@ -157,9 +157,11 @@ describe('Transmutable', () => {
         it('performs mutations', () => {
             const handler = (state) => {
                 state.a = 13;
+                state.c.d = 1029;
             };
 
             expected.a = 13;
+            expected.c.d = 1029;
             assert.deepStrictEqual(t.run(handler), expected);
         });
     });

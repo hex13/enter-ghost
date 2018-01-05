@@ -48,7 +48,7 @@ So instead of forcing user to manually copying objects with `Object.assign` / `.
 There are two modes of using:
 
 - easy (high level)
-- reusable (low level)
+- ~~reusable (low level)~~ Transmutable objects are DEPRECATED.
 
 Easy mode is just one function: `transform`
 

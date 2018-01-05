@@ -1,8 +1,8 @@
 "use strict";
 
 const createStage = require('./createStage');
-const evaluateMutations = require('./evaluateMutations');
 const { cloneAndApplyMutations } = require('./cloning');
+const { Transform } = require('./transform');
 const Commit = require('./commit');
 const { Stream } = require('./stream');
 
@@ -30,9 +30,8 @@ function Transmutable(o, hooks = {}) {
 }
 
 Transmutable.prototype.run = function (handler) {
-    return this.commit(
-        new Commit(evaluateMutations(this.target, handler))
-    );
+    const { mutations } = Transform(handler).run(this.target);
+    return this.commit(new Commit(mutations));
 }
 
 Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
@@ -82,4 +81,4 @@ Transmutable.prototype.merge = function merge(transmutable) {
 
 exports.Transmutable = Transmutable;
 
-exports.transform = require('./transform');
+exports.transform = require('./transform').transform;
