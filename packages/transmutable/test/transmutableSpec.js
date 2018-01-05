@@ -39,17 +39,6 @@ describe('Transmutable', () => {
     });
 
 
-    it('doesn\'t change anything without commiting', () => {
-        t.stage.a = 33;
-        t.stage.c.d = 922;
-        // this doesn't work
-        // because setters are only triggered on primitives and not on objects right now
-        // t.o.c = 5543;
-        t.stage.b = 5343;
-        assert.deepStrictEqual(t.stage, createExample());
-        assert.deepStrictEqual(ex, createExample());
-    });
-
     // TODO review this case (mutations vs changes)
     it('apply mutations to the object', () => {
         expected.a = 81;
@@ -62,28 +51,6 @@ describe('Transmutable', () => {
         assert.deepStrictEqual(output, expected);
     });
 
-    // TODO remove
-    xit('returns a new modified object after commit() and does it in a smart way (with dirty checking)', () => {
-
-        t.stage.mutated.something = 3;
-        expected.mutated.something = 3;
-
-        const copied = t.commit();
-
-        assert.deepStrictEqual(copied, expected);
-        assert(copied !== original);
-        assert(copied.a === original.a);
-        assert(copied.b === original.b);
-        assert(copied.mutated !== original.mutated);
-        assert(copied.still === original.still);
-        assert(copied.arr === original.arr);
-    });
-
-    it('reset mutations after commit', () => {
-        t.stage.a = 123456;
-        t.commit();
-        assert.strictEqual(t.nextCommit.mutations.length, 0);
-    });
 
     it('accumulates changes after commit (thus allows for commiting changes incrementally)', () => {
         expected.a = 200;
