@@ -25,27 +25,20 @@ describe('mea', () => {
         });
 
         function someService(input) {
-            const output = Stream();
-            input.subscribe((signal) => {
-
+            return input.map((signal) => {
                 let transform;
+
                 switch (signal.type) {
                     case 'inc':
-                        transform = Transform(state => {
+                        return Transform(state => {
                             state.val++;
                         });
-                        break;
                     case 'mul':
-                        transform = Transform(state => {
+                        return Transform(state => {
                             state.val *= signal.amount;
                         });
-                        break;
                 }
-
-                output.publish(transform)
             });
-
-            return output;
         }
 
         const hub = Hub(store);
