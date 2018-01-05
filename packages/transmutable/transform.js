@@ -1,8 +1,11 @@
 'use strict';
 const { cloneAndApplyMutations } = require('./cloning');
 const evaluateMutations = require('./evaluateMutations');
+const IS_TRANSFORM = Symbol();
 
 const Transform = (transformer) => {
+    if (transformer[IS_TRANSFORM]) return transformer;
+
     const run = (state, ...args) => {
         const mutations = evaluateMutations(transformer, state, ...args);
         return {
@@ -16,6 +19,7 @@ const Transform = (transformer) => {
     const transform = (...args) => {
         return run(...args).reify();
     };
+    transform[IS_TRANSFORM] = true;
     transform.run = run;
     return transform;
 }
