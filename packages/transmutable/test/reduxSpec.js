@@ -16,8 +16,14 @@ const assert = require('assert');
 
 
 describe('redux interop', () => {
+    const _require = require;
+    require = (module) => {
+        if (module == 'transmutable') return _require('..');
+        return _require(module);
+    };
+
     it('should work with redux', () => {
-        const { Reducer } = require('../transform.js');
+        const { Reducer } = require('transmutable');
         const { createStore } = require('redux');
 
         const reducer = Reducer((state, action) => {
@@ -39,7 +45,7 @@ describe('redux interop', () => {
         store.dispatch({type: 'concat', text: ' '});
         store.dispatch({type: 'concat', text: 'world'});
         assert.deepStrictEqual(store.getState(), {counter: 4, text: 'Hello world'});
-        // initial state has not changed :) 
+        // initial state has not changed :)
         assert.deepStrictEqual(initialState, {counter: 1, text: ''});
     });
 });

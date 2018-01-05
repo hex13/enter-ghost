@@ -48,16 +48,52 @@ So instead of forcing user to manually copying objects with `Object.assign` / `.
 
 ### Usage
 
+With Redux:
+
+```javascript
+const { Reducer } = require('transmutable');
+const { createStore } = require('redux');
+
+const reducer = Reducer((state, action) => {
+	switch (action.type) {
+		case 'inc':
+			state.counter++;
+			break;
+		case 'concat':
+			state.text += action.text;
+			break;
+	}
+});
+const initialState = {counter: 1, text: ''};
+const store = createStore(reducer, initialState);
+
+store.dispatch({type: 'inc'});
+store.dispatch({type: 'inc'});
+store.dispatch({type: 'inc'});
+store.dispatch({type: 'concat', text: 'Hello'});
+store.dispatch({type: 'concat', text: ' '});
+store.dispatch({type: 'concat', text: 'world'});
+
+assert.deepStrictEqual(
+	store.getState(),
+	{counter: 4, text: 'Hello world'}
+);
+// initial state has not changed :)
+assert.deepStrictEqual(initialState, {counter: 1, text: ''});
+
+```
+
 There are two modes of using:
 
-- easy (high level)
+- transform function
 - ~~reusable (low level)~~ Transmutable objects are DEPRECATED.
-
+- Reducer
 Easy mode is just one function: `transform`
 
 
-NOTE: full Transmutable objects are deprecated and will be probable be moved to another package / changed / or removed completely. If you want to have immutability helper, just use `transform`.
-====
+**NOTE: full Transmutable objects are deprecated and will be probable be moved to another package / changed / or removed completely. If you want to have immutability helper, just use `transform`.**
+
+
 
 Reusable mode involves creating a `Transmutable` object which stores `target` (original object), `stage` (proxied object) and `mutations` (array which contains data about mutations). It also has methods `reify` (it materializes mutations and returns a new changed object) and `commit` (like `reify` but it resets mutations and advances `target` property to the next state).
 
