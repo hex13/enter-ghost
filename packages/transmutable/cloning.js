@@ -28,22 +28,39 @@ function isDirty(mutations, propPath, target) {
     return false;
 }
 
+function callComputation(target, m) {
+    return get(target, getMutationPath(m))[getMutationType(m)](...getMutationArgs(m));
+}
+
+
+function findLastComputation(mutations, value, indexLesserThan) {
+    for (let i = indexLesserThan - 1; i >= 0; i--) {
+        if (getMutationValue(mutations[i]) === value) {
+            return mutations[i];
+        }
+    }
+}
+
+
 function applyChanges(target, mutations) {
     for (let i = 0; i < mutations.length; i++) {
         const m = mutations[i];;
         if (!m) break;
         const type = getMutationType(m);
+        const value = getMutationValue(m);
+        const path = getMutationPath(m);
+
         switch (type) {
             case 'set':
-                set(target, getMutationPath(m), getMutationValue(m));
+                if (typeof value == 'symbol') {
+                    const v = callComputation(target, findLastComputation(mutations, value, i));
+                    set(target, path, v);
+                    break;
+                }
+                set(target, path, value);
                 break;
             default:
-                get(target, getMutationPath(m))[type](...getMutationArgs(m));
-            // case 'push':
-            //     get(target, getMutationPath(m)).push(...getMutationArgs(m));
-            //     break;
-            // case 'shift':
-            //     get(target, getMutationPath(m)).shift(...getMutationArgs(m));
+                callComputation(target, m);
         }
     }
 };
@@ -92,7 +109,8 @@ function computeChanges(sourceObject, mutations) {
             && get(treeOfChanges, wasWrittenRef) !== true
         ) {
             changes.unshift(mutations[i]);
-            set(treeOfChanges, wasWrittenRef, true);
+            if (getMutationType(mutations[i]) === 'set')
+                set(treeOfChanges, wasWrittenRef, true);
         }
     }
     return changes;

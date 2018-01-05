@@ -16,7 +16,9 @@ module.exports = function createStage(target, handlers) {
                 }
                 if (typeof value == 'function') {
                     return function (...args) {
-                        handlers.set(createMutation(path, undefined, name, args));
+                        const abstractValue = Symbol(Math.random());
+                        handlers.set(createMutation(path, abstractValue, name, args));
+                        return abstractValue;
                     };
                 }
                 return value;

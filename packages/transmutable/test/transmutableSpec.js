@@ -1,6 +1,6 @@
 "use strict";
 
-const { Transmutable, transform } = require('../transmutable');
+const { Transmutable, transform } = require('../transmutable.js');
 const { applyChanges } = require('../cloning');
 const { createExample } = require('../testUtils');
 const { createMutation } = require('../mutations');
@@ -353,7 +353,7 @@ describe('transform', () => {
 
     const evaluateMutations = require('../evaluateMutations');
 
-    it('creates proper mutations when double pushing arrays', () => {
+    xit('creates proper mutations when double pushing arrays', () => {
         const o = {arr: [1, 2, 4]};
         const mutations = evaluateMutations(o, state => {
             state.arr.push(8);
@@ -366,6 +366,14 @@ describe('transform', () => {
         ])
     });
 
+    xit('creates proper mutations when mapping', () => {
+        const o = {arr: [1, 2, 4]};
+        const mutations = evaluateMutations(o, state => {
+            state.arr.map(x => x * 2);
+        });
+
+        assert.deepStrictEqual(mutations,)
+    });
 
     it('allows for double pushing array and then shift', () => {
         const o = {arr: [1, 2, 4]};
@@ -375,6 +383,32 @@ describe('transform', () => {
             state.arr.shift();
         });
         assert.deepStrictEqual(copy, {arr: [2, 4, 8, 16]})
+    });
+
+    it('allows for mapping', () => {
+        const o = {arr: [1, 2, 4]};
+        const mutations = transform(o, state => {
+            const decoy = state.arr.map(x => x * 10);
+            state.arr = state.arr.map(x => x * 2);
+            const decoy2 = state.arr.map(x => x * 11);
+        });
+        console.log(mutations)
+        assert.deepStrictEqual(mutations, {
+            arr: [2, 4, 8]
+        })
+    });
+
+    it('allows for filtering', () => {
+        const o = {arr: [1, 2, 4, 6, 8, 9, 10, 12, 13, 14]};
+        const mutations = transform(o, state => {
+            const decoy = state.arr.map(x => x * 10);
+            state.arr = state.arr.filter(x => x % 2 == 0);
+            const decoy2 = state.arr.filter(x => x == 4);
+        });
+        console.log(mutations)
+        assert.deepStrictEqual(mutations, {
+            arr: [2, 4, 6, 8, 10, 12, 14]
+        })
     });
 
 });
