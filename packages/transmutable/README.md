@@ -87,8 +87,7 @@ There are two modes of using:
 
 - transform function
 - ~~reusable (low level)~~ Transmutable objects are DEPRECATED.
-- Reducer
-Easy mode is just one function: `transform`
+- Reducer helper
 
 
 **NOTE: full Transmutable objects are deprecated and will be probable be moved to another package / changed / or removed completely. If you want to have immutability helper, just use `transform`.**

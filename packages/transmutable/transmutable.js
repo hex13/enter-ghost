@@ -82,3 +82,5 @@ Transmutable.prototype.merge = function merge(transmutable) {
 exports.Transmutable = Transmutable;
 
 exports.transform = require('./transform').transform;
+exports.transform = require('./transform').transform;
+exports.Reducer = require('./transform').Reducer;
