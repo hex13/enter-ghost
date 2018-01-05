@@ -1,12 +1,15 @@
 ### immutable objects that pretend to be mutable
 
+### Change in API:
+**now transforming function is a FIRST argument of `transform` and original state is a SECOND.**
+
 
 it enables for writing this:
 
 ```javascript
-copy = transform(foo, stage => {
+copy = transform(stage => {
 	stage.bar.baz = 123;
-});
+}, foo);
 ```
 
 instead of this (spread operator helps only a little - notice repetitions, manually coping state at each level):
@@ -79,9 +82,9 @@ const original = {
 
 // easy way:
 
-const copy = transform(original, stage => {
+const copy = transform(stage => {
     stage.cow = 'doge';
-});
+}, original);
 
         log(copy); // { cow: 'doge', dogs: { muchWow: 1 } }
         log(original); // still the same: { cow: 123, dogs: { muchWow: 1 } }

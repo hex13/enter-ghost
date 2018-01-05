@@ -342,10 +342,10 @@ describe('transform', () => {
         const someObject = {ooo:1};
         expected.b = 'małpy';
         expected.dupa = someObject;
-        const copy = transform(original, state => {
+        const copy = transform(state => {
             state.b = 'małpy';
             state.dupa = someObject;
-        });
+        }, original);
         assert.deepEqual(copy, expected);
         assert.strictEqual(copy.dupa, expected.dupa);
         assert.strictEqual(copy.c, original.c);
@@ -379,21 +379,21 @@ describe('transform', () => {
 
     it('allows for double pushing array and then shift', () => {
         const o = {arr: [1, 2, 4]};
-        const copy = transform(o, state => {
+        const copy = transform(state => {
             state.arr.push(8);
             state.arr.push(16);
             state.arr.shift();
-        });
+        }, o);
         assert.deepStrictEqual(copy, {arr: [2, 4, 8, 16]})
     });
 
     it('allows for mapping', () => {
         const o = {arr: [1, 2, 4]};
-        const mutations = transform(o, state => {
+        const mutations = transform(state => {
             const decoy = state.arr.map(x => x * 10);
             state.arr = state.arr.map(x => x * 2);
             const decoy2 = state.arr.map(x => x * 11);
-        });
+        }, o);
         console.log(mutations)
         assert.deepStrictEqual(mutations, {
             arr: [2, 4, 8]
@@ -402,11 +402,11 @@ describe('transform', () => {
 
     it('allows for filtering', () => {
         const o = {arr: [1, 2, 4, 6, 8, 9, 10, 12, 13, 14]};
-        const mutations = transform(o, state => {
+        const mutations = transform(state => {
             const decoy = state.arr.map(x => x * 10);
             state.arr = state.arr.filter(x => x % 2 == 0);
             const decoy2 = state.arr.filter(x => x == 4);
-        });
+        }, o);
         console.log(mutations)
         assert.deepStrictEqual(mutations, {
             arr: [2, 4, 6, 8, 10, 12, 14]

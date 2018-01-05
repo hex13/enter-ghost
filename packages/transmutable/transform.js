@@ -20,7 +20,12 @@ const Transform = (transformer) => {
     return transform;
 }
 
-exports.transform = (original, transformer) => {
+exports.transform = (transformer, original) => {
+    if (typeof transformer !== 'function') throw new Error(`
+        API was changed in 0.5.0 version of Transmutable library.
+        Now transform function takes transforming function as a FIRST argument.
+        Original state as a SECOND one.
+    `);
     return Transform(transformer).run(original).reify();
 }
 
