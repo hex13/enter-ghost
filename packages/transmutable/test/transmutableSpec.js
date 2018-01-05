@@ -1,6 +1,7 @@
 "use strict";
 
-const { Transmutable, transform } = require('../transmutable.js');
+const { Transmutable, transform} = require('../transmutable.js');
+const { Transform } = require('../transform.js');
 const { applyChanges } = require('../cloning');
 const { createExample } = require('../testUtils');
 const { createMutation } = require('../mutations');
@@ -61,7 +62,8 @@ describe('Transmutable', () => {
         assert.deepStrictEqual(output, expected);
     });
 
-    it('returns a new modified object after commit() and does it in a smart way (with dirty checking)', () => {
+    // TODO remove
+    xit('returns a new modified object after commit() and does it in a smart way (with dirty checking)', () => {
 
         t.stage.mutated.something = 3;
         expected.mutated.something = 3;
@@ -412,5 +414,26 @@ describe('transform', () => {
             arr: [2, 4, 6, 8, 10, 12, 14]
         })
     });
+
+    it('returns a new modified object and does it in a smart way (with dirty checking)', () => {
+
+        const original = createExample();
+        const expected = createExample();
+        expected.mutated.something = 3;
+
+        const copied = transform(state => {
+            state.mutated.something = 3;
+        }, original);
+
+        assert.deepStrictEqual(copied, expected);
+        assert(copied !== original);
+        assert(copied.a === original.a);
+        assert(copied.b === original.b);
+        assert(copied.mutated !== original.mutated);
+        assert(copied.still === original.still);
+        assert(copied.arr === original.arr);
+    });
+
+
 
 });
