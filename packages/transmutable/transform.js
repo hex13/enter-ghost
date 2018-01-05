@@ -26,7 +26,7 @@ exports.transform = (transformer, original) => {
         Now transform function takes transforming function as a FIRST argument.
         Original state as a SECOND one.
     `);
-    return Transform(transformer).run(original).reify();
+    return Transform(transformer)(original);
 }
 
 exports.Transform = Transform;
