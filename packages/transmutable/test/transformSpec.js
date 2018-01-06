@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const { createExample } = require('../testUtils');
-const { transform } = require('../transmutable');
+const { transform } = require('../transform');
 
 describe('transform', () => {
     it('allows for transforming', () => {

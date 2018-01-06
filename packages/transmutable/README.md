@@ -86,15 +86,12 @@ assert.deepStrictEqual(initialState, {counter: 1, text: ''});
 There are two modes of using:
 
 - transform function
-- ~~reusable (low level)~~ Transmutable objects are DEPRECATED.
+- ~~reusable (low level)~~ Transmutable objects are removed
 - Reducer helper
 
 
-**NOTE: full Transmutable objects are deprecated and will be probable be moved to another package / changed / or removed completely. If you want to have immutability helper, just use `transform`.**
+**NOTE: full Transmutable objects are removed. .**
 
-
-
-Reusable mode involves creating a `Transmutable` object which stores `target` (original object), `stage` (proxied object) and `mutations` (array which contains data about mutations). It also has methods `reify` (it materializes mutations and returns a new changed object) and `commit` (like `reify` but it resets mutations and advances `target` property to the next state).
 
 Transmutable library assumes immutability, so you should not perform any mutation of your objects (because of data-sharing between objects). Off course using `transmutable` API and "mutating" the `stage` is not mutation, because mutations are only recorded on `stage`, and not yet applied.
 
@@ -105,40 +102,30 @@ Example of use:
 ```javascript
 const log = console.log.bind(console);
 
-const { Transmutable, transform } = require('transmutable');
+const { transform } = require('transmutable');
 
 
 const original = {
-    cow: 123,
-    dogs: {
-        muchWow: 1
-    }
+	cow: 123,
+	dogs: {
+		muchWow: 1
+	}
 };
 
 // easy way:
 
 const copy = transform(stage => {
-    stage.cow = 'doge';
+	stage.cow = 'doge';
 }, original);
 
-        log(copy); // { cow: 'doge', dogs: { muchWow: 1 } }
-        log(original); // still the same: { cow: 123, dogs: { muchWow: 1 } }
-        log(copy.dogs === original.dogs); // true
+		log(copy); // { cow: 'doge', dogs: { muchWow: 1 } }
+		log(original); // still the same: { cow: 123, dogs: { muchWow: 1 } }
+		log(copy.dogs === original.dogs); // true
 
 
-// or using more detailed API. We create reusable Transmutable object
 
-const t = new Transmutable(original);
-t.stage.cow = 456;
-t.stage.dogs.muchWow = 888888;
 
-        log(t.reify()); // { cow: 456, dogs: { muchWow: 888888 } }
-        log(t.stage.dogs); // { muchWow: 1 }
 
-const copied = t.commit();
-
-        log(copied); // { cow: 456, dogs: { muchWow: 888888 } }
-        log(original); // { cow: 123, dogs: { muchWow: 1 } }
 ```
 
 * It allows for mutable-like programming interface.
