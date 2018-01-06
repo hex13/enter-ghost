@@ -112,7 +112,6 @@ const original = {
 	}
 };
 
-// easy way:
 
 const copy = transform(stage => {
 	stage.cow = 'doge';
@@ -131,13 +130,3 @@ const copy = transform(stage => {
 * It allows for mutable-like programming interface.
 * It allows for applying mutations either in immutable (via `forked.commit()`) or mutable way (via `forked.pushTo`).
 * It performs smart deep cloning (with dirty checking) - if something is not changed, it is copied only by reference
-
-properties of Transmutable object:
-====
-
-**stage** enables for recording mutations, but it doesn't mutate neither original object neither stage object itself.
-It may be implemented by Proxy or by getters/setters (but this is technical detail, don't rely on it).
-
-**reify()** - materializes mutations without committing. It returns smart copy of original object with applied mutations.
-
-**commit()** - materializes mutations with committing. So it's like reify, but with side-effects: mutations are reset and `stage` properties are updated to match next state.
