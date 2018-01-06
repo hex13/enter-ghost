@@ -71,10 +71,8 @@ function cloneDeepWithDirtyChecking(o, mutations) {
         if (!isDirty(mutations, objPath, o)) return o;
         let o2;
         if (Array.isArray(o)) {
-            o2 = o.slice();
+            return o.slice();
         } else o2 = {};
-
-        // NOTE currently we're doing for...in also for arrays (is this correct?)
 
         for (let k in o) {
             if (o[k] && typeof o[k] =='object') {
