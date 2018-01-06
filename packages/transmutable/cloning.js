@@ -15,7 +15,9 @@ function isDirty(mutations, propPath, target) {
         for (let j = 0; j < minLen; j++) {
             const mutPropName = mutPath[j];
             const searchedPropName = propPath[j];
-            if (mutPropName !== searchedPropName) {
+            // Compare by !=
+            // keys for arrays may be strings as well as numbers.
+            if (mutPropName != searchedPropName) {
                 affectedByMutation = false;
                 break;
             }
@@ -71,7 +73,8 @@ function cloneDeepWithDirtyChecking(o, mutations) {
         if (!isDirty(mutations, objPath, o)) return o;
         let o2;
         if (Array.isArray(o)) {
-            return o.slice();
+            o2 = o.slice();
+
         } else o2 = {};
 
         for (let k in o) {

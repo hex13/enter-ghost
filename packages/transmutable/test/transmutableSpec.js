@@ -416,4 +416,20 @@ describe('transform', () => {
         assert.deepStrictEqual(copy.deep.arr, [1, 2, 4, 8, 16, 32])
     });
 
+    it('allows for use arrays (deep) 2', () => {
+        const original = {
+            deep: {
+                arr: [{sth: {}}, 2]
+            }
+        }
+        const newItem = {a: 1};
+        const copy = transform((state) => {
+            state.deep.arr[0].sth = 4;
+        }, original)
+
+        assert.deepStrictEqual(original.deep.arr, [{sth:{}}, 2])
+        assert.deepStrictEqual(copy.deep.arr, [{sth: 4}, 2])
+    });
+
+
 });
