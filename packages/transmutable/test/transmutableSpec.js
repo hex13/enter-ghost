@@ -419,6 +419,7 @@ describe('transform', () => {
     it('allows for use arrays (deep) 2', () => {
         const original = {
             deep: {
+                non: {x:1},
                 arr: [{sth: {}}, 2]
             }
         }

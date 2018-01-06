@@ -3,32 +3,9 @@
 const { get, set } = require('./get-set');
 
 const WAS_WRITTEN = Symbol();
+const METHOD = Symbol();
 
 const { getMutationPath, getMutationValue, getMutationType, getMutationArgs } = require('./mutations');
-
-
-function isDirty(mutations, propPath, target) {
-    for (let i = 0; i < mutations.length; i++) {
-        const mutPath = getMutationPath(mutations[i]);
-        const minLen = Math.min(mutPath.length, propPath.length);
-        let affectedByMutation = true;
-        for (let j = 0; j < minLen; j++) {
-            const mutPropName = mutPath[j];
-            const searchedPropName = propPath[j];
-            // Compare by !=
-            // keys for arrays may be strings as well as numbers.
-            if (mutPropName != searchedPropName) {
-                affectedByMutation = false;
-                break;
-            }
-        }
-        if (affectedByMutation) {
-            return true;
-        }
-
-    }
-    return false;
-}
 
 function callComputation(target, m) {
     return get(target, getMutationPath(m))[getMutationType(m)](...getMutationArgs(m));
@@ -67,32 +44,23 @@ function applyChanges(target, mutations) {
     }
 };
 
-function cloneDeepWithDirtyChecking(o, mutations) {
 
-    const copy = (o, objPath = []) => {
-        if (!isDirty(mutations, objPath, o)) return o;
-        let o2;
+function cloneDeepWithDirtyChecking(o, mutations, treeOfChanges) {
+
+    const copy = (o, currentChanges) => {
+        if (!currentChanges || (Object.keys(currentChanges).length == 0 && !currentChanges[METHOD] )) return o;
         if (Array.isArray(o)) {
-            o2 = o.slice();
-
-        } else o2 = {};
-
+            return o.map((item, i) => {
+                return copy(item, currentChanges[i]);
+            })
+        }
+        const o2 = {};
         for (let k in o) {
-            if (o[k] && typeof o[k] =='object') {
-                const propPath = new Array(objPath.length + 1);
-                for (let i = 0; i < objPath.length; i++) {
-                    propPath[i] = objPath[i];
-                }
-                propPath[objPath.length] = k;
-
-                o2[k] = copy(o[k], propPath);
-            } else {
-                o2[k] = o[k];
-            }
+            o2[k] = copy(o[k], currentChanges? currentChanges[k] : undefined);
         }
         return o2;
     }
-    return copy(o);
+    return copy(o, treeOfChanges);
 }
 
 
@@ -112,16 +80,19 @@ function computeChanges(sourceObject, mutations) {
             changes.unshift(mutations[i]);
             if (getMutationType(mutations[i]) === 'set')
                 set(treeOfChanges, wasWrittenRef, true);
+            else
+                set(treeOfChanges,mutPath.concat( METHOD), true);
         }
     }
-    return changes;
+
+    return {tree: treeOfChanges, array: changes};
 }
 
 function cloneAndApplyMutations(sourceObject, mutations, handlers = {}) {
     const changes = computeChanges(sourceObject, mutations);
     if (handlers.onComputeChanges) handlers.onComputeChanges(changes);
-    const nextValue = cloneDeepWithDirtyChecking(sourceObject, changes);
-    applyChanges(nextValue, changes);
+    const nextValue = cloneDeepWithDirtyChecking(sourceObject, changes.array, changes.tree);
+    applyChanges(nextValue, changes.array);
     return nextValue;
 }
 exports.cloneAndApplyMutations = cloneAndApplyMutations;
