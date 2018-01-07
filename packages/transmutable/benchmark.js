@@ -1,6 +1,11 @@
 const { transform } = require('./transmutable');
 const { createExample }= require('./testUtils');
 const immer = require('immer').default;
+const {setAutoFreeze } = require('immer');
+const assert = require('assert');
+
+
+setAutoFreeze(false);
 let max = 10000;
 
 const original = {
@@ -27,8 +32,37 @@ function benchmark(code, name) {
 
 benchmark(() => {
     return transform(transformer, original);
-}, 'transmutable')
+}, 'transmutable - array')
 
 benchmark(() => {
     return immer(original, transformer);
-}, 'immer')
+}, 'immer - array');
+
+benchmark(() => {
+    return immer(createExample(), (state) => {
+        state.c.d = {};
+    });
+}, 'immer - example')
+
+benchmark(() => {
+    return transform((state) => {
+        state.c.d = {};
+    }, createExample());
+}, 'transmutable - example')
+
+benchmark(() => {
+    const state = createExample();
+    const res = Object.assign(
+        {},
+        state,
+        {c: Object.assign({}, state.c, {d: {}})},
+    )
+
+    // const expected = createExample();
+    // expected.c.d = {};
+    // assert.deepStrictEqual(res, expected);
+    return res;
+    // return transform((state) => {
+    //     state.c.d = {};
+    // }, );
+}, 'hand crafted - example')
