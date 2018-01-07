@@ -3,7 +3,7 @@ const createStage = require('./createStage');
 
 module.exports = (transformer, lastState, ...args) => {
     const mutations = [];
-    const stage = createStage(() => lastState, {
+    const stage = createStage(lastState, {
         set: (mutation) => {
             mutations.push(mutation);
         },

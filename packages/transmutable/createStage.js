@@ -4,7 +4,7 @@ const { createMutation } = require('./mutations');
 
 module.exports = function createStage(target, handlers) {
     const _createStage = (o, path = []) => {
-        const getTarget = () => typeof o == 'function'? o(): o;
+        const getTarget = () => o;
         const proxy = new Proxy(getTarget(), {
             get: (nonUsedProxyTarget, name) => {
                 // transmutable.target can change
