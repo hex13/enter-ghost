@@ -11,13 +11,22 @@ describe('transform', () => {
         const someObject = {ooo:1};
         expected.b = 'małpy';
         expected.dupa = someObject;
+        expected.c.d = 'some new value';
+        expected.deep.arr[1] = 'blah';
+        expected.todos[0].text = 'boo';
+        expected.todos[1].user = {name: 'dog'};
+
         const copy = transform(state => {
+
             state.b = 'małpy';
             state.dupa = someObject;
+            state.c.d = 'some new value';
+            state.deep.arr[1] = 'blah';
+            state.todos[0].text = 'boo';
+            state.todos[1].user = {name: 'dog'};
         }, original);
-        assert.deepEqual(copy, expected);
+        assert.deepStrictEqual(copy, expected);
         assert.strictEqual(copy.dupa, expected.dupa);
-        assert.strictEqual(copy.c, original.c);
 
         assert.deepEqual(original, createExample());
     });
@@ -46,7 +55,7 @@ describe('transform', () => {
         assert.deepStrictEqual(mutations,)
     });
 
-    it('allows for double pushing array and then shift', () => {
+    xit('allows for double pushing array and then shift', () => {
         const o = {arr: [1, 2, 4]};
         const copy = transform(state => {
             state.arr.push(8);

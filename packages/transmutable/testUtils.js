@@ -22,5 +22,8 @@ exports.createExample = () => ({
             cat: {},
             dog: {},
         }
-    }
+    },
+    todos: [
+        {text: 'something'}, {user: {name: 'cat'} }
+    ]
 });

@@ -3,6 +3,7 @@ const { cloneAndApplyMutations } = require('./cloning');
 const evaluateMutations = require('./evaluateMutations');
 const IS_TRANSFORM = Symbol();
 
+// TODO rewrite to use the new implementation
 const Transform = (transformer) => {
     if (transformer[IS_TRANSFORM]) return transformer;
 
@@ -24,13 +25,95 @@ const Transform = (transformer) => {
     return transform;
 }
 
+
+const { MUTATION, WAS_WRITTEN, WAS_ACCESSED} = require('./symbols');
+
+function ensurePatch(parentPatch, propName) {
+    let deeperPatch = parentPatch[propName];
+
+    if (!deeperPatch) {
+        deeperPatch = parentPatch[propName] = {};
+        parentPatch[WAS_ACCESSED] = true;
+    }
+
+    return deeperPatch;
+}
+
+function createStage(target, patch) {
+    return new Proxy(target, {
+        get(target, name) {
+            const value = target[name];
+
+            if (value && typeof value == 'object') {
+                return createStage(value, ensurePatch(patch, name));
+            }
+
+            return value;
+        },
+        set(target, name, value) {
+            const oldValue = target[name];
+
+            if (value !== oldValue) {
+                let deeperPatch = ensurePatch(patch, name);
+                deeperPatch[MUTATION] = {value}
+            }
+
+            return true;
+        }
+    });
+}
+
+function applyPatch (node, patch) {
+    if (patch && patch[MUTATION]) {
+        return patch[MUTATION].value;
+    }
+
+    if (
+        patch
+        && node && typeof node == 'object'
+        && patch[WAS_ACCESSED]
+        //&& Object.keys(patch).length
+    ) {
+        const isArray = Array.isArray(node);
+
+        let copy;
+
+        if (isArray)
+            copy = node.slice();
+        else {
+            copy = {};
+        }
+
+        if (!isArray) {
+            for (let k in node) {
+                copy[k] = node[k];
+            }
+        }
+
+        for (let k in patch) {
+            const res = applyPatch(node[k], patch[k]);
+            copy[k] = res;
+        }
+
+        return copy;
+    }
+
+    return node;
+}
+
+exports.applyPatch = applyPatch;
+
 exports.transform = (transformer, original) => {
     if (typeof transformer !== 'function') throw new Error(`
         API was changed in 0.5.0 version of Transmutable library.
         Now transform function takes transforming function as a FIRST argument.
         Original state as a SECOND one.
     `);
-    return Transform(transformer)(original);
+    const patch = {};
+    transformer(createStage(original, patch));
+    return applyPatch(original, patch);
+
+    //return Transform(transformer)(original);
 }
 
 exports.Transform = Transform;
