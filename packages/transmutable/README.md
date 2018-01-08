@@ -128,5 +128,4 @@ const copy = transform(stage => {
 ```
 
 * It allows for mutable-like programming interface.
-* It allows for applying mutations either in immutable (via `forked.commit()`) or mutable way (via `forked.pushTo`).
 * It performs smart deep cloning (with dirty checking) - if something is not changed, it is copied only by reference
