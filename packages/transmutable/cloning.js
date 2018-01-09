@@ -1,5 +1,9 @@
 'use strict';
 
+//
+// Legacy cloning algorithm.
+// New one is in transform.js
+//
 const { get, set } = require('./get-set');
 
 const WAS_WRITTEN = Symbol();
