@@ -219,5 +219,21 @@ describe('transform', () => {
         assert.deepStrictEqual(copy.deep.arr, [{sth: 4}, 2])
     });
 
+    it('support currying', () => {
+        const a = {x: 1};
+        const b = {x: 100};
+        const t = transform(state => {
+            state.x++;
+        });
+        assert.equal(typeof t, 'function');
+
+        const resA = t(a);
+        assert.deepStrictEqual(resA, {x: 2});
+        assert.deepStrictEqual(a, {x: 1});
+
+        const resB = t(b);
+        assert.deepStrictEqual(resB, {x: 101});
+        assert.deepStrictEqual(b, {x: 100});
+    });
 
 });

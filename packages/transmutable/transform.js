@@ -121,7 +121,10 @@ function applyPatch (node, patch) {
 
 exports.applyPatch = applyPatch;
 
-exports.transform = (transformer, original) => {
+const transform = (transformer, original) => {
+    if (typeof original == 'undefined') {
+        return transform.bind(null, transformer);
+    }
     if (typeof transformer !== 'function') throw new Error(`
         API was changed in 0.5.0 version of Transmutable library.
         Now transform function takes transforming function as a FIRST argument.
@@ -133,7 +136,7 @@ exports.transform = (transformer, original) => {
 
     //return Transform(transformer)(original);
 }
-
+exports.transform = transform;
 exports.Transform = Transform;
 
 // we keep Reducer separately because Reducer is meant for use with Redux
