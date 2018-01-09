@@ -219,7 +219,7 @@ describe('transform', () => {
         assert.deepStrictEqual(copy.deep.arr, [{sth: 4}, 2])
     });
 
-    it('support currying', () => {
+    it('supports currying', () => {
         const a = {x: 1};
         const b = {x: 100};
         const t = transform(state => {
@@ -235,5 +235,34 @@ describe('transform', () => {
         assert.deepStrictEqual(resB, {x: 101});
         assert.deepStrictEqual(b, {x: 100});
     });
+
+    it('passes additional arguments to transformer', () => {
+        const animals = {animals: 'squirrels'};
+        let c = 0;
+        const f = transform((state, ...args) => {
+            assert.deepStrictEqual(args, [
+                {type: 'FIND_FOOD', food: 'nuts'},
+                'under',
+                'tree'
+            ]);
+            c++;
+        },animals, {type: 'FIND_FOOD', food: 'nuts'}, 'under', 'tree');
+        assert.strictEqual(c, 1);
+    })
+
+    it('passes additional arguments to transformer (when currying)', () => {
+        const animals = {animals: 'squirrels'};
+        let c = 0;
+        const f = transform((state, ...args) => {
+            assert.deepStrictEqual(args, [
+                {type: 'FIND_FOOD', food: 'nuts'},
+                'under',
+                'tree'
+            ]);
+            c++;
+        });
+        f(animals, {type: 'FIND_FOOD', food: 'nuts'}, 'under', 'tree');
+        assert.strictEqual(c, 1);
+    })
 
 });

@@ -121,7 +121,7 @@ function applyPatch (node, patch) {
 
 exports.applyPatch = applyPatch;
 
-const transform = (transformer, original) => {
+const transform = (transformer, original, ...args) => {
     if (typeof original == 'undefined') {
         return transform.bind(null, transformer);
     }
@@ -131,7 +131,7 @@ const transform = (transformer, original) => {
         Original state as a SECOND one.
     `);
     const patch = {};
-    transformer(createStage(original, patch));
+    transformer(createStage(original, patch), ...args);
     return applyPatch(original, patch);
 
     //return Transform(transformer)(original);
