@@ -19,18 +19,6 @@ describe('Transmutable', () => {
     });
 
 
-    // this is for spec only. Transmutable assumes that you do NOT mutate your objects.
-    // Mutating objects could affect all objects (because of structural sharing)
-    // but this test is just for specification of library behavior (not for use case)
-    it('is in sync with the original object (after mutating original object it returns changed values)', () => {
-        ex.a = 4;
-        assert.strictEqual(t.stage.a, 4);
-
-        ex.c.d = 5;
-        assert.strictEqual(t.stage.c.d, 5);
-    });
-
-
     // TODO review this case (mutations vs changes)
     it('apply mutations to the object', () => {
         expected.a = 81;
@@ -44,18 +32,30 @@ describe('Transmutable', () => {
     });
 
 
-    it('accumulates changes after commit (thus allows for commiting changes incrementally)', () => {
+    it('accumulates changes after run (thus allows for commiting changes incrementally)', () => {
         expected.a = 200;
         expected.b = 20;
 
-        t.stage.a = 200;
-        t.commit();
-        assert.strictEqual(t.stage.a, 200);
+        let thingsThatHappened = [];
 
-        t.stage.b = 20;
+        t.run(state => {
+            state.a = 200;
+            thingsThatHappened.push(1);
+        });
+
+        t.run(state => {
+            assert.strictEqual(state.a, 200);
+            state.b = 20;
+            thingsThatHappened.push(2);
+        });
+
+        t.run(state => {
+            assert.deepStrictEqual(state, expected)
+            thingsThatHappened.push(3);
+        });
         const copied = t.commit();
 
-        assert.deepStrictEqual(copied, expected)
+        assert.deepStrictEqual(thingsThatHappened, [1, 2, 3])
     });
 
     // TODO consider implementing this (maybe):
