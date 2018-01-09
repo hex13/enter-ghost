@@ -137,11 +137,11 @@ Immer: 0.3.1
 Differences with Immer.
 
 * Transmutable is faster (look above)
-* In Transmutable `transform` parameters are: function, object instead of object, function like **currently** in `immer` (look into immer issue: https://github.com/mweststrate/immer/issues/36)
+* `transform`/`produce` functions. Both libraries support parameter order: function, object. Both libraries support currying. But `immer` also supports object, function order.
 * Immer supports frozen objects (it can be disabled), and ES5 environments. Transmutable does not support frozen objects and demand environment with support of ES Proxies. This may change in the future though.
 
 
-#### Gotchas
+### Gotchas
 
 
 ###### General:
