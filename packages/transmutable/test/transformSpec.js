@@ -33,6 +33,43 @@ describe('transform', () => {
 
     const evaluateMutations = require('../evaluateMutations');
 
+    it('exposes changes from draft inside the transformer function', () => {
+        const original = createExample();
+        const expected = createExample();
+        transform(draft => {
+            draft.a = 'what?';
+            draft.c = undefined;
+
+            assert.strictEqual(draft.a, 'what?');
+            assert.strictEqual(draft.c, undefined);
+
+            const mutated ={
+                foo: {
+                    bar: true
+                }
+            };
+
+            draft.mutated = mutated;
+
+            assert.strictEqual(draft.mutated, mutated);
+
+            draft.mutated.foo = 13;
+            assert.deepStrictEqual(draft.mutated, {foo: 13});
+            assert.deepStrictEqual(mutated, {foo: 13});
+
+            const added = {fish: {}};
+            draft.fish = added;
+            assert.deepStrictEqual(draft.fish, {fish: {}});
+            added.fish.livesIn = 'water';
+            assert.deepStrictEqual(draft.fish, {
+                fish: {
+                    livesIn: 'water'
+                }
+            });
+
+        }, original)
+    });
+
     xit('creates proper mutations when double pushing arrays', () => {
         const o = {arr: [1, 2, 4]};
         const mutations = evaluateMutations(state => {

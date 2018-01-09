@@ -42,7 +42,14 @@ function ensurePatch(parentPatch, propName) {
 function createStage(target, patch) {
     return new Proxy(target, {
         get(target, name) {
-            const value = target[name];
+            let value;
+            const mutation = patch[name] && patch[name][MUTATION];
+
+            if (mutation) {
+                return mutation.value;
+            }
+            else
+                value = target[name];
 
             if (value && typeof value == 'object') {
                 return createStage(value, ensurePatch(patch, name));
