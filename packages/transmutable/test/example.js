@@ -3,6 +3,8 @@ const assert = require('assert');
 
 describe('example', () => {
     it('works', () => {
+
+
         const require = (module) => {
             if (module == 'transmutable') return _require('..');
         };
@@ -12,6 +14,19 @@ describe('example', () => {
 
         const { transform } = require('transmutable');
 
+        (() => {
+            const { transform } = require('transmutable');
+
+            const original = {a: 123};
+
+            const copy = transform(draft => {
+            	draft.a = 456;
+            }, original);
+
+            console.log({original, copy});
+            // { original: { a: 123 }, copy: { a: 456 } }
+
+        })();
 
         const original = {
             cow: 123,

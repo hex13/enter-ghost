@@ -1,12 +1,13 @@
-const { transform } = require('./transmutable');
+const { transform } = require('./dist/transmutable');
 const { createExample }= require('./testUtils');
 const immer = require('immer').default;
 const {setAutoFreeze } = require('immer');
 const assert = require('assert');
 
 
+const {benchmarks} = require('./docData');
 setAutoFreeze(false);
-let max = 10000;
+let max = benchmarks.max;
 
 const original = {
     arr: []
@@ -27,7 +28,7 @@ function benchmark(code, name) {
         res = code();
     //console.log(original.arr.length, res.arr.length)
     let t1 = Date.now();
-    console.log(`Time for ${name}: `, t1 - t0)
+    console.log(`Time for ${name}: `, `${t1 - t0}ms`)
 }
 
 benchmark(() => {
@@ -36,13 +37,13 @@ benchmark(() => {
 
 benchmark(() => {
     return immer(original, transformer);
-}, 'immer - array');
+}, 'immer without autofreeze - array');
 
 benchmark(() => {
     return immer(createExample(), (state) => {
         state.c.d = {};
     });
-}, 'immer - example')
+}, 'immer without autofreeze - example')
 
 benchmark(() => {
     return transform((state) => {

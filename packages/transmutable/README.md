@@ -1,10 +1,11 @@
 ### immutable objects that pretend to be mutable
 
-### Change in API:
-**now transforming function is a FIRST argument of `transform` and original state is a SECOND.**
+
+* It allows for mutable-like programming interface.
+* It performs smart deep cloning (with dirty checking) - if something is not changed, it is copied only by reference
 
 
-it enables for writing this:
+Transmutable allows you for writing this:
 
 ```javascript
 copy = transform(stage => {
@@ -44,9 +45,29 @@ copy = Object.assign(
 
 Transmutable is based on idea that immutability should not come at the cost of developer experience.
 
-So instead of forcing user to manually copying objects with `Object.assign` / `...`, it leaves this part to the library. The library presents you the `stage` (proxied object which passively observes each mutation being made). This allows for performing smart deep copy (i.e. deep copy which is mutation-aware and performs only deep copies of "dirty" data. If something is not changed - it is copied by reference). Then mutations are "replayed" and applied to the copy of object.
+So instead of forcing user to manually copying objects with `Object.assign` / `...`, it leaves this part to the library. The library presents you the `draft` (proxy object which record your mutations and create some kind of patch).
+
+This allows for performing smart deep copy (i.e. deep copy which is mutation-aware and performs only deep copies of "dirty" data. If something is not changed - it is copied by reference).
+
+`transform` function returns immutable copy of original object, based on draft you made.
 
 ### Usage
+
+`transform` function:
+
+```javascript
+const { transform } = require('transmutable');
+
+const original = {a: 123};
+
+const copy = transform(draft => {
+	draft.a = 456;
+}, original);
+
+console.log({original, copy});
+// { original: { a: 123 }, copy: { a: 456 } }
+
+```
 
 With Redux:
 
@@ -83,49 +104,55 @@ assert.deepStrictEqual(initialState, {counter: 1, text: ''});
 
 ```
 
-There are two modes of using:
 
-- transform function
-- ~~reusable (low level)~~ Transmutable objects are removed
-- Reducer helper
+### Performance
 
+Check out [benchmark code](https://github.com/hex13/enter-ghost/blob/master/packages/transmutable/benchmark.js).
 
-**NOTE: full Transmutable objects are removed. .**
+Transmutable is faster than Immer but slower than hand crafted reducer.
 
+Times in ms.
 
-Transmutable library assumes immutability, so you should not perform any mutation of your objects (because of data-sharing between objects). Off course using `transmutable` API and "mutating" the `stage` is not mutation, because mutations are only recorded on `stage`, and not yet applied.
+Pushing 1000 objects to array. Repeated 10000 times.
 
+* Time for **transmutable** - array:  2220ms
+* Time for immer without autofreeze - array:  8362ms
 
+change one deep property in state. Repeated 10000 times.
 
-Example of use:
+* Time for hand crafted - example:  62ms
+* Time for **transmutable** - example:  78ms
+* Time for immer without autofreeze - example:  548ms
 
-```javascript
-const log = console.log.bind(console);
+Tested on:
 
-const { transform } = require('transmutable');
+Node v8.4.0
 
+Transmutable: 0.9.0
 
-const original = {
-	cow: 123,
-	dogs: {
-		muchWow: 1
-	}
-};
+Immer: 0.3.1
 
+### Comparison
 
-const copy = transform(stage => {
-	stage.cow = 'doge';
-}, original);
+Differences with Immer.
 
-		log(copy); // { cow: 'doge', dogs: { muchWow: 1 } }
-		log(original); // still the same: { cow: 123, dogs: { muchWow: 1 } }
-		log(copy.dogs === original.dogs); // true
+* Transmutable is faster (look above)
+* In Transmutable `transform` parameters are: function, object instead of object, function like **currently** in `immer` (look into immer issue: https://github.com/mweststrate/immer/issues/36)
+* Immer supports frozen objects (it can be disabled), and ES5 environments. Transmutable does not support frozen objects and demand environment with support of ES Proxies. This may change in the future though.
 
 
+#### Gotchas
 
 
+###### General:
 
-```
+* Transmutable assumes immutability, so you should not perform any mutation of your objects outside the `transmutable` API.
 
-* It allows for mutable-like programming interface.
-* It performs smart deep cloning (with dirty checking) - if something is not changed, it is copied only by reference
+###### Things dependent on current implementation:
+* Transmutable uses ES6 Proxies and it demands environment capable for running such Proxy.
+
+* In current version of Transmutable your state should be plain JS objects (numbers, strings, booleans, arrays, nested objects). You should not **currently** use e.g. ES6 Maps in your state. This may change in future versions.
+
+* Your state should not contain circular references.
+
+* Transmutable currently does not support frozen objects. Even if you freeze them by yourself (file an issue if this is a matter for you).
