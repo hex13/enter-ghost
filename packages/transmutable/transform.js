@@ -61,6 +61,17 @@ function createStage(target, patch) {
             const oldValue = target[name];
 
             if (value !== oldValue) {
+                if (Array.isArray(target)) {
+                    if (!patch[MUTATION]) {
+                        const arrayDraft = target.slice();
+                        // we need to explicitly assign the first changed item
+                        // all next changes will affect arrayDraft directly
+                        // without Proxy (`get` trap will return patch[MUTATION].value)
+                        arrayDraft[name] = value;
+                        patch[MUTATION] = {value: arrayDraft};
+                    }
+                    return true;
+                }
                 let deeperPatch = ensurePatch(patch, name);
                 deeperPatch[MUTATION] = {value}
             }

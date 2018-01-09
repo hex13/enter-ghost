@@ -92,13 +92,17 @@ describe('transform', () => {
         assert.deepStrictEqual(mutations,)
     });
 
-    xit('allows for double pushing array and then shift', () => {
-        const o = {arr: [1, 2, 4]};
+    it('allows for double pushing array and then shift', () => {
+        const original = {arr: [1, 2, 4]};
         const copy = transform(state => {
             state.arr.push(8);
+            assert.deepStrictEqual(state.arr, [1, 2, 4, 8]);
             state.arr.push(16);
+            assert.deepStrictEqual(state.arr, [1, 2, 4, 8, 16]);
             state.arr.shift();
-        }, o);
+            assert.deepStrictEqual(state.arr, [2, 4, 8, 16]);
+        }, original);
+        assert.deepStrictEqual(original, {arr: [1, 2, 4]});
         assert.deepStrictEqual(copy, {arr: [2, 4, 8, 16]})
     });
 
