@@ -92,20 +92,16 @@ function applyPatch (node, patch) {
         && patch[WAS_ACCESSED]
         //&& Object.keys(patch).length
     ) {
-        const isArray = Array.isArray(node);
-
         let copy;
 
-        if (isArray)
+        if (Array.isArray(node))
             copy = node.slice();
         else {
             copy = {};
-        }
-
-        if (!isArray) {
             for (let k in node) {
                 copy[k] = node[k];
             }
+
         }
 
         for (let k in patch) {
