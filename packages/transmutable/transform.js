@@ -63,8 +63,8 @@ function applyPatch (node, patch) {
     if (
         patch
         && node && typeof node == 'object'
-        && patch[WAS_ACCESSED]
-        //&& Object.keys(patch).length
+        //&& patch[WAS_ACCESSED]
+        && Object.keys(patch).length
     ) {
         let copy;
 
@@ -91,6 +91,9 @@ function applyPatch (node, patch) {
 
 exports.applyPatch = applyPatch;
 
+const diff = require('./diff');
+const copyDeep = require('./copyDeep');
+
 const transform = (transformer, original, ...args) => {
     if (typeof original == 'undefined') {
         return transform.bind(null, transformer);
@@ -100,11 +103,18 @@ const transform = (transformer, original, ...args) => {
         Now transform function takes transforming function as a FIRST argument.
         Original state as a SECOND one.
     `);
-    const patch = {};
-    transformer(createStage(original, patch), ...args);
+
+    let patch;
+    if (typeof Proxy == 'undefined') {
+        const copy = copyDeep(original);
+        transformer(copy, ...args);
+        patch = diff(original, copy);
+    } else {
+        patch = {};
+        transformer(createStage(original, patch), ...args);
+    }
     return applyPatch(original, patch);
 
-    //return Transform(transformer)(original);
 }
 exports.transform = transform;
 
