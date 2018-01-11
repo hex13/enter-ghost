@@ -25,5 +25,13 @@ exports.createExample = () => ({
     },
     todos: [
         {text: 'something'}, {user: {name: 'cat'} }
-    ]
+    ],
+    some: {
+        deep: {
+            object: {
+                l1: 'Leia',
+                l2: 'Luke'
+            }
+        }
+    }
 });
