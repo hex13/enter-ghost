@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { Transmutable } = require('../transmutable');
-const { Transform } = require('../transform');
+const { Transform } = require('../legacy_transform');
 const { Stream } = require('../stream');
 const { Hub } = require('../mea');
 describe('mea', () => {

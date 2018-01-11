@@ -2,7 +2,7 @@
 
 const createStage = require('./legacy_createStage');
 const { cloneAndApplyMutations } = require('./cloning');
-const { Transform } = require('./transform');
+const { Transform } = require('./legacy_transform');
 const Commit = require('./commit');
 const { Stream } = require('./stream');
 
