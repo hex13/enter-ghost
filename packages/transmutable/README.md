@@ -1,5 +1,6 @@
 ### immutable objects that pretend to be mutable
 
+### (now `transmutable` supports also environments without ES6 Proxies using fallback diffing algorithm).
 
 * It allows for mutable-like programming interface.
 * It performs smart deep cloning (with dirty checking) - if something is not changed, it is copied only by reference
@@ -139,7 +140,7 @@ Differences with Immer.
 
 * Transmutable is faster (look above)
 * `transform`/`produce` functions. Both libraries support parameter order: function, object. Both libraries support currying. But `immer` also supports object, function order.
-* Immer supports frozen objects (it can be disabled), and ES5 environments. Transmutable does not support frozen objects and demand environment with support of ES Proxies. This may change in the future though.
+* Immer supports frozen objects (it can be disabled). Transmutable does not support frozen objects.
 
 
 ### Gotchas
@@ -150,7 +151,6 @@ Differences with Immer.
 * Transmutable assumes immutability, so you should not perform any mutation of your objects outside the `transmutable` API.
 
 ###### Things dependent on current implementation:
-* Transmutable uses ES6 Proxies and it demands environment capable for running such Proxy.
 
 * In current version of Transmutable your state should be plain JS objects (numbers, strings, booleans, arrays, nested objects). You should not **currently** use e.g. ES6 Maps in your state. This may change in future versions.
 

@@ -1,6 +1,6 @@
 {
   "name": "transmutable",
-  "version": "0.9.5",
+  "version": "0.10",
   "description": "immutable objects that pretend to be mutable",
   "main": "dist/transmutable.js",
   "scripts": {
@@ -19,7 +19,7 @@
     "event sourcing",
     "state"
   ],
-  "author": "= <=>",
+  "author": "Łukasz Lityński",
   "license": "MIT",
   "repository": "https://github.com/hex13/enter-ghost/tree/master/packages/transmutable",
   "devDependencies": {
