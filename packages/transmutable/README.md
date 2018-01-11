@@ -72,10 +72,11 @@ console.log({original, copy});
 With Redux:
 
 ```javascript
-const { Reducer } = require('transmutable');
+const { transform } = require('transmutable');
 const { createStore } = require('redux');
 
-const reducer = Reducer((state, action) => {
+// when transform gets only one argument it returns curried function
+const reducer = transform((state, action) => {
 	switch (action.type) {
 		case 'inc':
 			state.counter++;

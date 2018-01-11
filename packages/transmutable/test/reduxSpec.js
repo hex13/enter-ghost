@@ -23,10 +23,10 @@ describe('redux interop', () => {
     };
 
     it('should work with redux', () => {
-        const { Reducer } = require('transmutable');
+        const { transform } = require('transmutable');
         const { createStore } = require('redux');
 
-        const reducer = Reducer((state, action) => {
+        const reducer = transform((state, action) => {
             switch (action.type) {
                 case 'inc':
                     state.counter++;
