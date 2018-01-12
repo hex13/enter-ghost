@@ -40,7 +40,6 @@ describe('Transmutable', () => {
             assert.deepStrictEqual(state, expected)
             thingsThatHappened.push(3);
         });
-        const copied = t.commit();
 
         assert.deepStrictEqual(thingsThatHappened, [1, 2, 3])
     });
@@ -74,10 +73,13 @@ describe('Transmutable', () => {
             assert.deepStrictEqual(forked.commits, t.commits, 'fork and master should have equivalent commits objects');
         });
         it('forked should have the same commits', () => {
-            t.stage.a = 1234;
-            t.commit();
-            t.stage.a = 666;
-            t.commit();
+            t.run(state => {
+                state.a = 1234;
+            })
+
+            t.run((state) => {
+                state.a = 666;
+            });
             const forked = t.fork();
             assert.notStrictEqual(forked.commits, t.commits);
             assert.deepStrictEqual(forked.commits, t.commits);
@@ -91,10 +93,12 @@ describe('Transmutable', () => {
         );
         it(testDesc, () => {
             const forked = t.fork();
-            forked.stage.c.d = 7654;
+
             expected.c.d = 7654;
 
-            forked.commit();
+            forked.run(state => {
+                state.c.d = 7654;
+            });
 
             assert.deepStrictEqual(expected, forked.reify());
             assert.strictEqual(forked.stage.c.d, 7654);
@@ -111,17 +115,20 @@ describe('Transmutable', () => {
             const forked = t.fork();
             const oldA = createExample().a;
 
-            forked.stage.a = 'aaaa';
-            forked.stage.c.d = 7654;
             expected.a = 'aaaa';
             expected.c.d = 7654;
 
-            forked.commit();
+            forked.run(state => {
+                state.a = 'aaaa';
+                state.c.d = 7654;
+            });
 
             expected.a = oldA;
-            forked.stage.a = oldA;
 
-            forked.commit();
+
+            forked.run(state => {
+                state.a = oldA;
+            });
 
             assert.deepStrictEqual(expected, forked.reify());
             assert.strictEqual(forked.stage.c.d, 7654);
@@ -136,14 +143,18 @@ describe('Transmutable', () => {
         });
         it('merge with branching', () => {
             const forked = t.fork();
-            forked.stage.c.d = 7654;
+
             expected.c.d = 7654;
 
-            forked.commit();
+            forked.run(state => {
+                state.c.d = 7654;
+            });
 
-            t.stage.a = 333;
+
             expected.a = 333;
-            t.commit();
+            t.run(state => {
+                state.a = 333;
+            });
             t.merge(forked);
 
             assert.deepStrictEqual(expected, t.reify(), 'changes in fork should be present in original object after merging');
@@ -153,11 +164,9 @@ describe('Transmutable', () => {
         it('commit count should be appropriate in master and fork when fast forwarding', () => {
             const forked = t.fork();
 
-            forked.stage.c.d = 7654;
-            forked.commit();
+            forked.run(() => {});
 
-            t.stage.a = 333;
-            t.commit();
+            t.run(() => {});
 
             t.merge(forked);
 
@@ -165,16 +174,13 @@ describe('Transmutable', () => {
             assert.strictEqual(forked.commits.length, 1);
         });
         it('commit count should be appropriate in master and fork when branching', () => {
-            t.stage.a = 2222;
-            t.commit();
+            t.run(() => {});
 
             const forked = t.fork();
 
-            forked.stage.c.d = 7654;
-            forked.commit();
+            forked.run(() => {});
 
-            t.stage.a = 333;
-            t.commit();
+            t.run(() => {});
 
             t.merge(forked);
             assert.strictEqual(t.commits.length, 3);
