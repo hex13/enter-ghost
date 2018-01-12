@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { State } = require('../transmutable');
+const { State } = require('../state');
 const { Transform } = require('../legacy_transform');
 const { Stream } = require('../stream');
 const { Hub } = require('../mea');

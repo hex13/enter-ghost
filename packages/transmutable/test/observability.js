@@ -3,7 +3,7 @@
 const assert = require('assert');
 
 const { createExample } = require('../testUtils');
-const { State } = require('../transmutable');
+const { State } = require('../state');
 
 describe('observability', () => {
 
