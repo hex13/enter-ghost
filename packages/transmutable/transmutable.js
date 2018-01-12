@@ -15,58 +15,53 @@ const errorChecks = {
     }
 }
 
-function Transmutable(o, hooks = {}) {
-    this.state$ = Stream();
-    this.target = o;
-    this.commits = [];
-    this.hooks = hooks;
-}
+class Transmutable {
+    constructor(o, hooks = {}) {
+        this.state$ = Stream();
+        this.target = o;
+        this.commits = [];
+        this.hooks = hooks;
+    }
+    get() {
+        return this.target;
+    }
+    run(handler) {
+        const { mutations } = Transform(handler).run(this.target);
+        return this.commit(new Commit(mutations));
+    }
+    commit(commit = new Commit) {
+        errorChecks.Transmutable.commit(commit);
 
-Transmutable.prototype.get = function() {
-    return this.target;
-}
+        const prevTarget = this.target;
 
-Transmutable.prototype.run = function (handler) {
-    const { mutations } = Transform(handler).run(this.target);
-    return this.commit(new Commit(mutations));
-}
+        this.target = commit.run(this.target);
 
-Transmutable.prototype.commit = function commit(commit = new Commit) {
-    errorChecks.Transmutable.commit(commit);
+        this.state$.publish(this.target, prevTarget);
 
-    const prevTarget = this.target;
-
-    this.target = commit.run(this.target);
-
-    this.state$.publish(this.target, prevTarget);
-
-    this.commits.push(commit);
-    this.hooks.onCommit && this.hooks.onCommit(this, commit);
-    return this.target;
-}
-
-
-Transmutable.prototype.observe = function observe(...args) {
-    const handler = typeof args[0] == 'function'? args[0] : args[1];
-    const path = typeof args[0] == 'function'? null : args[0];
-    return this.state$.subscribe(handler, path);
-}
-
-Transmutable.prototype.fork = function fork() {
-    const t = new Transmutable(this.target);
-    t.commits = this.commits.slice();
-    return t;
-}
-
-Transmutable.prototype.merge = function merge(transmutable) {
-    // TODO proposal:
-    // const track = new Track();
-    for (let i = 0; i < transmutable.commits.length; i++) {
-        if (this.commits.includes(transmutable.commits[i])) continue;
-
+        this.commits.push(commit);
+        this.hooks.onCommit && this.hooks.onCommit(this, commit);
+        return this.target;
+    }
+    observe(...args) {
+        const handler = typeof args[0] == 'function'? args[0] : args[1];
+        const path = typeof args[0] == 'function'? null : args[0];
+        return this.state$.subscribe(handler, path);
+    }
+    fork() {
+        const t = new Transmutable(this.target);
+        t.commits = this.commits.slice();
+        return t;
+    }
+    merge(transmutable) {
         // TODO proposal:
-        // track.commit(transmutable.commits[i]);
-        this.commit(new Commit(transmutable.commits[i].mutations));
+        // const track = new Track();
+        for (let i = 0; i < transmutable.commits.length; i++) {
+            if (this.commits.includes(transmutable.commits[i])) continue;
+
+            // TODO proposal:
+            // track.commit(transmutable.commits[i]);
+            this.commit(new Commit(transmutable.commits[i].mutations));
+        }
     }
 }
 
