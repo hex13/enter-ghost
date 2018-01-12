@@ -1,7 +1,7 @@
 "use strict";
 
 const createStage = require('./legacy_createStage');
-const { cloneAndApplyMutations } = require('./cloning');
+
 const { Transform } = require('./legacy_transform');
 const { transform } = require('./transform');
 const Commit = require('./commit');
@@ -10,7 +10,7 @@ const { Stream } = require('./stream');
 const errorChecks = {
     Transmutable: {
         commit(commit) {
-            if (!(commit instanceof Commit)) throw new Error('Wrong argument passed to method Transmutable::commit()')
+            if (!commit.isCommit) throw new Error('Wrong argument passed to method Transmutable::commit()')
         }
     }
 }
@@ -31,16 +31,12 @@ Transmutable.prototype.run = function (handler) {
     return this.commit(new Commit(mutations));
 }
 
-Transmutable.prototype._applyCommit = function(commit) {
-    this.target = cloneAndApplyMutations(this.target, commit.mutations);
-}
-
 Transmutable.prototype.commit = function commit(commit = new Commit) {
     errorChecks.Transmutable.commit(commit);
 
     const prevTarget = this.target;
 
-    this._applyCommit(commit);
+    this.target = commit.run(this.target);
 
     this.state$.publish(this.target, prevTarget);
 
