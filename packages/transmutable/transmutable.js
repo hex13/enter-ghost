@@ -19,7 +19,6 @@ function Transmutable(o, hooks = {}) {
     this.target = o;
     this.commits = [];
     this.hooks = hooks;
-    this.lastCommit = new Commit();
     this.nextCommit = new Commit();
 
     this.stage = createStage(() => this.target, {
@@ -43,7 +42,6 @@ Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
     this.state$.publish(this.target, prevTarget);
 
     this.commits.push(commit);
-    this.lastCommit = commit;
     this.nextCommit = new Commit();
     this.hooks.onCommit && this.hooks.onCommit(this, commit);
     return this.target;

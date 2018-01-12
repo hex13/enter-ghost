@@ -19,19 +19,6 @@ describe('Transmutable', () => {
     });
 
 
-    // TODO review this case (mutations vs changes)
-    it('apply mutations to the object', () => {
-        expected.a = 81;
-
-        const output = createExample();
-        t.stage.a = 81;
-        applyChanges(output, t.nextCommit.mutations);
-
-        assert.deepStrictEqual(ex, createExample());
-        assert.deepStrictEqual(output, expected);
-    });
-
-
     it('accumulates changes after run (thus allows for commiting changes incrementally)', () => {
         expected.a = 200;
         expected.b = 20;
@@ -62,26 +49,6 @@ describe('Transmutable', () => {
     xit('allows for adding deep objects', () => {
         t.stage.allows.for.adding.deep.objects = 2;
         const copied = t.commit();
-    });
-
-    it('allows for reify current stage', () => {
-        t.stage.a = {n:2017};
-        expected.a = {n:2017};
-        const reified = t.reify();
-        const reified2 = t.reify();
-
-        assert.strictEqual(reified.a, reified2.a, 'and reified objects have structural sharing')
-
-        assert.deepStrictEqual(t.nextCommit.mutations, [createMutation(['a'], {n: 2017})], 'it doesn\' reset mutations after reify');
-
-        assert.deepStrictEqual(original, createExample())
-        assert.deepStrictEqual(reified, expected);
-        assert.strictEqual(t.target, ex, 'target stays the same after reifying');
-    });
-
-    it('returns original object if there are no mutations', () => {
-        const reified = t.reify();
-        assert.strictEqual(reified, ex);
     });
 
     describe('actions', () => {
@@ -214,36 +181,6 @@ describe('Transmutable', () => {
             assert.strictEqual(forked.commits.length, 2);
         });
     })
-    describe('(events)', () => {
-        it('`lastCommit` has correct number of mutations', () => {
-            assert.strictEqual(t.lastCommit.mutations.length, 0);
-            t.stage.a = 9182;
-            assert.strictEqual(t.lastCommit.mutations.length, 0);
-            t.stage.b = 9182;
-            assert.strictEqual(t.lastCommit.mutations.length, 0);
-            t.stage.c = 9182;
-            assert.strictEqual(t.lastCommit.mutations.length, 0);
-            t.commit();
-            assert.strictEqual(t.lastCommit.mutations.length, 3);
-        });
-        it('`put` allows for putting events', () => {
-            const e = {type: 'foo124'};
-            t.nextCommit.put(e);
-            t.commit();
-            assert.deepStrictEqual(t.lastCommit.events, [{
-                type: 'foo124'
-            }]);
-        });
-        it('events are reset after commit', () => {
-            t.nextCommit.put({type: 'bar124'});
-            t.commit();
-            t.nextCommit.put({type: 'bar123'});
-            t.commit();
-            assert.deepStrictEqual(t.lastCommit.events, [{
-                type: 'bar123'
-            }]);
-        });
-    });
 
     describe('(hooks)', () => {
         it('calls onCommit after commit', () => {
