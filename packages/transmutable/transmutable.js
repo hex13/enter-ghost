@@ -3,6 +3,7 @@
 const createStage = require('./legacy_createStage');
 const { cloneAndApplyMutations } = require('./cloning');
 const { Transform } = require('./legacy_transform');
+const { transform } = require('./transform');
 const Commit = require('./commit');
 const { Stream } = require('./stream');
 
@@ -32,11 +33,16 @@ Transmutable.prototype.run = function (handler) {
     return this.commit(new Commit(mutations));
 }
 
+Transmutable.prototype._applyCommit = function(commit) {
+    this.target = cloneAndApplyMutations(this.target, commit.mutations);
+}
+
 Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
     errorChecks.Transmutable.commit(commit);
 
     const prevTarget = this.target;
-    this.target = cloneAndApplyMutations(this.target, commit.mutations);
+
+    this._applyCommit(commit);
 
     this.state$.publish(this.target, prevTarget);
 
