@@ -15,7 +15,7 @@ const errorChecks = {
     }
 }
 
-class Transmutable {
+class State {
     constructor(o, hooks = {}) {
         this.state$ = Stream();
         this.target = o;
@@ -48,7 +48,7 @@ class Transmutable {
         return this.state$.subscribe(handler, path);
     }
     fork() {
-        const t = new Transmutable(this.target);
+        const t = new State(this.target);
         t.commits = this.commits.slice();
         return t;
     }
@@ -66,4 +66,4 @@ class Transmutable {
 }
 
 
-exports.Transmutable = Transmutable;
+exports.State = State;

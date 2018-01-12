@@ -1,11 +1,11 @@
 const assert = require('assert');
-const { Transmutable } = require('../transmutable');
+const { State } = require('../transmutable');
 const { Transform } = require('../legacy_transform');
 const { Stream } = require('../stream');
 const { Hub } = require('../mea');
 describe('mea', () => {
     it('should call a store', (done) => {
-        const store = new Transmutable({val: 0});
+        const store = new State({val: 0});
 
         let count = 0;
         let signalsToSend = [

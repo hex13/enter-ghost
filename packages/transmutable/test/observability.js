@@ -3,7 +3,7 @@
 const assert = require('assert');
 
 const { createExample } = require('../testUtils');
-const { Transmutable } = require('../transmutable');
+const { State } = require('../transmutable');
 
 describe('observability', () => {
 
@@ -11,7 +11,7 @@ describe('observability', () => {
     beforeEach(() => {
         ex = createExample();
         original = ex;
-        t = new Transmutable(ex);
+        t = new State(ex);
         expected = createExample();
     });
 
