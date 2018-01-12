@@ -20,8 +20,6 @@ function Transmutable(o, hooks = {}) {
     this.target = o;
     this.commits = [];
     this.hooks = hooks;
-    this.nextCommit = new Commit();
-
 }
 
 Transmutable.prototype.get = function() {
@@ -37,7 +35,7 @@ Transmutable.prototype._applyCommit = function(commit) {
     this.target = cloneAndApplyMutations(this.target, commit.mutations);
 }
 
-Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
+Transmutable.prototype.commit = function commit(commit = new Commit) {
     errorChecks.Transmutable.commit(commit);
 
     const prevTarget = this.target;
@@ -47,7 +45,6 @@ Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
     this.state$.publish(this.target, prevTarget);
 
     this.commits.push(commit);
-    this.nextCommit = new Commit();
     this.hooks.onCommit && this.hooks.onCommit(this, commit);
     return this.target;
 }
@@ -69,17 +66,13 @@ Transmutable.prototype.merge = function merge(transmutable) {
     // TODO proposal:
     // const track = new Track();
     for (let i = 0; i < transmutable.commits.length; i++) {
-        this.nextCommit.mutations = transmutable.commits[i].mutations;
         if (this.commits.includes(transmutable.commits[i])) continue;
+
         // TODO proposal:
         // track.commit(transmutable.commits[i]);
-        this.commit();
+        this.commit(new Commit(transmutable.commits[i].mutations));
     }
 }
 
 
 exports.Transmutable = Transmutable;
-
-exports.transform = require('./transform').transform;
-exports.transform = require('./transform').transform;
-exports.Reducer = require('./transform').Reducer;
