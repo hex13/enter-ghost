@@ -101,15 +101,15 @@ describe('Transmutable', () => {
             });
 
             assert.deepStrictEqual(expected, forked.reify());
-            assert.strictEqual(forked.stage.c.d, 7654);
+            assert.strictEqual(forked.get().c.d, 7654);
 
             assert.deepStrictEqual(ex, t.reify(), 'changes in fork should not be present in original object');
-            assert.strictEqual(t.stage.c.d, 100, 'changes in fork should not be present in original object');
+            assert.strictEqual(t.get().c.d, 100, 'changes in fork should not be present in original object');
 
             t.merge(forked);
 
             assert.deepStrictEqual(expected, t.reify(), 'changes in fork should be present in original object after merging');
-            assert.strictEqual(t.stage.c.d, 7654, 'changes in fork should be present in original object after merging');
+            assert.strictEqual(t.get().c.d, 7654, 'changes in fork should be present in original object after merging');
         });
         it('many commits in fork (fast forward)', () => {
             const forked = t.fork();
@@ -131,15 +131,15 @@ describe('Transmutable', () => {
             });
 
             assert.deepStrictEqual(expected, forked.reify());
-            assert.strictEqual(forked.stage.c.d, 7654);
+            assert.strictEqual(forked.get().c.d, 7654);
 
             assert.deepStrictEqual(ex, t.reify(), 'changes in fork should not be present in original object');
-            assert.strictEqual(t.stage.c.d, createExample().c.d, 'changes in fork should not be present in original object');
+            assert.strictEqual(t.get().c.d, createExample().c.d, 'changes in fork should not be present in original object');
 
             t.merge(forked);
 
             assert.deepStrictEqual(expected, t.reify(), 'changes in fork should be present in original object after merging');
-            assert.strictEqual(t.stage.c.d, 7654, 'changes in fork should be present in original object after merging');
+            assert.strictEqual(t.get().c.d, 7654, 'changes in fork should be present in original object after merging');
         });
         it('merge with branching', () => {
             const forked = t.fork();
@@ -158,7 +158,7 @@ describe('Transmutable', () => {
             t.merge(forked);
 
             assert.deepStrictEqual(expected, t.reify(), 'changes in fork should be present in original object after merging');
-            assert.strictEqual(t.stage.c.d, 7654, 'changes in fork should be present in original object after merging');
+            assert.strictEqual(t.get().c.d, 7654, 'changes in fork should be present in original object after merging');
         });
 
         it('commit count should be appropriate in master and fork when fast forwarding', () => {

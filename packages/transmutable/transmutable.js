@@ -21,11 +21,10 @@ function Transmutable(o, hooks = {}) {
     this.hooks = hooks;
     this.nextCommit = new Commit();
 
-    this.stage = createStage(() => this.target, {
-        set: (mutation) => {
-            this.nextCommit.mutations.push(mutation);
-        }
-    });
+}
+
+Transmutable.prototype.get = function() {
+    return this.target;
 }
 
 Transmutable.prototype.run = function (handler) {

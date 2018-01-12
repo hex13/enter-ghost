@@ -30,12 +30,15 @@ describe('observability', () => {
         t.observe(() => {
             c++;
         });
-        t.stage.a = 292828;
         assert.strictEqual(c, 0);
-        t.commit();
+        t.run(state => {
+            state.a = 292828;
+        });
         assert.strictEqual(c, 1);
-        t.stage.a = 74342;
-        t.commit();
+
+        t.run(state => {
+            state.a = 74342;
+        })
         assert.strictEqual(c, 2);
     });
 
@@ -47,8 +50,9 @@ describe('observability', () => {
         t.observe(() => {
             c2++;
         });
-        t.stage.a = 381211;
-        t.commit();
+        t.run(state => {
+            state.a = 381211;
+        })
         assert.strictEqual(c1, 1);
         assert.strictEqual(c2, 1);
     });
@@ -62,8 +66,9 @@ describe('observability', () => {
             c++;
         });
 
-        t.stage.observable.foo.cat = 981198;
-        t.commit();
+        t.run(state => {
+            state.observable.foo.cat = 981198;
+        })
         assert.strictEqual(c, 1);
     });
 
@@ -76,20 +81,23 @@ describe('observability', () => {
             c++;
         });
 
-        t.stage.observable.foo.cat = 981198;
-        t.commit();
+        t.run(state => {
+            state.observable.foo.cat = 981198;
+        })
         assert.strictEqual(c, 1);
     });
 
 
     it('allows for observing changes (specific property)', () => {
         let c = 0;
-        t.observe(['observable', 'foo', 'cat'], () => {
+        t.observe(['observable', 'foo', 'cat'], (state) => {
+            assert.strictEqual(state, 981198);
             c++;
         });
         assert.strictEqual(c, 0);
-        t.stage.observable.foo.cat = 981198;
-        t.commit();
+        t.run(state => {
+            state.observable.foo.cat = 981198;
+        })
         assert.strictEqual(c, 1);
     });
 
@@ -99,8 +107,9 @@ describe('observability', () => {
             c++;
         });
         assert.strictEqual(c, 0);
-        t.stage.observable.foo.cat = 981198;
-        t.commit();
+        t.run(state => {
+            state.observable.foo.cat = 981198;
+        });
         assert.strictEqual(c, 1);
     });
 
@@ -110,19 +119,23 @@ describe('observability', () => {
             c++;
         });
         assert.strictEqual(c, 0);
-        t.stage.observable.foo = 981198;
-        t.commit();
+
+        t.run(state => {
+            state.observable.foo = 981198;
+        });
+
         assert.strictEqual(c, 1);
     });
 
-    it('it triggers handler at most one after one commit (even if there are many mutations)', () => {
+    it('it triggers handler at most one after one run (even if there are many mutations)', () => {
         let c = 0;
         t.observe(['observable', 'foo', 'cat'], () => {
             c++;
         });
-        t.stage.observable.foo.cat = 981198;
-        t.stage.observable.foo.cat = 282272;
-        t.commit();
+        t.run(state => {
+            state.observable.foo.cat = 981198;
+            state.observable.foo.cat = 282272;
+        });
         assert.strictEqual(c, 1);
     });
 
@@ -132,8 +145,10 @@ describe('observability', () => {
         t.observe(['observable', 'foo', 'cat'], () => {
             c++;
         });
-        t.stage.observable.foo.dog = 1234;
-        t.commit();
+
+        t.run(state => {
+            state.observable.foo.dog = 1234;
+        });
         assert.strictEqual(c, 0);
     });
 
