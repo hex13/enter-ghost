@@ -53,10 +53,6 @@ Transmutable.prototype.commit = function commit(commit = this.nextCommit) {
 }
 
 
-Transmutable.prototype.reify = function reify(target) {
-    return cloneAndApplyMutations(this.target, this.nextCommit.mutations);
-};
-
 Transmutable.prototype.observe = function observe(...args) {
     const handler = typeof args[0] == 'function'? args[0] : args[1];
     const path = typeof args[0] == 'function'? null : args[0];

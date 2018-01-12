@@ -5,7 +5,6 @@ const { applyChanges } = require('../cloning');
 const { createExample } = require('../testUtils');
 const { createMutation } = require('../mutations');
 
-const Commit = require('../commit');
 const assert = require('assert');
 
 describe('Transmutable', () => {
@@ -100,15 +99,15 @@ describe('Transmutable', () => {
                 state.c.d = 7654;
             });
 
-            assert.deepStrictEqual(expected, forked.reify());
+            assert.deepStrictEqual(expected, forked.get());
             assert.strictEqual(forked.get().c.d, 7654);
 
-            assert.deepStrictEqual(ex, t.reify(), 'changes in fork should not be present in original object');
+            assert.deepStrictEqual(ex, t.get(), 'changes in fork should not be present in original object');
             assert.strictEqual(t.get().c.d, 100, 'changes in fork should not be present in original object');
 
             t.merge(forked);
 
-            assert.deepStrictEqual(expected, t.reify(), 'changes in fork should be present in original object after merging');
+            assert.deepStrictEqual(expected, t.get(), 'changes in fork should be present in original object after merging');
             assert.strictEqual(t.get().c.d, 7654, 'changes in fork should be present in original object after merging');
         });
         it('many commits in fork (fast forward)', () => {
@@ -130,15 +129,15 @@ describe('Transmutable', () => {
                 state.a = oldA;
             });
 
-            assert.deepStrictEqual(expected, forked.reify());
+            assert.deepStrictEqual(expected, forked.get());
             assert.strictEqual(forked.get().c.d, 7654);
 
-            assert.deepStrictEqual(ex, t.reify(), 'changes in fork should not be present in original object');
+            assert.deepStrictEqual(ex, t.get(), 'changes in fork should not be present in original object');
             assert.strictEqual(t.get().c.d, createExample().c.d, 'changes in fork should not be present in original object');
 
             t.merge(forked);
 
-            assert.deepStrictEqual(expected, t.reify(), 'changes in fork should be present in original object after merging');
+            assert.deepStrictEqual(expected, t.get(), 'changes in fork should be present in original object after merging');
             assert.strictEqual(t.get().c.d, 7654, 'changes in fork should be present in original object after merging');
         });
         it('merge with branching', () => {
@@ -157,7 +156,7 @@ describe('Transmutable', () => {
             });
             t.merge(forked);
 
-            assert.deepStrictEqual(expected, t.reify(), 'changes in fork should be present in original object after merging');
+            assert.deepStrictEqual(expected, t.get(), 'changes in fork should be present in original object after merging');
             assert.strictEqual(t.get().c.d, 7654, 'changes in fork should be present in original object after merging');
         });
 
@@ -204,7 +203,7 @@ describe('Transmutable', () => {
 
             const call = calls[0];
             assert.deepStrictEqual(call.store, store);
-            assert(call.commit instanceof Commit);
+
         });
     });
 });
