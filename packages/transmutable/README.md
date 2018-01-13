@@ -46,7 +46,7 @@ copy = Object.assign(
 
 Transmutable is based on idea that immutability should not come at the cost of developer experience.
 
-So instead of forcing user to manually copying objects with `Object.assign` / `...`, it leaves this part to the library. The library presents you the `draft` (proxy object which record your mutations and create some kind of patch).
+So instead of forcing user to manually copying objects with `Object.assign` / `...`, it leaves this part to the library. The library presents you the `draft` (proxy object which records your mutations and creates some kind of patch).
 
 This allows for performing smart deep copy (i.e. deep copy which is mutation-aware and performs only deep copies of "dirty" data. If something is not changed - it is copied by reference).
 
