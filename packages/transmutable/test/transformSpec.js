@@ -269,7 +269,7 @@ describe('transform', () => {
 
 
 describe('over', () => {
-    it.only('allows for transforming over selector', () => {
+    it('allows for transforming over selector', () => {
         const original = createExample();
 
         const expected = createExample();
