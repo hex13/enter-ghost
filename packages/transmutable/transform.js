@@ -126,3 +126,5 @@ exports.transform = transform;
 exports.Reducer = () => {
     throw new Error("Transmutable: to create Redux reducer just use `transform` function with currying (look into docs)")
 }
+
+exports.over = (getter, setter, original) => transform(d => setter(getter(d)), original);

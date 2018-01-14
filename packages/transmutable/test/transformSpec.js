@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const { createExample } = require('../testUtils');
-const { transform } = require('../transform');
+const { transform, over } = require('../transform');
 
 describe('transform', () => {
     it('allows for transforming', () => {
@@ -265,4 +265,21 @@ describe('transform', () => {
         assert.strictEqual(c, 1);
     })
 
+});
+
+
+describe('over', () => {
+    it.only('allows for transforming over selector', () => {
+        const original = createExample();
+
+        const expected = createExample();
+        expected.some.deep.object.y = 'Yoda';
+
+        const copy = over(d => d.some.deep.object, d => {
+            d.y = 'Yoda';
+        }, original);
+
+        assert.deepStrictEqual(copy, expected);
+        assert.deepStrictEqual(original, createExample());
+    });
 });
