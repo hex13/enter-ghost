@@ -29,4 +29,17 @@ describe('set', () => {
         assert.strictEqual(get(o), o);
     });
 
+    it('get with function as path should call function as getter', () => {
+        const o = {
+            abc: {
+                foo: {
+
+                },
+                bar: {
+                    here: 'you are!'
+                }
+            }
+        };
+        assert.strictEqual(get(o, d => d.abc.bar.here), 'you are!');
+    });
 });

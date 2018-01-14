@@ -1,6 +1,7 @@
 'use strict';
 
 exports.get = function get(target, path) {
+  if (typeof path == 'function') return path(target);
   if (!path || !path.length) return target;
   let curr = target, i;
   for (i = 0; curr && i < path.length - 1; curr = curr[path[i++]]) ;
