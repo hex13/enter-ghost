@@ -2,8 +2,6 @@
 
 const createStage = require('./legacy_createStage');
 
-const { Transform } = require('./legacy_transform');
-const { transform } = require('./transform');
 const Commit = require('./commit');
 const { Stream } = require('./stream');
 
@@ -26,8 +24,7 @@ class State {
         return this.target;
     }
     run(handler) {
-        const { mutations } = Transform(handler).run(this.target);
-        return this.commit(new Commit(mutations));
+        return this.commit(new Commit(null, null, handler));
     }
     commit(commit = new Commit) {
         errorChecks.Transmutable.commit(commit);
@@ -60,7 +57,7 @@ class State {
 
             // TODO proposal:
             // track.commit(transmutable.commits[i]);
-            this.commit(new Commit(transmutable.commits[i].mutations));
+            this.commit(new Commit(transmutable.commits[i]));
         }
     }
 }
