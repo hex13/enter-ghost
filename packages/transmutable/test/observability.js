@@ -21,7 +21,9 @@ describe('observability', () => {
             c++;
         });
         assert.strictEqual(c, 0);
-        t.commit();
+        t.run(d => {
+            
+        });
         assert.strictEqual(c, 0);
     });
 

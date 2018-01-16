@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { State } = require('../state');
-const { Transform } = require('../legacy_transform');
+
 const { Stream } = require('../stream');
 const { Hub } = require('../mea');
 describe('mea', () => {
@@ -30,11 +30,11 @@ describe('mea', () => {
 
                 switch (signal.type) {
                     case 'inc':
-                        return Transform(state => {
+                        return (state => {
                             state.val++;
                         });
                     case 'mul':
-                        return Transform(state => {
+                        return (state => {
                             state.val *= signal.amount;
                         });
                 }

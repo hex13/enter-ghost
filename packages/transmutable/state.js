@@ -8,7 +8,7 @@ const { Stream } = require('./stream');
 const errorChecks = {
     Transmutable: {
         commit(commit) {
-            if (!commit.isCommit) throw new Error('Wrong argument passed to method Transmutable::commit()')
+            if (!commit || !commit.isCommit) throw new Error('Wrong argument passed to method Transmutable::commit()')
         }
     }
 }
@@ -26,11 +26,10 @@ class State {
     run(handler) {
         return this.commit(new Commit(null, null, handler));
     }
-    commit(commit = new Commit) {
+    commit(commit) {
         errorChecks.Transmutable.commit(commit);
 
         const prevTarget = this.target;
-
         this.target = commit.run(this.target);
 
         this.state$.publish(this.target, prevTarget);

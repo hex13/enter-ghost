@@ -4,6 +4,7 @@ const { State: Transmutable } = require('../state.js');
 const { applyChanges } = require('../cloning');
 const { createExample } = require('../testUtils');
 const { createMutation } = require('../mutations');
+const Commit = require('../commit');
 
 const assert = require('assert');
 
@@ -198,7 +199,7 @@ describe('Transmutable', () => {
                 }
             });
             assert.strictEqual(calls.length, 0);
-            store.commit();
+            store.commit(new Commit);
             assert.strictEqual(calls.length, 1);
 
             const call = calls[0];
