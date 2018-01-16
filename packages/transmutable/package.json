@@ -24,7 +24,7 @@
   "repository": "https://github.com/hex13/enter-ghost/tree/master/packages/transmutable",
   "devDependencies": {
     "babel-preset-env": "^1.6.1",
-    "immer": "^0.6.1",
+    "immer": "^0.7.0",
     "mocha": "^4.0.1",
     "redux": "^3.7.2"
   }
