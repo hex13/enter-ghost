@@ -45,7 +45,7 @@ class State {
     observe(...args) {
         const handler = typeof args[0] == 'function'? args[0] : args[1];
         const path = typeof args[0] == 'function'? null : args[0];
-        return this.state$.subscribe(handler, path);
+        return this.state$.select(path).subscribe(handler);
     }
     fork() {
         const t = new State(this.target);

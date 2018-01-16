@@ -7,20 +7,30 @@ function Stream() {
         publish(...args) {
             observers.forEach(o => o(...args));
         },
-        subscribe(observer, path) {
-            // TODO this should not go in here, because it's opinionated
-            // not every stream will carry state.
-            observers.push((nextState, lastState) => {
-                if (get(lastState, path) !== get(nextState, path))
-                    observer(get(nextState, path))
+        subscribe(observer) {
+            observers.push(observer);
+        },
+        select(path) {
+            return this.filter((nextState, lastState) => {
+                return get(lastState, path) !== get(nextState, path);
+            }).map(nextState => {
+                return get(nextState, path);
             });
         },
+        filter(filter) {
+            const newStream = Stream();
+            observers.push((...args) => {
+                if (filter(...args))
+                    newStream.publish(...args);
+            });
+            return newStream;
+        },
         map(mapper) {
-            const mappedStream = Stream();
+            const newStream = Stream();
             observers.push((v) => {
-                mappedStream.publish(mapper(v));
+                newStream.publish(mapper(v));
             })
-            return mappedStream;
+            return newStream;
         }
     }
 }
