@@ -57,7 +57,7 @@ class State {
 
             // TODO proposal:
             // track.commit(transmutable.commits[i]);
-            this.commit(new Commit(transmutable.commits[i]));
+            this.commit(transmutable.commits[i]);
         }
     }
 }
