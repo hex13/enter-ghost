@@ -1,8 +1,11 @@
+const assert = require('assert');
+
 const { transform } = require('./dist/transmutable');
+const { State } = require('./state');
 const { createExample }= require('./testUtils');
 const immer = require('immer').default;
 const {setAutoFreeze } = require('immer');
-const assert = require('assert');
+
 
 
 const {benchmarks} = require('./docData');
@@ -33,7 +36,14 @@ function benchmark(code, name) {
 
 benchmark(() => {
     return transform(transformer, original);
-}, 'transmutable - array')
+}, 'transmutable (transform function) - array')
+
+benchmark(() => {
+    const state = new State(original);
+    state.run(transformer);
+    return state.get();
+}, 'transmutable (State object)- array')
+
 
 benchmark(() => {
     return immer(original, transformer);
