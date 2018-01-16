@@ -21,8 +21,8 @@ class State {
     get() {
         return this.target;
     }
-    run(handler) {
-        return this.commit(new Commit(null, null, handler));
+    run(handler, selector) {
+        return this.commit(new Commit(handler, selector));
     }
     commit(commit) {
         errorChecks.Transmutable.commit(commit);

@@ -18,6 +18,15 @@ describe('Transmutable', () => {
         expected = createExample();
     });
 
+    it('allow for run scoped transform (with selector as a second argument', () => {
+        expected.some.deep.object = 100;
+        t.run(d => {
+            d.object = 100;
+        }, d => d.some.deep);
+        assert.deepStrictEqual(original, createExample());
+        assert.deepStrictEqual(t.get(), expected);
+    });
+
 
     it('accumulates changes after run (thus allows for commiting changes incrementally)', () => {
         expected.a = 200;

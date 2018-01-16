@@ -2,7 +2,7 @@
 
 const { cloneAndApplyMutations } = require('./cloning');
 const { Transform } = require('./legacy_transform');
-const { transform } = require('./transform');
+const { transform, over } = require('./transform');
 
 function legacy_Commit(mutations = [], events = [], handler) {
     if (mutations && mutations.isCommit) {
@@ -23,10 +23,10 @@ function legacy_Commit(mutations = [], events = [], handler) {
 
 }
 
-function Commit(a, b, handler = () => {}) {
+function Commit(handler = () => {}, selector = x => x) {
     return {
         run(state) {
-            return transform(handler, state);
+            return over(selector, handler, state);
         },
         isCommit: true
     }
