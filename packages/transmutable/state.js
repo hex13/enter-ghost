@@ -1,7 +1,5 @@
 "use strict";
 
-const createStage = require('./legacy_createStage');
-
 const Commit = require('./commit');
 const { Stream } = require('./stream');
 
