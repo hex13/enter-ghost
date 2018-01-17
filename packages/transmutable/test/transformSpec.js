@@ -31,7 +31,6 @@ describe('transform', () => {
         assert.deepEqual(original, createExample());
     });
 
-    const evaluateMutations = require('../evaluateMutations');
 
     it('exposes changes from draft inside the transformer function', () => {
         const original = createExample();
