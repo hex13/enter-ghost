@@ -31,7 +31,7 @@ function benchmark(code, name) {
         res = code();
     //console.log(original.arr.length, res.arr.length)
     let t1 = Date.now();
-    console.log(`Time for ${name}: `, `${t1 - t0}ms`)
+    console.log(`* Time for ${name}: `, `${t1 - t0}ms`)
 }
 
 benchmark(() => {
@@ -80,9 +80,9 @@ benchmark(() => {
     Proxy = P;
 }, 'transmutable (diffing) - example')
 
-
+const state = createExample();
 benchmark(() => {
-    const state = createExample();
+
     const res = Object.assign(
         {},
         state,
