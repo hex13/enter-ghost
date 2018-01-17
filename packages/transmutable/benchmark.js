@@ -38,6 +38,15 @@ benchmark(() => {
     return transform(transformer, original);
 }, 'transmutable (transform function) - array')
 
+
+benchmark(() => {
+    const P = Proxy;
+    Proxy = undefined;
+    transform(transformer, original);
+    Proxy = P;
+}, 'transmutable (diffing) - array')
+
+
 benchmark(() => {
     const state = new State(original);
     state.run(transformer);
@@ -59,7 +68,18 @@ benchmark(() => {
     return transform((state) => {
         state.c.d = {};
     }, createExample());
-}, 'transmutable - example')
+}, 'transmutable - example');
+
+
+benchmark(() => {
+    const P = Proxy;
+    Proxy = undefined;
+    transform((state) => {
+        state.c.d = {};
+    }, createExample());
+    Proxy = P;
+}, 'transmutable (diffing) - example')
+
 
 benchmark(() => {
     const state = createExample();
