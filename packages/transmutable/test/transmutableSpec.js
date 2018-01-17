@@ -4,6 +4,7 @@ const { State: Transmutable } = require('../state.js');
 const { applyChanges } = require('../cloning');
 const { createExample } = require('../testUtils');
 const { createMutation } = require('../mutations');
+const { SELECTOR } = require('../symbols');
 const Commit = require('../commit');
 
 const assert = require('assert');
@@ -16,6 +17,44 @@ describe('Transmutable', () => {
         original = ex;
         t = new Transmutable(ex);
         expected = createExample();
+    });
+
+   xit('adds selectors to state', () => {
+        const original = {
+            some: {
+                deep: {
+                    object: {
+                        abc: 123
+                    }
+                },
+                array: [1, 2, {a: 3}],
+            },
+            other: {
+                deep: {
+                    object: {
+                        def: 654
+                    }
+                }
+            }
+        };
+        const store = new Transmutable(original);
+        const state = store.get();
+        [
+            [state],
+            [state.some],
+            [state.some.deep],
+            [state.some.deep.object],
+            [state.some.array],
+            [state.some.array[2]],
+            [state.other],
+            [state.other.deep],
+            [state.other.deep.object],
+        ].forEach(([obj], i) => {
+            const expected = {
+                store,
+            };
+            assert.deepStrictEqual(obj[SELECTOR], expected, `error when checking assertion (i = ${i}). Expecting ${expected} but ${obj[SELECTOR]} found`);
+        });
     });
 
     it('allow for run scoped transform (with selector as a second argument', () => {
