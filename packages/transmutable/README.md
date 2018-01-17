@@ -57,7 +57,7 @@ This allows for performing smart deep copy (i.e. deep copy which is mutation-awa
 `transform` function:
 
 ```javascript
-const { transform } = require('transmutable');
+const { transform, transformAt } = require('transmutable');
 
 const original = {a: 123};
 
@@ -68,6 +68,39 @@ const copy = transform(draft => {
 console.log({original, copy});
 // { original: { a: 123 }, copy: { a: 456 } }
 
+```
+transformAt for applying changes only in the slice of state (concept similar to functional lenses):
+
+```javascript
+const original = {
+	some: {
+		deep: {
+			object: {
+				foo: 123,
+				bar: 'hello'
+			}
+		}
+	}
+}
+const copy = transformAt(d => d.some.deep.object, d => {
+	d.foo = 456;
+	d.bar += ' world';
+}, original);
+```
+
+Result will be:
+
+```javascript
+{
+	some: {
+		deep: {
+			object: {
+				foo: 456,
+				bar: 'hello world'
+			}
+		}
+	}
+}
 ```
 
 With Redux:
@@ -138,6 +171,7 @@ Immer: 0.8.1
 Differences with Immer.
 
 * Transmutable is faster (look above)
+* Transmutable has additional function `transformAt` for transforming only a slice of state
 * `transform`/`produce` functions. Both libraries support parameter order: function, object. Both libraries support currying. But `immer` also supports object, function order.
 * Immer supports frozen objects (it can be disabled). Transmutable does not support frozen objects.
 

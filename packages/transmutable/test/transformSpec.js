@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const { createExample } = require('../testUtils');
-const { transform, over } = require('../transform');
+const { transform, transformAt, over } = require('../transform');
 
 describe('transform', () => {
     it('allows for transforming', () => {
@@ -268,14 +268,14 @@ describe('transform', () => {
 });
 
 
-describe('over', () => {
+describe('over / transformAt', () => {
     it('allows for transforming over selector', () => {
         const original = createExample();
 
         const expected = createExample();
         expected.some.deep.object.y = 'Yoda';
 
-        const copy = over(d => d.some.deep.object, d => {
+        const copy = transformAt(d => d.some.deep.object, d => {
             d.y = 'Yoda';
         }, original);
 

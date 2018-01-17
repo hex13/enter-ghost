@@ -1,7 +1,43 @@
 const _require = require;
 const assert = require('assert');
 
+const {transformAt} = require('../transform');
+
+
+
 describe('example', () => {
+    it('transformAt', () => {
+        const require = (module) => {
+            if (module == 'transmutable') return _require('..');
+        };
+
+
+        const original = {
+            some: {
+                deep: {
+                    object: {
+                        foo: 123,
+                        bar: 'hello'
+                    }
+                }
+            }
+        }
+        const copy = transformAt(d => d.some.deep.object, d => {
+        	d.foo = 456;
+            d.bar += ' world';
+        }, original);
+
+        assert.deepStrictEqual(copy, {
+            some: {
+                deep: {
+                    object: {
+                        foo: 456,
+                        bar: 'hello world'
+                    }
+                }
+            }
+        });
+    });
     it('works', () => {
 
 
