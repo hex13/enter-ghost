@@ -111,28 +111,27 @@ assert.deepStrictEqual(initialState, {counter: 1, text: ''});
 
 Check out [benchmark code](https://github.com/hex13/enter-ghost/blob/master/packages/transmutable/benchmark.js).
 
-Transmutable is faster than Immer but slower than hand crafted reducer.
 
-Times in ms.
+Times in ms (the lower the better).
 
 Pushing 1000 objects to array. Repeated 10000 times.
 
-* Time for **transmutable** - array:  2220ms
-* Time for immer without autofreeze - array:  8362ms
+1. Time for **transmutable** (transform function) - array: 1770ms
+2. Time for immer without autofreeze - array:  2733ms
 
 change one deep property in state. Repeated 10000 times.
 
-* Time for hand crafted - example:  62ms
-* Time for **transmutable** - example:  78ms
-* Time for immer without autofreeze - example:  548ms
+1. Time for hand crafted reducer - example:  48ms
+2. Time for **transmutable** (transform function)- example:  50ms
+3. Time for immer without autofreeze - example:  98ms
 
 Tested on:
 
 Node v8.4.0
 
-Transmutable: 0.9.0
+Transmutable: 0.11.0
 
-Immer: 0.3.1
+Immer: 0.8.1
 
 ### Comparison
 
