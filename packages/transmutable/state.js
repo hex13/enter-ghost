@@ -41,6 +41,11 @@ class State {
         const path = typeof args[0] == 'function'? null : args[0];
         return this.state$.select(path).subscribe(handler);
     }
+    select(selector) {
+        return {
+            run: (handler) => this.run(handler, selector)
+        }
+    }
     fork() {
         const t = new State(this.target);
         t.commits = this.commits.slice();
