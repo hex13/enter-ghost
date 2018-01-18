@@ -1,21 +1,36 @@
 ### immutable objects that pretend to be mutable
 
-### (now `transmutable` supports also environments without ES6 Proxies using fallback diffing algorithm).
+It provides mutable-like interface for immutable code. No more `...` / `Object.assign`. Now this is handled automatic (via ES6 Proxies or fallback diffing if Proxies are not available).
 
-* It allows for mutable-like programming interface
-* It performs smart deep cloning (with dirty checking) - if something is not changed, it is copied only by reference:
-![screenshot](screenshot-transmutable.png)
-
-
-Transmutable allows you for writing immutable transformations by writing code that looks like mutable code. Like this:
+1. You create a normal JS object
+2. You run `transform` function (or `transformAt` if you want to  apply changes to the slice of state)
 
 ```javascript
-copy = transform(stage => {
-	stage.bar.baz = 123;
-}, foo);
+const o1 = {
+    some: {
+        object: {
+            animal: 'cat'
+        }
+    },
+    notTouched: {
+        abc: 123
+    }
+};
+
+const o2 = transform((d) => {
+    d.some.object.animal = 'dog';
+}, o1);
+
 ```
 
-It's a big reducing of boilerplate. Consider classic approach. For example people often write code like this when writing in Redux:
+It performs then smart deep cloning (with dirty checking) - if something is not changed, it is copied only by reference (structural sharing) so you don't lose your immutable references.
+
+![screenshot](https://raw.githubusercontent.com/hex13/enter-ghost/master/packages/transmutable/screenshot-transmutable.png)
+
+It allows for reducing of boilerplate traditionally associated with writing immutable code in JavaScript (especially in libraries like Redux).
+
+
+Consider more mainstream approach...
 
 ```javascript
 copy = {
@@ -49,11 +64,9 @@ And heres comes Transmutable for the rescue.
 
 Transmutable is based on idea that immutability should not come at the cost of developer experience.
 
-So instead of forcing user to manually copying objects with `Object.assign` / `...`, it leaves this part to the library. The library presents you the `draft` (proxy object which records your mutations and creates some kind of patch).
+So instead of forcing user to manually copying objects with `Object.assign` / `...`, it leaves this part to the library. The library presents you a `draft` (proxy object which records your mutations and creates some kind of patch).
 
-This allows for performing smart deep copy (i.e. deep copy which is mutation-aware and performs only deep copies of "dirty" data. If something is not changed - it is copied by reference).
-
-`transform` function returns immutable copy of original object, based on draft you made.
+Then patch is applied and you have effect similar to nested `...` / `Object.assign` madness but handled automatically for you.
 
 ### Usage
 
