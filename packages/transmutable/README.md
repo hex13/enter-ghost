@@ -69,7 +69,7 @@ console.log({original, copy});
 // { original: { a: 123 }, copy: { a: 456 } }
 
 ```
-transformAt for applying changes only in the slice of state (concept similar to functional lenses):
+`transformAt` for applying changes only in the slice of state (concept similar to functional lenses):
 
 ```javascript
 const original = {
