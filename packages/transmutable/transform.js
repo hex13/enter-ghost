@@ -127,6 +127,9 @@ exports.Reducer = () => {
     throw new Error("Transmutable: to create Redux reducer just use `transform` function with currying (look into docs)")
 }
 
-const over = (getter, setter, original) => transform(d => setter(getter(d)), original);
+const over = (getter, setter, original) => {
+    if (typeof setter == 'undefined') return over.bind(null, getter);
+    return transform(d => setter(getter(d)), original);
+}
 exports.over = over;
 exports.transformAt = over;

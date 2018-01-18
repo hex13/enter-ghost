@@ -281,4 +281,28 @@ describe('over / transformAt', () => {
         assert.deepStrictEqual(copy, expected);
         assert.deepStrictEqual(original, createExample());
     });
+
+    it('supports currying', () => {
+        const original = createExample();
+
+        const expected = createExample();
+        expected.some.deep.object.y = 'Yoda';
+
+        let copy;
+        copy = transformAt(d => d.some.deep.object, d => {
+            d.y = 'Yoda';
+        })(original);
+
+        assert.deepStrictEqual(copy, expected);
+        assert.deepStrictEqual(original, createExample());
+
+        copy = transformAt(d => d.some.deep.object)(d => {
+            d.y = 'Yoda';
+        }, original);
+
+        assert.deepStrictEqual(copy, expected);
+        assert.deepStrictEqual(original, createExample());
+
+    });
+
 });
