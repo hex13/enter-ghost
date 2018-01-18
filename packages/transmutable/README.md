@@ -6,7 +6,7 @@
 * It performs smart deep cloning (with dirty checking) - if something is not changed, it is copied only by reference
 
 
-Transmutable allows you for writing this:
+Transmutable allows you for writing immutable transformations by writing code that looks like mutable code. Like this:
 
 ```javascript
 copy = transform(stage => {
@@ -14,7 +14,7 @@ copy = transform(stage => {
 }, foo);
 ```
 
-instead of this (spread operator helps only a little - notice repetitions, manually coping state at each level):
+It's a big reducing of boilerplate. Consider classic approach. For example people often write code like this when writing in Redux:
 
 ```javascript
 copy = {
@@ -42,7 +42,9 @@ copy = Object.assign(
 )
 ```
 
+This is just wrong. Not very readable or maintainable.
 
+And heres comes Transmutable for the rescue.
 
 Transmutable is based on idea that immutability should not come at the cost of developer experience.
 
