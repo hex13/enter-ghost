@@ -2,8 +2,9 @@
 
 ### (now `transmutable` supports also environments without ES6 Proxies using fallback diffing algorithm).
 
-* It allows for mutable-like programming interface.
-* It performs smart deep cloning (with dirty checking) - if something is not changed, it is copied only by reference
+* It allows for mutable-like programming interface
+* It performs smart deep cloning (with dirty checking) - if something is not changed, it is copied only by reference:
+![screenshot](screenshot-transmutable.png)
 
 
 Transmutable allows you for writing immutable transformations by writing code that looks like mutable code. Like this:
