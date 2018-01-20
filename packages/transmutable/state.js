@@ -1,6 +1,7 @@
 "use strict";
 
 const Commit = require('./commit');
+const { AUTO } = require('./symbols');
 const { Stream } = require('./stream');
 
 const errorChecks = {
@@ -11,12 +12,27 @@ const errorChecks = {
     }
 }
 
+function assignAutoValues(d) {
+    const auto = d[AUTO];
+    if (auto) {
+        for (let k in auto) {
+            d[k] = auto[k](d);
+        }
+    }
+}
+
+
 class State {
     constructor(o, hooks = {}) {
         this.state$ = Stream();
         this.target = o;
         this.commits = [];
         this.hooks = hooks;
+
+        this.assignAutoValues();
+    }
+    assignAutoValues() {
+        this.target = new Commit(assignAutoValues).run(this.target);
     }
     get() {
         return this.target;
@@ -33,6 +49,9 @@ class State {
         this.state$.publish(this.target, prevTarget);
 
         this.commits.push(commit);
+
+        this.assignAutoValues();
+
         this.hooks.onCommit && this.hooks.onCommit(this, commit);
         return this.target;
     }

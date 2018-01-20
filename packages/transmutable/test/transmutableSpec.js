@@ -4,7 +4,7 @@ const { State: Transmutable } = require('../state.js');
 
 const { createExample } = require('../testUtils');
 const { createMutation } = require('../mutations');
-const { SELECTOR } = require('../symbols');
+const { SELECTOR, AUTO } = require('../symbols');
 const Commit = require('../commit');
 
 const assert = require('assert');
@@ -106,6 +106,30 @@ describe('Transmutable', () => {
         t.stage.allows.for.adding.deep.objects = 2;
         const copied = t.commit();
     });
+
+    // TODO auto-values are very limited for now. Work on this.
+    // AUTO is now string, it should be symbol (look into symbols.js)
+    it('should compute auto-values', () => {
+        const computeC = (d) => d.a + d.b;
+        const O = () => ({
+            a: 3,
+            b: 4,
+            [AUTO]: {
+                c: computeC
+            }
+        });
+        const original = O();
+        const store = new Transmutable(original);
+        assert.deepStrictEqual(store.get().c, 7);
+
+        store.run(d => {
+            d.a = 10;
+        });
+        assert.deepStrictEqual(original, O());
+        assert.deepStrictEqual(original.c, undefined);
+        assert.deepStrictEqual(store.get().c, 14);
+    });
+
 
     describe('actions', () => {
         it('performs mutations', () => {
