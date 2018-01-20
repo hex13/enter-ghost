@@ -6,6 +6,7 @@ const { createExample } = require('../testUtils');
 const { createMutation } = require('../mutations');
 const { SELECTOR, AUTO } = require('../symbols');
 const Commit = require('../commit');
+const {next} = require('../mea');
 
 const assert = require('assert');
 
@@ -128,6 +129,38 @@ describe('Transmutable', () => {
         assert.deepStrictEqual(original, O());
         assert.deepStrictEqual(original.c, undefined);
         assert.deepStrictEqual(store.get().c, 14);
+    });
+
+
+    it('should compute auto-values (arr/idx + next(with cycling))', () => {
+        const O = () => ({
+            [AUTO]: {
+                trafficLight: {
+                    arr: ['red', 'yellow', 'green'],
+                    idx: 0
+                }
+            }
+        });
+        const original = O();
+        const store = new Transmutable(original);
+        assert.strictEqual(store.get().trafficLight, 'red');
+
+        store.run(d => {
+            next(d, 'trafficLight')
+        });
+        assert.deepStrictEqual(store.get().trafficLight, 'yellow');
+
+        store.run(d => {
+            next(d, 'trafficLight')
+        });
+        assert.deepStrictEqual(store.get().trafficLight, 'green');
+
+        store.run(d => {
+            next(d, 'trafficLight')
+        });
+        assert.deepStrictEqual(store.get().trafficLight, 'red');
+
+        assert.deepStrictEqual(original, O());
     });
 
 

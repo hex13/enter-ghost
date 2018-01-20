@@ -16,7 +16,13 @@ function assignAutoValues(d) {
     const auto = d[AUTO];
     if (auto) {
         for (let k in auto) {
-            d[k] = auto[k](d);
+            const desc = auto[k];
+            if (typeof desc == 'function') {
+                d[k] = desc(d);
+            } else {
+                if (desc.arr) d[k] = desc.arr[desc.idx % desc.arr.length];
+            }
+
         }
     }
 }
@@ -46,13 +52,14 @@ class State {
         const prevTarget = this.target;
         this.target = commit.run(this.target);
 
-        this.state$.publish(this.target, prevTarget);
+
 
         this.commits.push(commit);
 
         this.assignAutoValues();
 
         this.hooks.onCommit && this.hooks.onCommit(this, commit);
+        this.state$.publish(this.target, prevTarget);
         return this.target;
     }
     observe(...args) {
