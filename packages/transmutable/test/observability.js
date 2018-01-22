@@ -4,6 +4,7 @@ const assert = require('assert');
 
 const { createExample } = require('../testUtils');
 const { State } = require('../state');
+const { AUTO } = require('../symbols');
 
 describe('observability', () => {
 
@@ -22,7 +23,7 @@ describe('observability', () => {
         });
         assert.strictEqual(c, 0);
         t.run(d => {
-            
+
         });
         assert.strictEqual(c, 0);
     });
@@ -152,6 +153,22 @@ describe('observability', () => {
             state.observable.foo.dog = 1234;
         });
         assert.strictEqual(c, 0);
+    });
+
+    it('triggers after auto-values', () => {
+        let c = 0;
+
+        t.observe((state) => {
+            assert.strictEqual(state.qwerty, 1234);
+            c++;
+        });
+
+        t.run(state => {
+            state[AUTO] = {
+                qwerty: () => 1234
+            };
+        });
+        assert.strictEqual(c, 1);
     });
 
 });
