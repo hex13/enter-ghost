@@ -14,11 +14,19 @@ const errorChecks = {
 
 function assignAutoValues(d) {
     const auto = d[AUTO];
+
     if (auto) {
         for (let k in auto) {
             const desc = auto[k];
             if (typeof desc == 'function') {
                 d[k] = desc(d);
+            } else if(desc.isResource) {
+                if (!d.resources)
+                    d.resources = [];
+                if (!d.resources.find(res => {
+                    return res.id == desc.resource.id;
+                }))
+                    d.resources.push(desc.resource);
             } else {
                 if (desc.arr) d[k] = desc.arr[desc.idx % desc.arr.length];
             }

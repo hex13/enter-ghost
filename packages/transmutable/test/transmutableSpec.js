@@ -163,6 +163,47 @@ describe('Transmutable', () => {
         assert.deepStrictEqual(original, O());
     });
 
+    it('should handle auto-values: resources', () => {
+        const O = () => ({
+            [AUTO]: {
+                resource: {
+                     isResource: true,
+                     resource: {
+                        id: 1,
+                        type: 'foo'
+                     }
+                },
+                otherResource: {
+                     isResource: true,
+                     resource: {
+                        id: 2,
+                        type: 'foo'
+                     }
+                }
+            },
+            //resources: []
+        });
+        const original = O();
+        const store = new Transmutable(original);
+        assert.deepStrictEqual(store.get().resources, [
+            {id: 1, type: 'foo'}, {id: 2, type: 'foo'},
+        ]);
+
+        store.run(d => {
+            d[AUTO].yetAnotherResource = {
+                isResource: true,
+                resource: {
+                    id: 3,
+                    type: 'bar'
+                }
+            };
+        });
+
+        assert.deepStrictEqual(store.get().resources, [
+            {id: 1, type: 'foo'}, {id: 2, type: 'foo'}, {id: 3, type: 'bar'},
+        ]);
+
+    });
 
     describe('actions', () => {
         it('performs mutations', () => {
