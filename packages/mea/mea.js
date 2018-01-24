@@ -2,7 +2,7 @@
 // experimental API
 
 const { Stream } = require('./stream');
-const { AUTO } = require('./symbols');
+const { AUTO } = require('transmutable/symbols');
 
 const Hub = (store) => {
     const input = Stream();

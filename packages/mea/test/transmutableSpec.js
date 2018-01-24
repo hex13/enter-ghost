@@ -2,9 +2,8 @@
 
 const { State: Transmutable } = require('../state.js');
 
-const { createExample } = require('../testUtils');
-const { createMutation } = require('../mutations');
-const { SELECTOR, AUTO } = require('../symbols');
+const { createExample } = require('transmutable/testUtils');
+const { SELECTOR, AUTO } = require('transmutable/symbols');
 const Commit = require('../commit');
 const {next} = require('../mea');
 

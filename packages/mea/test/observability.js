@@ -2,9 +2,9 @@
 
 const assert = require('assert');
 
-const { createExample } = require('../testUtils');
+const { createExample } = require('transmutable/testUtils');
 const { State } = require('../state');
-const { AUTO } = require('../symbols');
+const { AUTO } = require('transmutable/symbols');
 
 describe('observability', () => {
 

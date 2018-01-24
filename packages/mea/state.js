@@ -1,7 +1,7 @@
 "use strict";
 
 const Commit = require('./commit');
-const { AUTO } = require('./symbols');
+const { AUTO } = require('transmutable/symbols');
 const { Stream } = require('./stream');
 
 const errorChecks = {

@@ -1,6 +1,6 @@
 'use strict';
 
-const { transform, over } = require('./transform');
+const { transform, over } = require('transmutable/transform');
 
 function Commit(handler = () => {}, selector = x => x) {
     return {

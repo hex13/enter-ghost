@@ -1,5 +1,5 @@
 'use strict';
-const { get } = require('./get-set');
+const { get } = require('transmutable/get-set');
 
 function Stream() {
     const observers = [];
