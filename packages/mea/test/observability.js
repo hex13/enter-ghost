@@ -79,7 +79,7 @@ describe('observability', () => {
         let c = 0;
         expected.observable.foo.cat = 981198;
 
-        t.observe(['observable'], (state) => {
+        t.select(['observable']).observe((state) => {
             assert.deepStrictEqual(state, expected.observable);
             c++;
         });
@@ -91,9 +91,9 @@ describe('observability', () => {
     });
 
 
-    it('allows for observing changes (specific property)', () => {
+    it('allows for observing changes (specific property) #1 array selector', () => {
         let c = 0;
-        t.observe(['observable', 'foo', 'cat'], (state) => {
+        t.select(['observable', 'foo', 'cat']).observe((state) => {
             assert.strictEqual(state, 981198);
             c++;
         });
@@ -104,9 +104,23 @@ describe('observability', () => {
         assert.strictEqual(c, 1);
     });
 
+    it('allows for observing changes (specific property) #2 function selector', () => {
+        let c = 0;
+        t.select(d => d.observable.foo.cat).observe((state) => {
+            assert.strictEqual(state, 981198);
+            c++;
+        });
+        assert.strictEqual(c, 0);
+        t.run(state => {
+            state.observable.foo.cat = 981198;
+        })
+        assert.strictEqual(c, 1);
+    });
+
+
     it('allows for observing changes (parent observed, child changed)', () => {
         let c = 0;
-        t.observe(['observable'], () => {
+        t.select(['observable']).observe(() => {
             c++;
         });
         assert.strictEqual(c, 0);
@@ -118,7 +132,7 @@ describe('observability', () => {
 
     it('allows for observing changes (child observed, parent changed)', () => {
         let c = 0;
-        t.observe(['observable', 'foo', 'cat'], () => {
+        t.select(['observable', 'foo', 'cat']).observe(() => {
             c++;
         });
         assert.strictEqual(c, 0);
@@ -132,7 +146,7 @@ describe('observability', () => {
 
     it('it triggers handler at most one after one run (even if there are many mutations)', () => {
         let c = 0;
-        t.observe(['observable', 'foo', 'cat'], () => {
+        t.select(['observable', 'foo', 'cat']).observe(() => {
             c++;
         });
         t.run(state => {
@@ -145,7 +159,7 @@ describe('observability', () => {
 
     it('doesn\'t trigger observer if there is no matching mutation', () => {
         let c = 0;
-        t.observe(['observable', 'foo', 'cat'], () => {
+        t.select(['observable', 'foo', 'cat']).observe(() => {
             c++;
         });
 

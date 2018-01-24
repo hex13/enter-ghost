@@ -70,14 +70,16 @@ class State {
         this.state$.publish(this.target, prevTarget);
         return this.target;
     }
-    observe(...args) {
-        const handler = typeof args[0] == 'function'? args[0] : args[1];
-        const path = typeof args[0] == 'function'? null : args[0];
-        return this.state$.select(path).subscribe(handler);
+    observe(handler) {
+        if (handler)
+            return this.state$.select(d => d).subscribe(handler);
     }
     select(selector) {
         return {
-            run: (handler) => this.run(handler, selector)
+            run: (handler) => this.run(handler, selector),
+            observe: (handler) => {
+                return this.state$.select(selector).subscribe(handler);
+            }
         }
     }
     fork() {
