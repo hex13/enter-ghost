@@ -98,9 +98,9 @@ const original = {
 		}
 	}
 }
-const copy = transformAt(d => d.some.deep.object, d => {
-	d.foo = 456;
-	d.bar += ' world';
+const copy = transformAt(['some', 'deep', 'object'], d => {
+    d.foo = 456;
+    d.bar += ' world';
 }, original);
 ```
 

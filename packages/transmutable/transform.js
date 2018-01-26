@@ -1,6 +1,7 @@
 'use strict';
 
 const { MUTATION, WAS_WRITTEN, WAS_ACCESSED} = require('./symbols');
+const { get, set } = require('./get-set');
 
 function ensurePatch(parentPatch, propName) {
     let deeperPatch = parentPatch[propName];
@@ -105,14 +106,16 @@ const transform = (transformer, original, ...args) => {
     `);
 
     let patch;
+    let result;
     if (typeof Proxy == 'undefined') {
         const copy = copyDeep(original);
-        transformer(copy, ...args);
+        result = transformer(copy, ...args);
         patch = diff(original, copy);
     } else {
         patch = {};
-        transformer(createStage(original, patch), ...args);
+        result = transformer(createStage(original, patch), ...args);
     }
+    if (typeof result != 'undefined') return result;
     return applyPatch(original, patch);
 
 }
@@ -129,7 +132,12 @@ exports.Reducer = () => {
 
 const over = (getter, setter, original) => {
     if (typeof setter == 'undefined') return over.bind(null, getter);
-    return transform(d => setter(getter(d)), original);
+    return transform(d => {
+        const result = setter(get(d, getter));
+        if (typeof result != 'undefined') {
+            set(d, getter, result)
+        }
+    }, original);
 }
 exports.over = over;
 exports.transformAt = over;

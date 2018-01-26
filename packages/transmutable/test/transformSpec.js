@@ -31,6 +31,28 @@ describe('transform', () => {
         assert.deepEqual(original, createExample());
     });
 
+    it('allows for transforming - return-style', () => {
+        const original = createExample();
+        const expected = {
+            abc: 123,
+            def: {
+                ghi: 'jkl'
+            }
+        };
+        const copy = transform(d => {
+            assert.deepStrictEqual(d, createExample());
+            return {
+                abc: 123,
+                def: {
+                    ghi: 'jkl'
+                }
+            }
+        }, original);
+
+        assert.deepStrictEqual(copy, expected);
+        assert.deepStrictEqual(original, createExample());
+    });
+
 
     it('exposes changes from draft inside the transformer function', () => {
         const original = createExample();
@@ -274,12 +296,62 @@ describe('over / transformAt', () => {
         const expected = createExample();
         expected.some.deep.object.y = 'Yoda';
 
-        const copy = transformAt(d => d.some.deep.object, d => {
+        let copy;
+
+        copy = transformAt(d => d.some.deep.object, d => {
             d.y = 'Yoda';
         }, original);
 
         assert.deepStrictEqual(copy, expected);
         assert.deepStrictEqual(original, createExample());
+
+        copy = transformAt(['some', 'deep'], d => {
+            d.object.y = 'Yoda';
+        }, original);
+
+        assert.deepStrictEqual(copy, expected);
+        assert.deepStrictEqual(original, createExample());
+
+    });
+
+    it('allows for transforming - return-style', () => {
+        const original = {
+            foo: {
+                bar: 123
+            }
+        };
+        const expected = {
+            foo: {
+                baz: 'jkl'
+            }
+        };
+        let copy;
+        copy = transformAt(['foo'], d => {
+            assert.deepStrictEqual(d, {bar: 123});
+            return {baz: 'jkl'}
+        }, original);
+
+        assert.deepStrictEqual(copy, expected);
+        assert.deepStrictEqual(original, {
+            foo: {
+                bar: 123
+            }
+        });
+
+        copy = transformAt('foo', d => {
+            assert.deepStrictEqual(d, {bar: 123})
+            return {
+                baz: 'jkl'
+            };
+        }, original);
+
+        assert.deepStrictEqual(copy, expected);
+        assert.deepStrictEqual(original, {
+            foo: {
+                bar: 123
+            }
+        });
+
     });
 
     it('supports currying', () => {

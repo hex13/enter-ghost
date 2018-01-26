@@ -22,7 +22,7 @@ describe('example', () => {
                 }
             }
         }
-        const copy = transformAt(d => d.some.deep.object, d => {
+        const copy = transformAt(['some', 'deep', 'object'], d => {
         	d.foo = 456;
             d.bar += ' world';
         }, original);
