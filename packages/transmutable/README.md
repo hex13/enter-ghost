@@ -1,5 +1,8 @@
 ### immutable objects that pretend to be mutable
 
+
+---
+
 ##### New in 0.12.0:
 ##### Now you can replace the whole state just by returning a new value. It works in both `transform` and `transformAt`.
 
@@ -35,7 +38,12 @@ transformAt(['foo', 'bar'], bar => bar + 1, {
 }); // returns: { foo: { bar: 11 } }
 ```
 
-It provides mutable-like interface for immutable code. No more `...` / `Object.assign`. Now this is handled automatic (via ES6 Proxies or fallback diffing if Proxies are not available).
+---
+
+---
+### Transmutable project
+
+Transmutable provides mutable-like interface for immutable code. No more `...` / `Object.assign`. Now this is handled automatic (via ES6 Proxies or fallback diffing if Proxies are not available).
 
 1. You create a normal JS object
 2. You run `transform` function (or `transformAt` if you want to  apply changes to the slice of state)
