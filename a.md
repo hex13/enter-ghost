@@ -1,3 +1,3 @@
 TEST
 
-![circle](a.svg)
+![circle](/a.svg)
