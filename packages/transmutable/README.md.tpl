@@ -1,6 +1,6 @@
 ### immutable objects that pretend to be mutable
 
-Bundle size: (4.04kB)
+Bundle size: ({{ size }}kB)
 ---
 
 ##### New in 0.12.0:
@@ -249,4 +249,3 @@ Differences with Immer.
 * Your state should not contain circular references.
 
 * Transmutable currently does not support frozen objects. Even if you freeze them by yourself (file an issue if this is a matter for you).
-
