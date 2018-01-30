@@ -2,10 +2,15 @@
     <defs>
         <style>
             circle {
-                transition: 1s all;
+                animation: 2s a infinite alternate;
             }
-            circle:hover {
-                fill: blue;
+            @keyframes a {
+                0% {
+                   r: 10;
+                }
+                100% {
+                    r: 40;
+                }
             }
         </style>
     </defs>
