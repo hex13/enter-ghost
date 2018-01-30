@@ -1,3 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200">
+    <defs>
+        <style>
+            circle {
+                transition: 1s all;
+            }
+            circle:hover {
+                fill: blue;
+            }
+        </style>
+    </defs>
   <circle cx="10" cy="10" r="30" fill="red" />
 </svg>
