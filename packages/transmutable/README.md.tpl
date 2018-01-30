@@ -1,44 +1,6 @@
 ### immutable objects that pretend to be mutable
 
 Bundle size: ({{ size }}kB)
----
-
-##### New in 0.12.0:
-##### Now you can replace the whole state just by returning a new value. It works in both `transform` and `transformAt`.
-
-This allows you for deciding when you want to transform only some properties and when you just want to replace a whole state:
-
-```javascript
-function dec(d) {
-    if (d.counter > 0)
-        d.counter--; // mutation-like mode
-    else
-        return {message: 'countdown finished'}  // "returnish" mode
-}
-
-for (var i = 0, state = {counter:3}; i < 4; i++) {
-    state = transform(dec, state);
-    console.log(state)
-}
-// logs:
-// { counter: 2 }
-// { counter: 1 }
-// { counter: 0 }
-// { message: 'countdown finished' }
-
-```
-
-You can also use it feature for transforming selected properties when using `transformAt`:
-
-```javascript
-transformAt(['foo', 'bar'], bar => bar + 1, {
-    foo: {
-        bar: 10
-    }
-}); // returns: { foo: { bar: 11 } }
-```
-
----
 
 ---
 ### Transmutable project
@@ -198,6 +160,45 @@ assert.deepStrictEqual(initialState, {counter: 1, text: ''});
 
 ```
 
+---
+
+##### New in 0.12.0:
+##### Now you can replace the whole state just by returning a new value. It works in both `transform` and `transformAt`.
+
+This allows you for deciding when you want to transform only some properties and when you just want to replace a whole state:
+
+```javascript
+function dec(d) {
+    if (d.counter > 0)
+        d.counter--; // mutation-like mode
+    else
+        return {message: 'countdown finished'}  // "returnish" mode
+}
+
+for (var i = 0, state = {counter:3}; i < 4; i++) {
+    state = transform(dec, state);
+    console.log(state)
+}
+// logs:
+// { counter: 2 }
+// { counter: 1 }
+// { counter: 0 }
+// { message: 'countdown finished' }
+
+```
+
+You can also use it feature for transforming selected properties when using `transformAt`:
+
+```javascript
+transformAt(['foo', 'bar'], bar => bar + 1, {
+    foo: {
+        bar: 10
+    }
+}); // returns: { foo: { bar: 11 } }
+```
+
+
+---
 
 ### Performance
 
