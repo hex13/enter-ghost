@@ -1,18 +1,138 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-130 -80 220 160"
+    style="background: white;border:1px solid grey"
+>
     <defs>
+     <param name="r" value="125" />
+        <ref id="r" param="length" default="30" />
         <style>
+            :root {
+                --r: 28px;
+                --copy-x: 40px;
+            }
+            #link {
+            opacity:0;
+                animation: 6s link infinite;
+                animation-fill-mode: forwards;
+            }
+            @keyframes link {
+                0% {
+                opacity:0;
+                }
+                70% {
+                opacity:0;
+                }
+                100% {
+                opacity:1;
+                }
+            }
+            .obj {
+               fill: black;
+            }
+            .obj-2 {
+               fill: #000;
+               opacity: 0;
+               animation: 6s show-2 infinite;
+            }
+
             circle {
-                animation: 2s a infinite alternate;
+                r: var(--r);
+                stroke: green;
+            }
+            #draft {
+
+                animation: 6s a infinite;
+            }
+            #copy {
+                cx: var(--copy-x);
+                opacity: 0;
+                animation: 6s 4s copy;
+            }
+            #mutation {
+                dx: -50px;
+                opacity: 0;
+                animation: 6s show-1 infinite;
+                fill:#055;
+
+            }
+            text {
+             font-size: 8px;
+             font-family: sans-serif;
+            }
+            @keyframes show-2 {
+                0% {
+                    opacity:0;
+                }
+                70% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity:1;
+                }
+            }
+            @keyframes show-1 {
+                0% {
+                    opacity: 0;
+                }
+                20% {
+                    opacity: 0;
+                }
+                60% {
+                    opacity: 1;
+                }
+                90% {
+                    opacity: 1;
+                }
+                100% {
+                    opacity: 0.6;
+                }
+            }
+
+            @keyframes show {
+                0% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
+                }
             }
             @keyframes a {
                 0% {
-                   r: 10;
+                   cx: -100;
+                   fill: blue;
+                }
+                60% {
+                    r: calc(var(--r) + 20px);
+                    cx: -30;
+                    fill: rgba(0,255,255,0.2);
                 }
                 100% {
-                    r: 40;
+                    fill: rgba(50,200,60,0.4);
+                    cx: var(--copy-x);
+                }
+            }
+            @keyframes copy {
+                0% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
                 }
             }
         </style>
     </defs>
-  <circle cx="10" cy="10" r="30" fill="red" />
+    <circle id="original" cx="-100" cy="0" style="" fill="#aaa" />
+    <circle id="draft" cx="-100" cy="0" />
+    <!-- <circle id="copy" cy="0" fill="rgba(10,200,70,1)"/> -->
+    <text class="obj" x="-115" y="-10" id="original-object">{</text>
+    <text class="obj" x="-110" id="original-object">foo: 123,</text>
+    <text class="obj" x="-110" y="10" id="original-object-2">bar: 456</text>
+    <text class="obj" x="-115" y="20" id="original-object">}</text>
+    <text x="-65" id="mutation">d.foo = 'new value'</text>
+
+    <text x="25" y="-10" class="obj-2" id="original-object">{</text>
+    <text x="30" class="obj-2" id="original-object">foo: 'new value',</text>
+    <text x="30" y="10" class="obj-2" id="original-object-2">bar: 456</text>
+    <text x="25" y="20" class="obj-2"  id="original-object">}</text>
+
+    <line id="link" x1="2" y1="-2" x2="28" y2="-4" stroke="blue"/>
 </svg>
