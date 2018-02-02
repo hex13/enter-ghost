@@ -52,6 +52,21 @@ function createStage(target, patch) {
             }
 
             return true;
+        },
+        ownKeys(target) {
+            return Array.from(new Set(
+                Reflect.ownKeys(target).concat(Object.keys(patch))
+            ));
+        },
+        getOwnPropertyDescriptor(target, name) {
+            if (patch[name] &&  patch[name][MUTATION]) {
+                return {
+                    configurable: true,
+                    enumerable: true,
+                    value: patch[name][MUTATION].value
+                }
+            }
+            return Reflect.getOwnPropertyDescriptor(target, name);
         }
     });
 }

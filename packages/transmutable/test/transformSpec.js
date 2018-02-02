@@ -284,7 +284,24 @@ describe('transform', () => {
         });
         f(animals, {type: 'FIND_FOOD', food: 'nuts'}, 'under', 'tree');
         assert.strictEqual(c, 1);
-    })
+    });
+
+    // it's related to proxy traps `ownKeys` and `getOwnPropertyDescriptor`
+    it('Object.keys and JSON.stringify reflect mutations', () => {
+        const o = {a: 123};
+
+        let ok = false;
+        const copy = transform((d) => {
+            assert.deepStrictEqual(Object.keys(d), ['a'])
+            d.a = 21;
+            d.abc = 'x';
+            assert.strictEqual(JSON.stringify(d), '{"a":21,"abc":"x"}')
+            assert.deepStrictEqual(Object.keys(d), ['a', 'abc'])
+            ok = true;
+        }, o);
+
+        assert(ok);
+    });
 
 });
 
