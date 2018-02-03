@@ -3,6 +3,7 @@
 const assert = require('assert');
 const { createExample } = require('../testUtils');
 const { transform, transformAt, over } = require('../transform');
+const { ENTITY } = require('../symbols');
 
 describe('transform', () => {
     it('allows for transforming', () => {
@@ -303,6 +304,29 @@ describe('transform', () => {
         assert(ok);
     });
 
+    xit('accepts entites', () => {
+        const O = () => {
+            const o = {
+                a: {},
+                entities: {
+                    'cat': 1234,
+                    'dog': 7854
+                }
+            };
+            o.entities.cat = o;
+            return o;
+        };
+        const o = O();
+
+        const copy = transform((d) => {
+            d.a.parent = {[ENTITY]: 'cat'};
+            d.entities.dog = 999;
+        }, o);
+        const expected = O();
+        console.log(copy);
+        expected.a.parent = o;
+        //assert.deepStrictEqual(copy, expected);
+    });
 });
 
 
