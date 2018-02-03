@@ -10,11 +10,11 @@ const symbols = require('../symbols');
 describe('symbols', () => {
     it('symbols module contains symbols', () => {
         console.log("\n---\nlogging symbols...");
-        ['ENTITY', 'MUTATION'].forEach(name => {
-            assert(symbols[name]);
-            console.log(`symbols.ENTITY = ${String(symbols[name])} : ${typeof symbols[name]}`)
+        ['ENTITY', 'ENTITIES', 'MUTATION'].forEach(name => {
+            assert(symbols[name], `There is no ${name} in symbols`);
+            console.log(`symbols.${name} = ${String(symbols[name])} : ${typeof symbols[name]}`)
         });
-        console.log("logging symbols... DONE\n---\n");
+        console.log("logging symbols... OK\n---\n");
     });
 });
 
@@ -323,7 +323,7 @@ describe('transform', () => {
                 deep: {
 
                 },
-                entities: {
+                [symbols.ENTITIES]: {
                     'cat': {
                         name: 'Sylvester'
                     },
@@ -340,14 +340,14 @@ describe('transform', () => {
             d.cat1 = {[ENTITY]: 'cat'};
             d.deep.cat2 = {[ENTITY]: 'cat'};
 
-            d.entities.someNewEntity = {
+            d[symbols.ENTITIES].someNewEntity = {
                 text: '!!!',
             };
             d.deep.newEntity = {[ENTITY]: 'someNewEntity'};
         }, o);
 
         const expected = O();
-        expected.entities.someNewEntity = {text: '!!!'};
+        expected[symbols.ENTITIES].someNewEntity = {text: '!!!'};
         expected.deep.cat2 = {name: 'Sylvester'};
         expected.cat1 = {
             name: 'Sylvester'

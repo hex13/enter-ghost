@@ -19,7 +19,12 @@ const SELECTOR = Symbol();
 const AUTO = '@@auto'//Symbol();
 
 const symbols = {};
-['ENTITY'].forEach(name => {
-    symbols[name] = '@@' + name.toLowerCase();
+[
+    'ENTITY',
+    // inspired by Redux: https://redux.js.org/docs/recipes/reducers/NormalizingStateShape.html
+    'ENTITIES',
+].forEach(name => {
+    symbols[name] = '@@transmutable/' + name.toLowerCase();
 });
+
 module.exports = Object.assign({ WAS_ACCESSED, WAS_WRITTEN, METHOD, MUTATION, DRAFT, SELECTOR, AUTO }, symbols);

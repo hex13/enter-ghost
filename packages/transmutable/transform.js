@@ -1,6 +1,6 @@
 'use strict';
 
-const { MUTATION, WAS_WRITTEN, WAS_ACCESSED, ENTITY } = require('./symbols');
+const { MUTATION, WAS_WRITTEN, WAS_ACCESSED, ENTITY, ENTITIES } = require('./symbols');
 const { get, set } = require('./get-set');
 
 function ensurePatch(parentPatch, propName) {
@@ -76,10 +76,10 @@ function applyPatch (node, patch, root, rootPatch) {
         const mutValue = patch[MUTATION].value;
         if (mutValue && mutValue[ENTITY]) {
             const id = mutValue[ENTITY];
-            if (rootPatch.entities && rootPatch.entities && rootPatch.entities[id]) {
-                return rootPatch.entities[id][MUTATION].value;
+            if (rootPatch[ENTITIES] && rootPatch[ENTITIES] && rootPatch[ENTITIES][id]) {
+                return rootPatch[ENTITIES][id][MUTATION].value;
             }
-            return root.entities[mutValue[ENTITY]];
+            return root[ENTITIES][mutValue[ENTITY]];
         }
         return patch[MUTATION].value;
     }
