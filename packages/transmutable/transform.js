@@ -1,6 +1,6 @@
 'use strict';
 
-const { MUTATION, WAS_WRITTEN, WAS_ACCESSED} = require('./symbols');
+const { MUTATION, WAS_WRITTEN, WAS_ACCESSED, ENTITY } = require('./symbols');
 const { get, set } = require('./get-set');
 
 function ensurePatch(parentPatch, propName) {
@@ -71,8 +71,16 @@ function createStage(target, patch) {
     });
 }
 
-function applyPatch (node, patch) {
+function applyPatch (node, patch, root, rootPatch) {
     if (patch && patch[MUTATION]) {
+        const mutValue = patch[MUTATION].value;
+        if (mutValue && mutValue[ENTITY]) {
+            const id = mutValue[ENTITY];
+            if (rootPatch.entities && rootPatch.entities && rootPatch.entities[id]) {
+                return rootPatch.entities[id][MUTATION].value;
+            }
+            return root.entities[mutValue[ENTITY]];
+        }
         return patch[MUTATION].value;
     }
 
@@ -95,7 +103,7 @@ function applyPatch (node, patch) {
         }
 
         for (let k in patch) {
-            const res = applyPatch(node[k], patch[k]);
+            const res = applyPatch(node[k], patch[k], root, rootPatch);
             copy[k] = res;
         }
 
@@ -131,7 +139,7 @@ const transform = (transformer, original, ...args) => {
         result = transformer(createStage(original, patch), ...args);
     }
     if (typeof result != 'undefined') return result;
-    return applyPatch(original, patch);
+    return applyPatch(original, patch, original, patch);
 
 }
 exports.transform = transform;

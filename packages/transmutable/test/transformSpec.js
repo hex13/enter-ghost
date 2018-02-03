@@ -4,6 +4,19 @@ const assert = require('assert');
 const { createExample } = require('../testUtils');
 const { transform, transformAt, over } = require('../transform');
 const { ENTITY } = require('../symbols');
+const symbols = require('../symbols');
+
+// symbols
+describe('symbols', () => {
+    it('symbols module contains symbols', () => {
+        console.log("\n---\nlogging symbols...");
+        ['ENTITY', 'MUTATION'].forEach(name => {
+            assert(symbols[name]);
+            console.log(`symbols.ENTITY = ${String(symbols[name])} : ${typeof symbols[name]}`)
+        });
+        console.log("logging symbols... DONE\n---\n");
+    });
+});
 
 describe('transform', () => {
     it('allows for transforming', () => {
@@ -304,28 +317,46 @@ describe('transform', () => {
         assert(ok);
     });
 
-    xit('accepts entites', () => {
+    it('accepts entites', () => {
         const O = () => {
             const o = {
-                a: {},
+                deep: {
+
+                },
                 entities: {
-                    'cat': 1234,
+                    'cat': {
+                        name: 'Sylvester'
+                    },
                     'dog': 7854
                 }
             };
-            o.entities.cat = o;
+            // circular entities won't work? TODO examine why.
+            // o.entities.root = o;
             return o;
         };
         const o = O();
 
         const copy = transform((d) => {
-            d.a.parent = {[ENTITY]: 'cat'};
-            d.entities.dog = 999;
+            d.cat1 = {[ENTITY]: 'cat'};
+            d.deep.cat2 = {[ENTITY]: 'cat'};
+
+            d.entities.someNewEntity = {
+                text: '!!!',
+            };
+            d.deep.newEntity = {[ENTITY]: 'someNewEntity'};
         }, o);
+
         const expected = O();
-        console.log(copy);
-        expected.a.parent = o;
-        //assert.deepStrictEqual(copy, expected);
+        expected.entities.someNewEntity = {text: '!!!'};
+        expected.deep.cat2 = {name: 'Sylvester'};
+        expected.cat1 = {
+            name: 'Sylvester'
+        };
+        expected.deep.newEntity = {
+            text: '!!!'
+        };
+
+        assert.deepStrictEqual(copy, expected);
     });
 });
 
