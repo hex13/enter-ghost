@@ -11,4 +11,5 @@ const DRAFT = Symbol();
 const SELECTOR = Symbol();
 // TODO change into Symbol (but Transmutable currently does not clone symbols...)
 const AUTO = '@@auto'//Symbol();
-module.exports = { WAS_ACCESSED, WAS_WRITTEN, METHOD, MUTATION, DRAFT, SELECTOR, AUTO };
+const ENTITY = '@@entity';//Symbol();
+module.exports = { WAS_ACCESSED, WAS_WRITTEN, METHOD, MUTATION, DRAFT, SELECTOR, AUTO, ENTITY };
