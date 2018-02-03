@@ -18,10 +18,10 @@
                 0% {
                 opacity:0;
                 }
-                70% {
+                50% {
                 opacity:0;
                 }
-                100% {
+                70% {
                 opacity:1;
                 }
             }
@@ -36,7 +36,8 @@
 
             circle {
                 r: var(--r);
-                stroke: green;
+                stroke-width: 0.1;
+                stroke: rgba(0,100,10,0.3);
             }
             #draft {
 
@@ -54,6 +55,27 @@
                 fill:#055;
 
             }
+            .desc {
+               fill: #00d;
+            }
+            #desc-original {
+            opacity: 0;
+            animation: 1s 0s show;
+            animation-fill-ssmode: forwards;
+
+            }
+            #desc-mutations {
+                opacity: 0;
+                animation: 2s 1s show;
+                animation-fill-ssmode: forwards;
+            }
+            #desc-copy {
+            opacity: 0;
+            animation: 2s 3s show;
+            animation-fill-mosde: forwards;
+
+            }
+
             text {
              font-size: 8px;
              font-family: sans-serif;
@@ -62,8 +84,11 @@
                 0% {
                     opacity:0;
                 }
-                70% {
+                60% {
                     opacity: 0;
+                }
+                70% {
+                    opacity:1;
                 }
                 100% {
                     opacity:1;
@@ -98,7 +123,7 @@
             @keyframes a {
                 0% {
                    cx: -100;
-                   fill: blue;
+                   fill: rgba(100,100,200,0.6);
                 }
                 60% {
                     r: calc(var(--r) + 20px);
@@ -106,8 +131,9 @@
                     fill: rgba(0,255,255,0.2);
                 }
                 100% {
-                    fill: rgba(50,200,60,0.4);
-                    cx: var(--copy-x);
+                    fill: rgba(50,200,60,0.2);
+                    r: calc(var(--r) + 20px);
+                    cx: -30;
                 }
             }
             @keyframes copy {
@@ -135,4 +161,8 @@
     <text x="25" y="20" class="obj-2"  id="original-object">}</text>
 
     <line id="link" x1="2" y1="-2" x2="28" y2="-4" stroke="blue"/>
+
+    <text id="desc-original" class="desc" x="-113" y="-35">original</text>
+    <text id="desc-mutations" class="desc" x="-45" y="-50">mutations</text>
+    <text id="desc-copy" class="desc" x="25" y="-35">copy</text>
 </svg>
