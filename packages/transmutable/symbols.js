@@ -3,6 +3,11 @@
 // const MUTATION = 'MUTATION'
 // const WAS_ACCESSED = 'WAS_ACCESSED'
 
+// TODO all these should be symbols (now some of them are strings)
+// TODO there are too many of them!
+// WAS_WRITTEN, WAS_ACCESSED - probably they should be removed, but it has to be checked
+// DRAFT - doesn't seem to be used
+// SELECTOR TODO check
 
 const WAS_WRITTEN = Symbol();
 const METHOD = Symbol();
