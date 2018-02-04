@@ -4,6 +4,8 @@ Bundle size: (4.65kB)
 
 ---
 ### Transmutable project
+![logo: on left there is a red circle (representing original state). On right there are two circles: red (because original state is the same before and after), and a blue one (new state derived from first one)](logo.svg)
+
 
 Transmutable provides mutable-like interface for immutable code. No more `...` / `Object.assign`. Now this is handled automatic (via ES6 Proxies or fallback diffing if Proxies are not available).
 
