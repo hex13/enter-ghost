@@ -1,14 +1,10 @@
-### immutable objects that pretend to be mutable
+### Transmutable - immutable objects that pretend to be mutable
 
-Bundle size: (4.65kB)
-
----
-### Transmutable
 ![logo: on left there is a red circle
  (representing original state). On right there are two circles: red (because original state is the same before and after), and a blue one (new state derived from first one)](https://raw.githubusercontent.com/hex13/enter-ghost/master/packages/transmutable/logo.svg?sanitize=true)
 
 
-Transmutable provides mutable-like interface for immutable code. No more `...` / `Object.assign`. Now this is handled automatic (via ES6 Proxies or fallback diffing if Proxies are not available).
+Transmutable is a small library (4.65kB) which allows to write immutable code in a way which is very similar to normal mutable code interface for immutable code. No more `...` / `Object.assign`. Now this is handled automatic (via ES6 Proxies or fallback diffing if Proxies are not available).
 
 1. You create a normal JS object
 2. You run `transform` function (or `transformAt` if you want to  apply changes to the slice of state)
