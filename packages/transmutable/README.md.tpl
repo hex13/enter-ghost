@@ -4,12 +4,13 @@
  (representing original state). On right there are two circles: red (because original state is the same before and after), and a blue one (new state derived from first one)](https://raw.githubusercontent.com/hex13/enter-ghost/master/packages/transmutable/logo.svg?sanitize=true)
 
 
-Transmutable is a small library ({{ size }}kB) which allows to write immutable code in a way which is very similar to normal mutable code interface for immutable code. No more `...` / `Object.assign`. Now this is handled automatic (via ES6 Proxies or fallback diffing if Proxies are not available).
+Transmutable is a small library ({{ size }}kB) which allows to write immutable code in a way which is very similar to writing mutable code.
 
-1. You create a normal JS object
-2. You run `transform` function (or `transformAt` if you want to  apply changes to the slice of state)
+Instead of `...` / `Object.assign` you just call `transform` with your transforming function as an argument. Your function will get `draft`, i.e. special Proxy object (or just a copy of state, if ES6 Proxies aren't available). Then you can "mutate" your draft object.
 
+Example:
 ```javascript
+
 const o1 = {
     some: {
         object: {
@@ -27,7 +28,7 @@ const o2 = transform((d) => {
 
 ```
 
-It performs then smart deep cloning (with dirty checking) - if something is not changed, it is copied only by reference (structural sharing) so you don't lose your immutable references.
+After that Transmutable will go through your mutations and will make automatically a new object derived from previous object + mutations you have provided. Things your modify will be copied with changes applied to the copy, things you didn't touch will be copied just by reference (structural sharing) so you don't lose your immutable references. 
 
 ![screenshot](https://raw.githubusercontent.com/hex13/enter-ghost/master/packages/transmutable/screenshot-transmutable.png)
 
