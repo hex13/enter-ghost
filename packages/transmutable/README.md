@@ -1,6 +1,6 @@
 ### immutable objects that pretend to be mutable
 
-Bundle size: (4.04kB)
+Bundle size: (4.65kB)
 
 ---
 ### Transmutable project
@@ -90,6 +90,17 @@ console.log({original, copy});
 // { original: { a: 123 }, copy: { a: 456 } }
 
 ```
+
+or you could use also `this` variable:
+
+```javascript
+const copy = transform(function () {
+	this.a = 456;
+}, original);
+```
+Notice that `this` won't work with [arrow-functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) because they just don't have `this` at all.
+
+
 `transformAt` for applying changes only in the slice of state (concept similar to functional lenses):
 
 ```javascript
@@ -232,6 +243,7 @@ Differences with Immer.
 
 * Transmutable is faster (look above)
 * Transmutable has additional function `transformAt` for transforming only a slice of state
+* Transmutable support "returnish" style of transformer, Immer does not and displays a warning when you try to do this.
 * `transform`/`produce` functions. Both libraries support parameter order: function, object. Both libraries support currying. But `immer` also supports object, function order.
 * Immer supports frozen objects (it can be disabled). Transmutable does not support frozen objects.
 
@@ -247,7 +259,7 @@ Differences with Immer.
 
 * In current version of Transmutable your state should be plain JS objects (numbers, strings, booleans, arrays, nested objects). You should not **currently** use e.g. ES6 Maps in your state. This may change in future versions.
 
-* Your state should not contain circular references.
+* Transmutable assumes by default that your state is a tree (one root object containing hierarchy of child objects), so no circular references, no repeated references etc.
 
 * Transmutable currently does not support frozen objects. Even if you freeze them by yourself (file an issue if this is a matter for you).
 

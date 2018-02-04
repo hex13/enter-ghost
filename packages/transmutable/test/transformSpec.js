@@ -186,6 +186,16 @@ describe('transform', () => {
         assert(copied.arr === original.arr);
     });
 
+    it('allows for using `this`', () => {
+        const original = {a: {b: 4}};
+
+        const copied = transform(function () {
+            this.a.b = 5;
+        }, original);
+
+        assert.deepStrictEqual(copied, {a:{b:5}});
+    });
+
     it('allows for accessing properties. Accessing properties should not trigger mutations', () => {
         let passed = false;
         const original = createExample();
@@ -427,6 +437,17 @@ describe('over / transformAt', () => {
         });
 
     });
+
+    it('allows for using `this`', () => {
+        const original = {a: {b: 4}};
+
+        const copied = transformAt(['a'], function () {
+            this.b = 5;
+        }, original);
+
+        assert.deepStrictEqual(copied, {a:{b:5}});
+    });
+
 
     it('supports currying', () => {
         const original = createExample();
