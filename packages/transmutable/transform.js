@@ -15,10 +15,12 @@ function ensurePatch(parentPatch, propName) {
 }
 
 function createStage(target, patch) {
+    const getPatch = () => typeof patch == 'function'? patch() : patch;
     return new Proxy(target, {
         get(target, name) {
+
             let value;
-            const mutation = patch[name] && patch[name][MUTATION];
+            const mutation = typeof patch == 'function'? null : (patch[name] && patch[name][MUTATION]);
 
             if (mutation) {
                 return mutation.value;
@@ -27,12 +29,13 @@ function createStage(target, patch) {
                 value = target[name];
 
             if (value && typeof value == 'object') {
-                return createStage(value, ensurePatch(patch, name));
+                return createStage(value, () => ensurePatch(getPatch(), name));
             }
 
             return value;
         },
         set(target, name, value) {
+            const patch = getPatch();
             const oldValue = target[name];
 
             if (value !== oldValue) {

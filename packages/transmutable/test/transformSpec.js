@@ -186,14 +186,16 @@ describe('transform', () => {
         assert(copied.arr === original.arr);
     });
 
-    it('allows for accessing properties', () => {
+    it('allows for accessing properties. Accessing properties should not trigger mutations', () => {
         let passed = false;
-        transform(state => {
+        const original = createExample();
+        const copy = transform(state => {
             assert.strictEqual(state.a, 2);
             assert.deepStrictEqual(state.c, {d: 100});
             assert.deepStrictEqual(state.c.d, 100);
             passed = true;
-        }, createExample());
+        }, original);
+        assert.strictEqual(copy, original);
         assert(passed);
     });
 
