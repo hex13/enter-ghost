@@ -3,7 +3,7 @@
 Bundle size: ({{ size }}kB)
 
 ---
-### Transmutable project
+### Transmutable
 ![logo: on left there is a red circle (representing original state). On right there are two circles: red (because original state is the same before and after), and a blue one (new state derived from first one)](logo.svg)
 
 

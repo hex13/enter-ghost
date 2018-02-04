@@ -3,8 +3,9 @@
 Bundle size: (4.65kB)
 
 ---
-### Transmutable project
+### Transmutable
 ![logo: on left there is a red circle (representing original state). On right there are two circles: red (because original state is the same before and after), and a blue one (new state derived from first one)](logo.svg)
+
 
 Transmutable provides mutable-like interface for immutable code. No more `...` / `Object.assign`. Now this is handled automatic (via ES6 Proxies or fallback diffing if Proxies are not available).
 
@@ -263,3 +264,4 @@ Differences with Immer.
 * Transmutable assumes by default that your state is a tree (one root object containing hierarchy of child objects), so no circular references, no repeated references etc.
 
 * Transmutable currently does not support frozen objects. Even if you freeze them by yourself (file an issue if this is a matter for you).
+
