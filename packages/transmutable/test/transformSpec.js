@@ -71,7 +71,7 @@ describe('transform', () => {
     it('exposes changes from draft inside the transformer function', () => {
         const original = createExample();
         const expected = createExample();
-        transform(draft => {
+        const copy = transform(draft => {
             draft.a = 'what?';
             draft.c = undefined;
 
@@ -102,7 +102,14 @@ describe('transform', () => {
                 }
             });
 
-        }, original)
+            draft.starWars = draft.some.deep.object;
+            draft.some.deep.object.y = 'Yoda';
+
+            assert.deepStrictEqual(draft.some.deep.object.y, 'Yoda');
+            assert.deepStrictEqual(draft.starWars.y, 'Yoda');
+            assert.deepStrictEqual(draft.starWars, draft.some.deep.object);
+
+        }, original);
     });
 
     xit('creates proper mutations when double pushing arrays', () => {
@@ -185,6 +192,24 @@ describe('transform', () => {
         assert(copied.still === original.still);
         assert(copied.arr === original.arr);
     });
+
+    it('mutations with similar paths does not collide', () => {
+
+        const original = createExample();
+        const expected = createExample();
+        expected.some.deep.object.y = 'Yoda';
+        expected.some.deep.secondObject = {a: 'ooo'};
+        expected.some.deep.thirdObject  = {b: 'aaa'};
+
+        const copied = transform(state => {
+            state.some.deep.secondObject = {a: 'ooo'};
+            state.some.deep.object.y = 'Yoda';
+            state.some.deep.thirdObject  = {b: 'aaa'};
+        }, original);
+
+        assert.deepStrictEqual(copied, expected);
+    });
+
 
     it('allows for using `this`', () => {
         const original = {a: {b: 4}};

@@ -3,24 +3,16 @@
 const { MUTATION, WAS_WRITTEN, WAS_ACCESSED, ENTITY, ENTITIES } = require('./symbols');
 const { get, set } = require('./get-set');
 
-function ensurePatch(parentPatch, propName) {
-    let deeperPatch = parentPatch[propName];
 
-    if (!deeperPatch) {
-        deeperPatch = parentPatch[propName] = {};
-        parentPatch[WAS_ACCESSED] = true;
-    }
 
-    return deeperPatch;
-}
 
-function createStage(target, patch) {
-    const getPatch = () => typeof patch == 'function'? patch() : patch;
+
+function createStage(target, rootPatch, keys = []) {
     return new Proxy(target, {
         get(target, name) {
 
             let value;
-            const mutation = typeof patch == 'function'? null : (patch[name] && patch[name][MUTATION]);
+            const mutation = get(rootPatch, keys.concat([name, MUTATION]));
 
             if (mutation) {
                 return mutation.value;
@@ -29,13 +21,17 @@ function createStage(target, patch) {
                 value = target[name];
 
             if (value && typeof value == 'object') {
-                return createStage(value, () => ensurePatch(getPatch(), name));
+                return createStage(value, rootPatch, keys.concat(name));
             }
 
             return value;
         },
         set(target, name, value) {
-            const patch = getPatch();
+            let patch = get(rootPatch, keys);
+            if (!patch) {
+                patch = {};
+                set(rootPatch, keys, patch);
+            }
             const oldValue = target[name];
 
             if (value !== oldValue) {
@@ -50,18 +46,19 @@ function createStage(target, patch) {
                     }
                     return true;
                 }
-                let deeperPatch = ensurePatch(patch, name);
-                deeperPatch[MUTATION] = {value}
+                set(rootPatch, keys.concat(name), {[MUTATION]:{value}})
             }
 
             return true;
         },
         ownKeys(target) {
+            const patch = get(rootPatch, keys.concat([])) || {}
             return Array.from(new Set(
                 Reflect.ownKeys(target).concat(Object.keys(patch))
             ));
         },
         getOwnPropertyDescriptor(target, name) {
+            const patch = get(rootPatch, keys) || {};
             if (patch[name] &&  patch[name][MUTATION]) {
                 return {
                     configurable: true,
