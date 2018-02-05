@@ -1,7 +1,7 @@
 const assert = require('assert');
 
-const { transform } = require('./dist/transmutable');
-const { State } = require('./state');
+const { transform } = require('./transform');
+const { State } = require('../mea/state');
 const { createExample }= require('./testUtils');
 const immer = require('immer').default;
 const {setAutoFreeze } = require('immer');
@@ -20,6 +20,9 @@ for (let i = 0; i < 1000; i++) {
 }
 
 function transformer(state) {
+    // for (let i = 0; i < 100; i++) {
+    //     state['o' + i] = Object.assign({}, state.arr[1]);
+    // }
     for (let i = 0; i < 100; i++) {
         state.arr[i].done = true;
     }
