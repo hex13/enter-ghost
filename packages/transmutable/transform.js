@@ -4,15 +4,24 @@ const { MUTATION, WAS_WRITTEN, WAS_ACCESSED, ENTITY, ENTITIES } = require('./sym
 const { get, set } = require('./get-set');
 
 
+const concatOne = (arr, s) => {
+    const newArr = new Array(arr.length + 1);
+    for (let i = 0; i <= arr.length; i++) {
+        if (i < arr.length) newArr[i] = arr[i];
+        else newArr[i] = s;
+    }
+    return newArr;
+};
 
+const concat = concatOne;
 
 
 function createStage(target, rootPatch, keys = []) {
     return new Proxy(target, {
         get(target, name) {
-
+            const propPatch = concat(keys, name);
             let value;
-            const mutation = get(rootPatch, keys.concat([name, MUTATION]));
+            const mutation = get(rootPatch, concat(propPatch, MUTATION));
 
             if (mutation) {
                 return mutation.value;
@@ -21,21 +30,22 @@ function createStage(target, rootPatch, keys = []) {
                 value = target[name];
 
             if (value && typeof value == 'object') {
-                return createStage(value, rootPatch, keys.concat(name));
+                return createStage(value, rootPatch, propPatch);
             }
 
             return value;
         },
         set(target, name, value) {
-            let patch = get(rootPatch, keys);
-            if (!patch) {
-                patch = {};
-                set(rootPatch, keys, patch);
-            }
             const oldValue = target[name];
 
             if (value !== oldValue) {
                 if (Array.isArray(target)) {
+                    let patch = get(rootPatch, keys);
+                    if (!patch) {
+                        patch = {};
+                        set(rootPatch, keys, patch);
+                    }
+
                     if (!patch[MUTATION]) {
                         const arrayDraft = target.slice();
                         // we need to explicitly assign the first changed item
@@ -46,7 +56,7 @@ function createStage(target, rootPatch, keys = []) {
                     }
                     return true;
                 }
-                set(rootPatch, keys.concat(name), {[MUTATION]:{value}})
+                set(rootPatch, concat(keys, name), {[MUTATION]:{value}})
             }
 
             return true;
