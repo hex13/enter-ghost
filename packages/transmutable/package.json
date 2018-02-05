@@ -1,6 +1,6 @@
 {
   "name": "transmutable",
-  "version": "0.14.2",
+  "version": "0.15.0",
   "description": "immutable objects that pretend to be mutable",
   "main": "dist/transmutable.js",
   "scripts": {
