@@ -28,6 +28,21 @@ function isScope6 (node) {
     );
 };
 
+function isScopeAutumn (node) {
+    return (
+        node.type == 'Program'
+        //node.type.indexOf('Function') == 0 ||
+        || node.type == 'BlockStatement'
+        || node.type == 'ClassMethod'
+        || node.type == 'ObjectMethod'
+        || node.type == 'ForStatement'
+        || node.type == 'FunctionDeclaration'
+        || node.type == 'FunctionExpression'
+        || node.type == 'ArrowFunctionExpression'        
+        //|| node.type == 'ObjectMethod' // !! TODO
+    );
+};
+
 
 
 function posInLoc(pos, loc) {
@@ -59,6 +74,8 @@ function isFunctionScope6(node, parent) {
 
 exports.isScope = isScope;
 exports.isScope6 = isScope6;
+exports.isScopeAutumn = isScopeAutumn;
 exports.posInLoc = posInLoc;
 exports.isFunctionScope = isFunctionScope;
 exports.isFunctionScope6 = isFunctionScope6;
+

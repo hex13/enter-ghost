@@ -9,7 +9,7 @@ const State = require('./state')(require('./analysisBuilder'));
 //const SE = require('../san-escobar');
 //const { log, spy } = SE(SE.htmlLogger);
 
-const { isScope, isScope6 } = require('./helpers');
+const { isScope, isScope6, isScopeAutumn } = require('./helpers');
 
 const getters = require('./getters');
 const services = require('./services')(getters);
@@ -65,7 +65,11 @@ function enterOrLeave(phase, state) {
         if (isScope6(node)) {
             invokeVisitor(visitor, node, 'Scope6', phase, state);
         }
-
+        if (isScopeAutumn(node)) {
+            invokeVisitor(visitor, node, 'ScopeAutumn', phase, state);
+        }
+        
+        
         if (isChainEnd(node, state)) {
             invokeVisitor(visitor, node, 'ChainEnd', phase, state);
         }
