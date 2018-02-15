@@ -57,6 +57,22 @@ const additionalVisitors = [
     {
         cond: isScope,
         type: 'Scope'
+    },
+    {
+        cond: isScope6,
+        type: 'Scope6'
+    },
+    {
+        cond: isScopeAutumn,
+        type: 'ScopeAutumn'
+    },
+    {
+        cond: isChainEnd,
+        type: 'ChainEnd'
+    },
+    {
+        cond: isFunction,
+        type: 'Function'
     }
 ];
 
@@ -68,24 +84,10 @@ function enterOrLeave(phase, state) {
         invokeVisitor(visitor, node, node.type, phase, state);
 
         additionalVisitors.forEach(av => {
-            if (av.cond(node))
+            if (av.cond(node, state))
                 invokeVisitor(visitor, node, av.type, phase, state);
         });
 
-        if (isScope6(node)) {
-            invokeVisitor(visitor, node, 'Scope6', phase, state);
-        }
-        if (isScopeAutumn(node)) {
-            invokeVisitor(visitor, node, 'ScopeAutumn', phase, state);
-        }
-
-
-        if (isChainEnd(node, state)) {
-            invokeVisitor(visitor, node, 'ChainEnd', phase, state);
-        }
-        if (isFunction(node)) {
-            invokeVisitor(visitor, node, 'Function', phase, state);
-        }
         state.customEntities.forEach(item => {
             invokeVisitor(visitor, item, 'CustomEntity', phase, state);
         });
