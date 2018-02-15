@@ -53,23 +53,33 @@ function isFunction(node) {
     );
 }
 
+const additionalVisitors = [
+    {
+        cond: isScope,
+        type: 'Scope'
+    }
+];
+
 function enterOrLeave(phase, state) {
     const { node } = state;
 
     state.customEntities.length = 0;
     state.visitors.forEach((visitor) => {
         invokeVisitor(visitor, node, node.type, phase, state);
-        if (isScope(node)) {
-            invokeVisitor(visitor, node, 'Scope', phase, state);
-        }
+
+        additionalVisitors.forEach(av => {
+            if (av.cond(node))
+                invokeVisitor(visitor, node, av.type, phase, state);
+        });
+
         if (isScope6(node)) {
             invokeVisitor(visitor, node, 'Scope6', phase, state);
         }
         if (isScopeAutumn(node)) {
             invokeVisitor(visitor, node, 'ScopeAutumn', phase, state);
         }
-        
-        
+
+
         if (isChainEnd(node, state)) {
             invokeVisitor(visitor, node, 'ChainEnd', phase, state);
         }
