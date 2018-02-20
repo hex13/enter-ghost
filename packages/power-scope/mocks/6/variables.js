@@ -5,7 +5,7 @@ const someVariable = {
 }
 
 // TODO support destructuring and replace following line w/
-//const { destrVariable } = {
+//const destrVariable = {
 const destrVariable = {
 }
 

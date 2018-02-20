@@ -2,14 +2,24 @@ const { posInLoc } = require('./helpers');
 
 module.exports = (getters) => {
     const { getEntries, getEntry } = getters;
-    function lookupEntry(scope, name) {
+    function lookupEntry(scope, name, limitScope) {
+        //if (limitScope) return lookupEntryInCurrent(scope, name);
         let entity;
         do {
             entity = getEntry(scope, name);
+            if (scope === limitScope) break;
             scope = scope.parent;
         } while(!entity && scope);
         return entity;
     }
+
+    function lookupEntryInCurrent(scope, name) {
+        let entity;
+
+        entity = getEntry(scope, name);
+        return entity;
+    }
+    
 
     function resolveRef(ref) {
         let name = ref[0].key;
@@ -131,6 +141,6 @@ module.exports = (getters) => {
     }
 
     return {
-        lookupEntry, resolveRef, refAt, scopeAt, entryAt, postprocess, addBackRef
+        lookupEntry, resolveRef, refAt, scopeAt, entryAt, postprocess, addBackRef, lookupEntryInCurrent
     };
 };
