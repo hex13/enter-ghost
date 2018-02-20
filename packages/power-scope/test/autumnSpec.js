@@ -50,7 +50,7 @@ const mocks =
     mock: fs.readFileSync('/Users/lukasz/sandbox/meva-sandbox/variableMock.js', 'utf8'),
     object: fs.readFileSync(__dirname + '/../mocks/autumn/object.js', 'utf8'),
     function: fs.readFileSync(__dirname + '/../mocks/autumn/function.js', 'utf8'),
-    big: fs.readFileSync(__dirname + '/../mocks/autumn/big.js', 'utf8'),
+    //big: fs.readFileSync(__dirname + '/../mocks/autumn/big.js', 'utf8'),
 };
 
 const parse = require('babylon').parse;
