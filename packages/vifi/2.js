@@ -94,6 +94,7 @@ class MainFileSystem {
         const file = new File(path);
         file.originalPath = path;
         const mp = this.getMountPoint(file);
+        if (!mp) throw new Error(`File '${path}' can't be found`)
         if (mp && mp.root != '/') {
             file.path = file.path.slice(mp.root.length);
         }
