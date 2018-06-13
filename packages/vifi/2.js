@@ -82,13 +82,32 @@ class NodeFsWrapper {
     }
 }
 
+
+class Matcher {
+    constructor(isMatch) {
+        this.patterns = [];
+        this.isMatch = isMatch;
+    }
+    add(params) {
+        this.patterns.push(params);
+    }
+    match(pattern) {
+        return this.patterns.find(storedPattern => this.isMatch(pattern, storedPattern));
+    }
+    matchAll(pattern) {
+
+    }
+}
+
 class MainFileSystem {
     constructor() {
         this._loaders = [];
         this._mountingPoints = [];
+        const isMatch = (file, mp) => file.originalPath.indexOf(mp.root) == 0;
+        this._matcher = new Matcher(isMatch);
     }
     getMountPoint(file) {
-        return this._mountingPoints.find(mp => file.originalPath.indexOf(mp.root) == 0);
+        return this._matcher.match(file);
     }
     open(path) {
         const file = new File(path);
@@ -113,9 +132,8 @@ class MainFileSystem {
         if (vfs.readFile) {
             vfs = new NodeFsWrapper(vfs);
         }
-        this._mountingPoints.push({
-            root, vfs
-        });
+
+        this._matcher.add({ root, vfs });
     }
     loader(loader) {
         this._loaders.push(loader);
