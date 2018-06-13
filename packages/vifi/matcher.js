@@ -12,7 +12,7 @@ class Matcher {
         return this.patterns.find(storedPattern => this.isMatch(pattern, storedPattern));
     }
     matchAll(pattern) {
-
+        return this.patterns.filter(storedPattern => this.isMatch(pattern, storedPattern));
     }
 }
 
