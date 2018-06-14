@@ -88,22 +88,29 @@ class MainFileSystem {
     constructor() {
         this._loaders = [];
         this._mountingPoints = [];
-        const isMatch = (file, mp) => file.originalPath.indexOf(mp.root) == 0;
+
+        const isMatch = (path, mp) => path.indexOf(mp.root) == 0;
         this._matcher = new Matcher(isMatch);
     }
-    getMountPoint(file) {
-        return this._matcher.match(file);
+    createFile({ path, mountingPoint }) {
+        if (mountingPoint && mountingPoint.root != '/') {
+            path = path.slice(mountingPoint.root.length);
+        }
+
+        const file = new File(path);
+        file.connect(mountingPoint.vfs);
+        return file;
+    }
+    getMountPoint(path) {
+        return this._matcher.match(path);
     }
     open(path) {
-        const file = new File(path);
-        file.originalPath = path;
-        const mp = this.getMountPoint(file);
+        const mp = this.getMountPoint(path);
         if (!mp) throw new Error(`File '${path}' can't be found`)
-        if (mp && mp.root != '/') {
-            file.path = file.path.slice(mp.root.length);
-        }
-        file.connect(mp.vfs);
-        return file;
+        return this.createFile({
+            path,
+            mountingPoint: mp,
+        });
     }
     // read(file) {
     //     const mp = this.getMountPoint(file);
