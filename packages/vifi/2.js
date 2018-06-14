@@ -102,17 +102,17 @@ class MainFileSystem {
         if (mp && mp.root != '/') {
             file.path = file.path.slice(mp.root.length);
         }
-        file.connect(this);
+        file.connect(mp.vfs);
         return file;
     }
-    read(file) {
-        const mp = this.getMountPoint(file);
-        return mp.vfs.read(file);
-    }
-    write(file, data) {
-        const mp = this.getMountPoint(file);
-        return mp.vfs.write(file, data);
-    }
+    // read(file) {
+    //     const mp = this.getMountPoint(file);
+    //     return mp.vfs.read(file);
+    // }
+    // write(file, data) {
+    //     const mp = this.getMountPoint(file);
+    //     return mp.vfs.write(file, data);
+    // }
     mount(root, vfs) {
         if (vfs.readFile) {
             vfs = new NodeFsWrapper(vfs);
